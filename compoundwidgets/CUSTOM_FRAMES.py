@@ -1,7 +1,5 @@
 import tkinter as tk
 import tkinter.ttk as ttk
-from CUSTOM_BUTTONS import *
-from COMPOUND_WIDGETS import LabelCombo
 
 
 class CollapsableFrame(ttk.Frame):

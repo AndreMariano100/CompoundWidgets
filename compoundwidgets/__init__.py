@@ -1,4 +1,4 @@
-__version__ = "0.1.2"
+__version__ = "0.1.4"
 __author__ = 'Andre Mariano'
 __all__ = ['COMPOUND_WIDGETS', 'CUSTOM_BUTTONS', 'CUSTOM_FRAMES', 'MESSAGE_BOX_WIDGETS']
 
