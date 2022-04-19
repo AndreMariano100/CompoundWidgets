@@ -1,8 +1,3 @@
 __version__ = "0.1"
 __author__ = 'Andre Mariano'
-
-
-from COMPOUND_WIDGETS import *
-from CUSTOM_FRAMES import *
-from CUSTOM_BUTTONS import *
-from MESSAGE_BOX_WIDGETS import *
+__all__ = ['COMPOUND_WIDGETS', 'CUSTOM_BUTTONS', 'CUSTOM_FRAMES', 'MESSAGE_BOX_WIDGETS']
