@@ -3,15 +3,14 @@ from setuptools import setup
 setup(
     name='compoundwidgets',
     version='0.1',
-    description='Compound TTK Widgets',
+    author='Andre Mariano',
+    license="MIT",
     url='https://github.com/AndreMariano100/CompoundWidgets.git',
-    author='André Mariano',
+    description='Compound TTK Widgets with ttkbootstrap',
     author_email='andremariano100@gmail.com',
-    license='none',
     packages=['compoundwidgets'],
     install_requires=['ttkbootstrap'],
-
     classifiers=[
-        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3',
     ],
 )
