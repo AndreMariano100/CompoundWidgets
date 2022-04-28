@@ -1,7 +1,8 @@
 import tkinter.ttk as ttk
-import tkinter as tk
 from PIL import Image, ImageTk
 import os
+
+ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), 'IMAGES'))
 
 
 def open_image(file_name: str, size_x: int, size_y: int, maximize: bool = False) -> ImageTk:
@@ -33,8 +34,7 @@ def open_image(file_name: str, size_x: int, size_y: int, maximize: bool = False)
 class ClearButton(ttk.Button):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        root_path = os.getcwd().split('MAIN')[0]
-        image_path = os.path.join(root_path, 'MAIN_WIDGETS', 'IMAGES', 'clear.png')
+        image_path = os.path.join(ROOT_DIR, 'clear.png')
         tk_image = open_image(file_name=image_path, size_x=20, size_y=20)
 
         self.configure(text='LIMPAR\t\t', style='warning.TButton', width=15, image=tk_image, compound='right')
@@ -44,8 +44,7 @@ class ClearButton(ttk.Button):
 class SaveButton(ttk.Button):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        root_path = os.getcwd().split('MAIN')[0]
-        image_path = os.path.join(root_path, 'MAIN_WIDGETS', 'IMAGES', 'save.png')
+        image_path = os.path.join(ROOT_DIR, 'save.png')
         tk_image = open_image(file_name=image_path, size_x=20, size_y=20)
 
         self.configure(text='SALVAR\t\t', style='success.TButton', width=15, image=tk_image, compound='right')
@@ -55,8 +54,7 @@ class SaveButton(ttk.Button):
 class CancelButton(ttk.Button):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        root_path = os.getcwd().split('MAIN')[0]
-        image_path = os.path.join(root_path, 'MAIN_WIDGETS', 'IMAGES', 'no.png')
+        image_path = os.path.join(ROOT_DIR, 'no.png')
         tk_image = open_image(file_name=image_path, size_x=20, size_y=20)
 
         self.configure(text='CANCELAR\t', style='danger.TButton', width=15, image=tk_image, compound='right')
@@ -66,8 +64,7 @@ class CancelButton(ttk.Button):
 class YesButton(ttk.Button):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        root_path = os.getcwd().split('MAIN')[0]
-        image_path = os.path.join(root_path, 'MAIN_WIDGETS', 'IMAGES', 'yes.png')
+        image_path = os.path.join(ROOT_DIR, 'yes.png')
         tk_image = open_image(file_name=image_path, size_x=20, size_y=20)
 
         self.configure(text='SIM\t\t', style='success.TButton', width=15, image=tk_image, compound='right')
@@ -77,8 +74,7 @@ class YesButton(ttk.Button):
 class NoButton(ttk.Button):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        root_path = os.getcwd().split('MAIN')[0]
-        image_path = os.path.join(root_path, 'MAIN_WIDGETS', 'IMAGES', 'no.png')
+        image_path = os.path.join(ROOT_DIR, 'no.png')
         tk_image = open_image(file_name=image_path, size_x=20, size_y=20)
 
         self.configure(text='NÃO\t\t', style='danger.TButton', width=15, image=tk_image, compound='right')
@@ -88,8 +84,7 @@ class NoButton(ttk.Button):
 class CalculateButton(ttk.Button):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        root_path = os.getcwd().split('MAIN')[0]
-        image_path = os.path.join(root_path, 'MAIN_WIDGETS', 'IMAGES', 'calculate.png')
+        image_path = os.path.join(ROOT_DIR, 'calculate.png')
         tk_image = open_image(file_name=image_path, size_x=20, size_y=20)
 
         self.configure(text='CALCULAR\t', style='primary.TButton', width=15, image=tk_image, compound='right')
@@ -99,8 +94,7 @@ class CalculateButton(ttk.Button):
 class HelpButton(ttk.Button):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        root_path = os.getcwd().split('MAIN')[0]
-        image_path = os.path.join(root_path, 'MAIN_WIDGETS', 'IMAGES', 'help.png')
+        image_path = os.path.join(ROOT_DIR, 'help.png')
         tk_image = open_image(file_name=image_path, size_x=30, size_y=20)
 
         self.configure(style='secondary.TButton', image=tk_image)
@@ -110,19 +104,17 @@ class HelpButton(ttk.Button):
 class BackButton(ttk.Button):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        root_path = os.getcwd().split('MAIN')[0]
-        image_path = os.path.join(root_path, 'MAIN_WIDGETS', 'IMAGES', 'back.png')
+        image_path = os.path.join(ROOT_DIR, 'back.png')
         tk_image = open_image(file_name=image_path, size_x=30, size_y=20)
 
-        self.configure(text='VOLTAR\t\t', style='info.TButton', width=15, image=tk_image, compound='right')
+        self.configure(text='VOLTAR\t\t', style='primary.TButton', width=15, image=tk_image, compound='right')
         self.image = tk_image
 
 
 class AddToReport(ttk.Button):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        root_path = os.getcwd().split('MAIN')[0]
-        image_path = os.path.join(root_path, 'MAIN_WIDGETS', 'IMAGES', 'add_to_form.png')
+        image_path = os.path.join(ROOT_DIR, 'add_to_form.png')
         tk_image = open_image(file_name=image_path, size_x=16, size_y=16)
 
         self.configure(text='ADICIONAR\t', style='primary.TButton', width=13, image=tk_image, compound='right',
@@ -133,8 +125,7 @@ class AddToReport(ttk.Button):
 class EditReport(ttk.Button):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        root_path = os.getcwd().split('MAIN')[0]
-        image_path = os.path.join(root_path, 'MAIN_WIDGETS', 'IMAGES', 'edit_form.png')
+        image_path = os.path.join(ROOT_DIR, 'edit_form.png')
         tk_image = open_image(file_name=image_path, size_x=16, size_y=16)
 
         self.configure(text='EDITAR\t\t', style='primary.TButton', width=13, image=tk_image, compound='right',
@@ -145,44 +136,9 @@ class EditReport(ttk.Button):
 class RemoveFromReport(ttk.Button):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        root_path = os.getcwd().split('MAIN')[0]
-        image_path = os.path.join(root_path, 'MAIN_WIDGETS', 'IMAGES', 'remove_from_form.png')
+        image_path = os.path.join(ROOT_DIR, 'remove_from_form.png')
         tk_image = open_image(file_name=image_path, size_x=16, size_y=16)
 
         self.configure(text='EXCLUIR\t\t', style='primary.TButton', width=13, image=tk_image, compound='right',
                        padding=4)
         self.image = tk_image
-
-
-if __name__ == '__main__':
-
-    from ttkbootstrap import Style
-
-    root = tk.Tk()
-    root.columnconfigure(0, weight=1)
-    root.style = Style(theme='flatly')
-    root.minsize(250, 400)
-
-    ClearButton(root).grid(row=0, column=0, padx=10, pady=10)
-
-    SaveButton(root).grid(row=1, column=0, padx=10, pady=10)
-
-    CancelButton(root).grid(row=2, column=0, padx=10, pady=10)
-
-    CalculateButton(root).grid(row=3, column=0, padx=10, pady=10)
-
-    YesButton(root).grid(row=4, column=0, padx=10, pady=10)
-
-    NoButton(root).grid(row=5, column=0, padx=10, pady=10)
-
-    BackButton(root).grid(row=6, column=0, padx=10, pady=10)
-
-    HelpButton(root).grid(row=7, column=0, padx=10, pady=10)
-
-    AddToReport(root).grid(row=8, column=0, padx=10, pady=10)
-
-    EditReport(root).grid(row=9, column=0, padx=10, pady=10)
-
-    RemoveFromReport(root).grid(row=10, column=0, padx=10, pady=10)
-
-    root.mainloop()
