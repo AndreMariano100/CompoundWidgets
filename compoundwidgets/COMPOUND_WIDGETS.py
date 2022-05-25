@@ -572,7 +572,7 @@ class LabelEntryUnit (ttk.Frame):
         self.unit_combo.config(state='readonly', values=[])
 
     def get_entry(self):
-        return self.variable.get()
+        return self.variable.get() or 0
 
     def set_entry(self, value):
         self.variable.set(value)
@@ -584,7 +584,7 @@ class LabelEntryUnit (ttk.Frame):
         self.unit_combo.set(value)
 
     def get(self):
-        return self.variable.get(), self.unit_combo.get()
+        return self.get_entry(), self.get_unit()
 
     def set(self, value, unit):
         self.variable.set(value)

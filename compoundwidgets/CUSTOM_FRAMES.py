@@ -7,64 +7,56 @@ class CollapsableFrame(ttk.Frame):
     Creates a collapsable frame
     Input:
         parent - container for the frame
-        title - string for the title of the frame
+        title - title of the frame
         open_start - whether the frame initiates openned or closed
-
-    Relevant Attributes:
-        title_label - use to configure the local title: CollapsableFrame.title_label.config(text='My Title')
-        widgets_frame - use as container for the widgets: widget(CollapsableFrame.widget_frame, option=value).grid()
     """
 
-    def __init__(self, parent, title='', open_start=True, **kwargs):
+    def __init__(self, parent, title='Frame Title', open_start=True, **kwargs):
 
-        # Initialization
+        # Main container
         if True:
-            super().__init__(parent, **kwargs)
-            self.title_string = title
+            self.container = ttk.Frame(parent, style='primary.TFrame')
+            self.container.columnconfigure(0, weight=1)
+            self.container.rowconfigure(0, weight=1)
+            self.container.rowconfigure(1, weight=1)
 
-            self.rowconfigure(0, weight=0)
-            if open_start:
-                self.rowconfigure(1, weight=1)
-            else:
-                self.rowconfigure(1, weight=0)
-            self.columnconfigure(0, weight=1)
-            self.configure(style='primary.TFrame')
-
-        # Title Frame
+        # Title frame @ main container
         if True:
-            self.title_frame = ttk.Frame(self, style='primary.TFrame')
-            self.title_frame.grid(row=0, column=0, sticky='nsew')
-            self.title_frame.rowconfigure(0, weight=1)
-            self.title_frame.columnconfigure(0, weight=1)
-            self.title_frame.columnconfigure(1, weight=0)
+            title_frame = ttk.Frame(self.container, style='primary.TFrame')
+            title_frame.grid(row=0, column=0, sticky='nsew')
+            title_frame.rowconfigure(0, weight=1)
+            title_frame.columnconfigure(0, weight=1)
+            title_frame.columnconfigure(1, weight=0)
 
-        # Widgets at Title Frame
-        if True:
-            self.title_label = ttk.Label(self.title_frame, style='primary.Inverse.TLabel', font=('Helvetica', 10),
-                                         padding=5, text=self.title_string)
-            self.title_label.grid(row=0, column=0, sticky='nsew')
-            self.title_label.bind('<ButtonRelease-1>', self.check_collapse)
+            title_label = ttk.Label(title_frame, style='primary.Inverse.TLabel', font=('OpenSans', 12),
+                                    padding=5, text=title)
+            title_label.grid(row=0, column=0, sticky='nsew')
+            title_label.bind('<ButtonRelease-1>', self.check_collapse)
 
-            self.collapse_button = ttk.Label(self.title_frame, text='-', style='primary.TButton',
-                                             font=('OpenSans', 12, 'bold'), width=3, padding=0)
-            self.collapse_button.grid(row=0, column=1, sticky='nsew', padx=5)
+            self.collapse_button = ttk.Label(title_frame, text='-', style='primary.TButton',
+                                             font=('OpenSans', 12, 'bold'), width=2, padding=0)
+            self.collapse_button.grid(row=0, column=1, sticky='nsew')
             self.collapse_button.bind('<ButtonRelease-1>', self.check_collapse)
 
-        # Widget Frame
+        # Self initialization
         if True:
-            self.widgets_frame = ttk.Frame(self)
-            self.widgets_frame.grid(row=1, column=0, sticky='nsew', padx=1, pady=1)
-            self.widgets_frame.rowconfigure(0, weight=1)
-            self.widgets_frame.columnconfigure(0, weight=1)
+            super().__init__(self.container, **kwargs)
+            self.grid(row=1, column=0, sticky='nsew', padx=2, pady=2)
+            self.rowconfigure(0, weight=1)
+            self.columnconfigure(0, weight=1)
 
-            if not open_start:
-                self.widgets_frame.grid_remove()
+        # Delegate content geometry methods to container frame
+        _methods = vars(tk.Grid).keys()
+        for method in _methods:
+            if "grid" in method:
+                # prefix content frame methods with 'content_'
+                setattr(self, f"content_{method}", getattr(self, method))
+                # overwrite content frame methods from container frame
+                setattr(self, method, getattr(self.container, method))
 
-        # Start status adjust
-        if True:
-            if not open_start:
-                self.collapse_button['text'] = '+'
-                self.collapse_button.event_generate('<ButtonRelease-1>')
+        # Collapsed start adjust
+        if not open_start:
+            self.collapse_frame()
 
     def check_collapse(self, event):
 
@@ -80,85 +72,180 @@ class CollapsableFrame(ttk.Frame):
     def collapse_frame(self):
         self.collapse_button.configure(text='+')
         self.rowconfigure(1, weight=0)
-        self.widgets_frame.grid_remove()
+        self.content_grid_remove()
 
     def expand_frame(self):
         self.collapse_button.configure(text='-')
         self.rowconfigure(1, weight=1)
-        self.widgets_frame.grid()
+        self.content_grid()
 
     def is_collapsed(self):
         if self.collapse_button.cget('text') == '-':
             return False
         return True
 
-    def add_event(self, method):
-        if callable(method):
-            self.title_label.bind('<ButtonRelease-1>', method, add='+')
-            self.collapse_button.bind('<ButtonRelease-1>', method, add='+')
-
-        else:
-            raise Exception(f'Method {method} is not callable')
-
 
 class ScrollableFrame(ttk.Frame):
     """
-    Creates the frame with vertical scroll bar
-        Input:
+    Creates a frame with a vertical scrollbar.
+    Input:
         parent - container for the frame
-    Attributes:
-        self.widgets_frame - frame for the widgets
-    Methods:
-        adjust_scroll(event) - call to update the canvas vertical size
     """
 
-    def __init__(self, parent, **kwargs):
+    def __init__(self, master=None, **kwargs):
 
-        # Initialization
-        if True:
-            super().__init__(parent, **kwargs)
-            self.parent = parent
-            self.columnconfigure(0, weight=1)
-            self.columnconfigure(1, weight=0, minsize=10)
-            self.rowconfigure(0, weight=1)
-            self.rowconfigure(1, weight=0, minsize=10)
+        # content frame container
+        self.container = ttk.Frame(master)
+        self.container.bind("<Configure>", lambda _: self.yview())
+        self.container.propagate(False)
+        self.container.rowconfigure(0, weight=1)
+        self.container.columnconfigure(0, weight=1)
+        self.container.columnconfigure(1, weight=0, minsize=10)
 
-        # Scroll Canvas \ Scroll Bar \ Main Frame
-        if True:
-            # Scroll canvas
-            self.scroll_canvas = tk.Canvas(self, borderwidth=0, highlightthickness=0)
-            self.scroll_canvas.grid(row=0, column=0, sticky='nsew')
-            self.scroll_canvas.bind("<Configure>", self.adjust_scroll)
+        # content frame
+        super().__init__(self.container, **kwargs)
+        self.place(rely=0.0, relwidth=1.0)
 
-            # Scroll bar
-            y_scroll = ttk.Scrollbar(self, orient='vertical', command=self.scroll_canvas.yview)
-            y_scroll.grid(row=0, column=1, rowspan=2, sticky='nsew')
-            x_scroll = ttk.Scrollbar(self, orient='horizontal', command=self.scroll_canvas.xview)
-            x_scroll.grid(row=1, column=0, sticky='nsew')
+        # vertical scrollbar
+        self.vscroll = ttk.Scrollbar(self.container, command=self.yview, orient='vertical')
+        self.vscroll.pack(side='right', fill='y')
 
-            # Frame for the widgets
-            self.widgets_frame = ttk.Frame(self.scroll_canvas, padding=10, style='light.TFrame')
-            self.widgets_frame.grid(sticky='nsew')
-            self.widgets_frame.bind("<Configure>",
-                                    lambda e: self.scroll_canvas.configure(scrollregion=self.scroll_canvas.bbox("all")))
+        # widget event binding
+        self.container.bind("<Enter>", self._on_enter, "+")
+        self.container.bind("<Leave>", self._on_leave, "+")
+        self.container.bind("<Map>", self._on_map, "+")
+        self.bind("<<MapChild>>", self._on_map_child, "+")
 
-            # Putting the frame on the canvas
-            self.frame_id = self.scroll_canvas.create_window((0, 0), window=self.widgets_frame, anchor='nw')
-            self.scroll_canvas.configure(yscrollcommand=y_scroll.set, xscrollcommand=x_scroll.set)
+        # delegate content geometry methods to container frame
+        _methods = vars(tk.Pack).keys() | vars(tk.Grid).keys() | vars(tk.Place).keys()
+        for method in _methods:
+            if any(["pack" in method, "grid" in method, "place" in method]):
+                # prefix content frame methods with 'content_'
+                setattr(self, f"content_{method}", getattr(self, method))
+                # overwrite content frame methods from container frame
+                setattr(self, method, getattr(self.container, method))
 
-            # Binding the MouseWheel event
-            self.bind_all("<MouseWheel>", self._on_mousewheel)
+    def yview(self, *args):
+        """Update the vertical position of the content frame within the container.
+        Parameters:
+            *args (List[Any, ...]):
+                Optional arguments passed to yview in order to move the
+                content frame within the container frame.
+        """
+        if not args:
+            first, _ = self.vscroll.get()
+            self.yview_moveto(fraction=first)
+        elif args[0] == "moveto":
+            self.yview_moveto(fraction=float(args[1]))
+        elif args[0] == "scroll":
+            self.yview_scroll(number=int(args[1]), what=args[2])
+        else:
+            return
 
-    def adjust_scroll(self, event):
+    def yview_moveto(self, fraction: float):
+        """Update the vertical position of the content frame within the container.
+        Parameters:
+            fraction (float):
+                The relative position of the content frame within the container.
+        """
+        base, thumb = self._measures()
+        if fraction < 0:
+            first = 0.0
+        elif (fraction + thumb) > 1:
+            first = 1 - thumb
+        else:
+            first = fraction
+        self.vscroll.set(first, first + thumb)
+        self.content_place(rely=-first * base)
 
-        self.update()
-        required_height = self.widgets_frame.winfo_reqheight()
-        required_width = self.widgets_frame.winfo_reqwidth()
+    def yview_scroll(self, number: int, what: str):
+        """Update the vertical position of the content frame within the
+        container.
 
-        final_width = max(required_width, self.winfo_width()) - 10
-        final_height = max(required_height, self.winfo_height()) - 10
-        self.scroll_canvas.itemconfigure(self.frame_id, width=final_width, height=final_height)
-        self.scroll_canvas.configure(scrollregion=f'0 0 {final_width} {final_height}')
+        Parameters:
+
+            number (int):
+                The amount by which the content frame will be moved
+                within the container frame by 'what' units.
+
+            what (str):
+                The type of units by which the number is to be interpeted.
+                This parameter is currently not used and is assumed to be
+                'units'.
+        """
+        first, _ = self.vscroll.get()
+        fraction = (number / 100) + first
+        self.yview_moveto(fraction)
+
+    def _measures(self):
+        """Measure the base size of the container and the thumb size
+        for use in the yview methods"""
+        outer = self.container.winfo_height()
+        inner = max([self.winfo_height(), outer])
+        base = inner / outer
+        if inner == outer:
+            thumb = 1.0
+        else:
+            thumb = outer / inner
+        return base, thumb
+
+    def _on_map_child(self, event):
+        """Callback for when a widget is mapped to the content frame."""
+        if self.container.winfo_ismapped():
+            self.yview()
+
+    def _on_enter(self, event):
+        """Callback for when the mouse enters the widget."""
+
+        children = self.winfo_children()
+        for widget in [self, *children]:
+            bindings = widget.bind()
+            if "<MouseWheel>" not in bindings:
+                widget.bind("<MouseWheel>", self._on_mousewheel, "+")
+
+    def _on_leave(self, event):
+        """Callback for when the mouse leaves the widget."""
+        children = self.winfo_children()
+        for widget in [self, *children]:
+            widget.unbind("<MouseWheel>")
+
+    def _on_configure(self, event):
+        """Callback for when the widget is configured"""
+        self.yview()
+
+    def _on_map(self, event):
+        self.yview()
 
     def _on_mousewheel(self, event):
-        self.scroll_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+        """Callback for when the mouse wheel is scrolled."""
+        delta = -int(event.delta / 30)
+        self.yview_scroll(delta, 'units')
+
+
+if __name__ == '__main__':
+    from ttkbootstrap import Style
+
+    root = tk.Tk()
+    root.syle = Style()
+    root.minsize(800, 600)
+    root.columnconfigure(0, weight=1)
+    frame_1 = CollapsableFrame(root, title='First Frame')
+    frame_1.grid(row=0, column=0, sticky='nsew', padx=10, pady=10)
+
+    label = ttk.Label(frame_1, text='Some label')
+    label.grid(row=0, column=0, sticky='nsew', padx=10, pady=20)
+
+    frame_2 = CollapsableFrame(root, title='Second Frame')
+    frame_2.grid(row=1, column=0, sticky='nsew', padx=10, pady=10)
+
+    root.rowconfigure(2, weight=1)
+    frame_3 = ScrollableFrame(root)
+    frame_3.grid(row=2, column=0, sticky='nsew', padx=10, pady=10)
+    frame_3.columnconfigure(0, weight=1)
+
+    for i in range(30):
+        frame_3.rowconfigure(i, weight=1)
+        label = ttk.Label(frame_3, text=f'Label {i}', style='secondary.Inverse.TLabel')
+        label.grid(row=i, column=0, sticky='nsew', pady=2)
+
+    root.mainloop()
