@@ -7,3 +7,4 @@ Change Log
 0.1.4 (19/04/2022) - Bugs corrected
 0.1.5 (19/04/2022) - Test files added
 0.1.6 (25/05/2022) - Corrections on frames widgets
+0.1.7 (18/07/2022) - ttk.spinbox added for float values (LabelSpinbox)

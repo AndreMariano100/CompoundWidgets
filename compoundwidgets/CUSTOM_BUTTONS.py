@@ -117,7 +117,7 @@ class AddToReport(ttk.Button):
         image_path = os.path.join(ROOT_DIR, 'add_to_form.png')
         tk_image = open_image(file_name=image_path, size_x=16, size_y=16)
 
-        self.configure(text='ADICIONAR\t', style='primary.TButton', width=13, image=tk_image, compound='right',
+        self.configure(text='ADICIONAR\t', style='success.TButton', width=13, image=tk_image, compound='right',
                        padding=4)
         self.image = tk_image
 
@@ -139,6 +139,6 @@ class RemoveFromReport(ttk.Button):
         image_path = os.path.join(ROOT_DIR, 'remove_from_form.png')
         tk_image = open_image(file_name=image_path, size_x=16, size_y=16)
 
-        self.configure(text='EXCLUIR\t\t', style='primary.TButton', width=13, image=tk_image, compound='right',
+        self.configure(text='EXCLUIR\t\t', style='danger.TButton', width=13, image=tk_image, compound='right',
                        padding=4)
         self.image = tk_image

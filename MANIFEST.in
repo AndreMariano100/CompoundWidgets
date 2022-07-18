@@ -1,1 +1,2 @@
 global-include *.py *.png
+recursive-include CompoundWidgets/compoundwidgets/images *

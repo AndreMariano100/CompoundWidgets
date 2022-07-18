@@ -864,3 +864,118 @@ class LabelText (ttk.Frame):
     def set(self, value):
         self.text.delete('1.0', tk.END)
         self.text.insert('1.0', value)
+
+
+class LabelSpinbox(ttk.Frame):
+    """
+        Create a compound widget, with a label and a Spinbox.
+        Input:
+            parent: container in which the widgets will be created
+            label_text: string to be shown on the label
+            label_anchor - position of the text within the label
+            label_width: label width in number of characters
+            entry_width: entry width in number of characters
+            entry_method: method to associate when the entry events
+            spin_start: initial value
+            spin_end: end_value
+            spin_increment: increment
+        Methods:
+            enable method:
+                enables the widgets (state='normal')
+            disable method:
+                disables the widgets (state='disabled')
+            read_only method:
+                disabled edition of the entry widget (state='readonly')
+            get method:
+                gets the value from the entry widget
+            set method:
+                sets the value to the entry widget
+        """
+
+    def __init__(self, parent,
+                 label_text='label:',
+                 label_anchor='e',
+                 label_width=10,
+                 entry_width=5,
+                 entry_method=None,
+                 spin_start=0,
+                 spin_end=10,
+                 spin_increment=1,
+                 spin_precision=1
+                 ):
+
+        # Parent class initialization
+        super().__init__(parent)
+        self.increment = spin_increment
+        self.start = spin_start
+        self.end = spin_end
+        self.precision = spin_precision
+
+        # Frame configuration
+        if True:
+            self.rowconfigure(0, weight=1)
+            self.columnconfigure(0, weight=1)
+            self.columnconfigure(1, weight=0)
+
+        # Label
+        if True:
+            self.label = ttk.Label(self, text=label_text, anchor=label_anchor, width=label_width)
+            self.label.grid(row=0, column=0, sticky='ew', padx=2)
+
+        # Spinbox
+        if True:
+            self.variable = tk.DoubleVar(value=spin_start)
+            self.spin = ttk.Spinbox(self, textvariable=self.variable, justify='center', width=entry_width,
+                                    from_=spin_start, to=spin_end, increment=spin_increment)
+            self.spin.grid(row=0, column=1, sticky='ew', padx=2)
+
+        # Bind method
+        if True:
+            self.spin.bind("<Return>", entry_method)
+            self.spin.bind("<FocusOut>", entry_method)
+            self.spin.bind("<<Increment>>", self._do_on_increment)
+            self.spin.bind("<<Decrement>>", self._do_on_decrement)
+
+    def enable(self):
+        self.label.config(style='TLabel')
+        self.spin.config(state='normal')
+
+    def disable(self):
+        self.label.config(style='secondary.TLabel')
+        self.spin.config(state='disabled')
+
+    def readonly(self):
+        self.label.config(style='TLabel')
+        self.spin.config(state='readonly')
+
+    def _do_on_increment(self, *args, **kwargs):
+        self.do_upon_clicking_arrows("up")
+        return "break"
+
+    def _do_on_decrement(self, *args, **kwargs):
+        self.do_upon_clicking_arrows("down")
+        return "break"
+
+    def do_upon_clicking_arrows(self, direction):
+
+        if direction == 'up':
+            sign = 1
+            if self.get() >= self.end:
+                self.set(self.end)
+
+            else:
+                self.set(self.get() + sign * self.increment)
+        else:
+            sign = -1
+            if self.get() <= self.start:
+                self.set(self.start)
+
+            else:
+                self.set(self.get() + sign * self.increment)
+
+    def get(self):
+        return self.variable.get()
+
+    def set(self, value):
+        self.variable.set(round(value, self.precision))
+
