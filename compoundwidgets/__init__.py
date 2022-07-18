@@ -1,6 +1,6 @@
-__version__ = "0.1.4"
+__version__ = "0.1.7"
 __author__ = 'Andre Mariano'
-__all__ = ['COMPOUND_WIDGETS', 'CUSTOM_BUTTONS', 'CUSTOM_FRAMES', 'MESSAGE_BOX_WIDGETS']
+__all__ = ['COMPOUND_WIDGETS', 'CUSTOM_BUTTONS', 'CUSTOM_FRAMES', 'MESSAGE_BOX_WIDGETS', 'IMAGES']
 
 from .COMPOUND_WIDGETS import CheckLedButton
 from .COMPOUND_WIDGETS import LabelCombo

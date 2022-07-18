@@ -1,6 +1,4 @@
-# python setup.py sdist
-
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='compoundwidgets',
@@ -12,6 +10,8 @@ setup(
     author_email='andremariano100@gmail.com',
     packages=['compoundwidgets', 'compoundwidgets.IMAGES'],
     install_requires=['ttkbootstrap', 'Pillow'],
+    include_package_data=True,
+    package_data={"IMAGES": ["*.png"]},
     classifiers=[
         'Programming Language :: Python :: 3',
     ],
