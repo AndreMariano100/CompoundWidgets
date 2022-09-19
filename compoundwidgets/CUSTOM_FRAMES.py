@@ -8,7 +8,7 @@ class CollapsableFrame(ttk.Frame):
     Input:
         parent - container for the frame
         title - title of the frame
-        open_start - whether the frame initiates openned or closed
+        open_start - whether the frame initiates opened or closed
     """
 
     def __init__(self, parent, title='Frame Title', open_start=True, **kwargs):
@@ -97,10 +97,10 @@ class ScrollableFrame(ttk.Frame):
         # content frame container
         self.container = ttk.Frame(master)
         self.container.bind("<Configure>", lambda _: self.yview())
-        self.container.propagate(False)
+        # self.container.propagate(False)
         self.container.rowconfigure(0, weight=1)
         self.container.columnconfigure(0, weight=1)
-        self.container.columnconfigure(1, weight=0, minsize=10)
+        self.container.columnconfigure(1, weight=0)
 
         # content frame
         super().__init__(self.container, **kwargs)
@@ -220,32 +220,3 @@ class ScrollableFrame(ttk.Frame):
         """Callback for when the mouse wheel is scrolled."""
         delta = -int(event.delta / 30)
         self.yview_scroll(delta, 'units')
-
-
-if __name__ == '__main__':
-    from ttkbootstrap import Style
-
-    root = tk.Tk()
-    root.syle = Style()
-    root.minsize(800, 600)
-    root.columnconfigure(0, weight=1)
-    frame_1 = CollapsableFrame(root, title='First Frame')
-    frame_1.grid(row=0, column=0, sticky='nsew', padx=10, pady=10)
-
-    label = ttk.Label(frame_1, text='Some label')
-    label.grid(row=0, column=0, sticky='nsew', padx=10, pady=20)
-
-    frame_2 = CollapsableFrame(root, title='Second Frame')
-    frame_2.grid(row=1, column=0, sticky='nsew', padx=10, pady=10)
-
-    root.rowconfigure(2, weight=1)
-    frame_3 = ScrollableFrame(root)
-    frame_3.grid(row=2, column=0, sticky='nsew', padx=10, pady=10)
-    frame_3.columnconfigure(0, weight=1)
-
-    for i in range(30):
-        frame_3.rowconfigure(i, weight=1)
-        label = ttk.Label(frame_3, text=f'Label {i}', style='secondary.Inverse.TLabel')
-        label.grid(row=i, column=0, sticky='nsew', pady=2)
-
-    root.mainloop()

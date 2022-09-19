@@ -116,13 +116,13 @@ class LedButton (ttk.Frame):
         if str(self.label.cget('state')) == 'disabled':
             return
         self.color_canvas.config(bg=self.selected_color)
-        self.label.config(style='primary.TButton')
+        # self.label.config(style='primary.TButton')
 
     def deselect(self, event=None):
         if str(self.label.cget('state')) == 'disabled':
             return
         self.color_canvas.config(bg=self.deselected_color)
-        self.label.config(style='secondary.TButton')
+        # self.label.config(style='secondary.TButton')
 
 
 class CheckLedButton (ttk.Frame):
@@ -222,14 +222,14 @@ class CheckLedButton (ttk.Frame):
             return
         self.color_canvas_1.config(bg=self.bg_color)
         self.color_canvas_2.config(bg=self.selected_color)
-        self.label.config(style='primary.TButton')
+        # self.label.config(style='primary.TButton')
 
     def deselect(self):
         if str(self.label.cget('state')) == 'disabled':
             return
         self.color_canvas_1.config(bg=self.deselected_color)
         self.color_canvas_2.config(bg=self.bg_color)
-        self.label.config(style='secondary.TButton')
+        # self.label.config(style='secondary.TButton')
 
     def is_selected(self):
         if self.color_canvas_2.cget('bg') == self.selected_color:
@@ -321,11 +321,11 @@ class RadioLedButton(ttk.Frame):
 
     def select(self):
         self.color_canvas.config(bg=self.selected_color)
-        self.label.config(style='primary.TButton')
+        # self.label.config(style='primary.TButton')
 
     def deselect(self):
         self.color_canvas.config(bg=self.deselected_color)
-        self.label.config(style='secondary.TButton')
+        # self.label.config(style='secondary.TButton')
 
     def enable(self):
         self.color_canvas.config(bg=self.deselected_color)
@@ -495,10 +495,10 @@ class LabelEntryUnit (ttk.Frame):
     def __init__(self, parent,
                  label_text='Label:',
                  label_anchor='e',
-                 label_width=30,
+                 label_width=None,
                  entry_value='',
                  entry_numeric=False,
-                 entry_width=10,
+                 entry_width=None,
                  entry_max_char=None,
                  entry_method=None,
                  combobox_unit=None,
@@ -520,14 +520,18 @@ class LabelEntryUnit (ttk.Frame):
 
         # Label
         if True:
-            self.label = ttk.Label(self, text=label_text, anchor=label_anchor, width=label_width)
+            self.label = ttk.Label(self, text=label_text, anchor=label_anchor)
             self.label.grid(row=0, column=0, sticky='ew', padx=2)
-
+            if label_width:
+                self.label['width'] = label_width
         # Entry
         if True:
             self.variable = tk.StringVar(value=entry_value)
-            self.entry = ttk.Entry(self, textvariable=self.variable, justify='center', width=entry_width)
+            self.entry = ttk.Entry(self, textvariable=self.variable, justify='center')
             self.entry.grid(row=0, column=1, sticky='ew', padx=2)
+
+            if entry_width:
+                self.entry['width'] = entry_width
 
         # Restrict numeric values
         if entry_numeric:
@@ -639,10 +643,10 @@ class LabelCombo (ttk.Frame):
     def __init__(self, parent,
                  label_text='Label:',
                  label_anchor='e',
-                 label_width=10,
+                 label_width=None,
                  combo_value='',
                  combo_list=('No values informed',),
-                 combo_width=20,
+                 combo_width=None,
                  combo_method=None):
 
         # Parent class initialization
@@ -656,18 +660,24 @@ class LabelCombo (ttk.Frame):
 
         # Label configuration
         if True:
-            self.label = ttk.Label(self, text=label_text, anchor=label_anchor, width=label_width)
+            self.label = ttk.Label(self, text=label_text, anchor=label_anchor)
             self.label.grid(row=0, column=0, sticky='ew', padx=2)
 
-        # Combo box configuration
+            if label_width:
+                self.label['width'] = label_width
+
+        # Combobox configuration
         if True:
             self.combo_list = combo_list
             self.variable = tk.StringVar(value=combo_value)
-            self.combobox = ttk.Combobox(self, textvariable=self.variable, justify='center', width=combo_width,
+            self.combobox = ttk.Combobox(self, textvariable=self.variable, justify='center',
                                          values=combo_list, state='readonly')
             self.combobox.grid(row=0, column=1, sticky='ew', padx=2)
 
-        # Bind method
+            if combo_width:
+                self.combobox['width'] = combo_width
+
+        # Combobox bind to method
         if True:
             self.combobox.bind('<<ComboboxSelected>>', combo_method)
 
@@ -720,9 +730,9 @@ class LabelEntry (ttk.Frame):
                  label_text='label:',
                  label_anchor='e',
                  entry_value='',
-                 label_width=10,
+                 label_width=None,
                  entry_numeric=False,
-                 entry_width=20,
+                 entry_width=None,
                  entry_max_char=None,
                  entry_method=None):
 
@@ -741,14 +751,20 @@ class LabelEntry (ttk.Frame):
 
         # Label
         if True:
-            self.label = ttk.Label(self, text=label_text, anchor=label_anchor, width=label_width)
+            self.label = ttk.Label(self, text=label_text, anchor=label_anchor)
             self.label.grid(row=0, column=0, sticky='ew', padx=2)
+
+            if label_width:
+                self.label['width'] = label_width
 
         # Entry
         if True:
             self.variable = tk.StringVar(value=entry_value)
-            self.entry = ttk.Entry(self, textvariable=self.variable, justify='center', width=entry_width)
+            self.entry = ttk.Entry(self, textvariable=self.variable, justify='center')
             self.entry.grid(row=0, column=1, sticky='ew', padx=2)
+
+            if entry_width:
+                self.entry['width'] = entry_width
 
         # Restrict numeric values
         if entry_numeric:
@@ -758,7 +774,7 @@ class LabelEntry (ttk.Frame):
         elif entry_max_char:
             self.entry.config(validate='all', validatecommand=(validate_chars, '%d', '%P', entry_max_char))
 
-        # Bind method
+        # Entry bind to method
         if True:
             self.entry.bind("<Return>", entry_method)
             self.entry.bind("<FocusOut>", entry_method)
@@ -807,37 +823,62 @@ class LabelText (ttk.Frame):
     def __init__(self, parent,
                  label_text='label:',
                  label_anchor='e',
-                 label_width=20,
+                 label_width=None,
                  text_value='',
-                 text_width=20,
-                 text_height=3,
-                 text_method=None):
+                 text_width=None,
+                 text_height=None,
+                 text_method=None,
+                 sided=True):
 
         # Parent class initialization
         super().__init__(parent)
 
         # Frame configuration
         if True:
-            self.rowconfigure(0, weight=1)
-            self.columnconfigure(0, weight=0)
-            self.columnconfigure(1, weight=1)
-            self.columnconfigure(2, weight=0)
-
+            if sided:
+                self.rowconfigure(0, weight=1)
+                self.columnconfigure(0, weight=0)
+                self.columnconfigure(1, weight=1)
+                self.columnconfigure(2, weight=0)
+            else:
+                self.rowconfigure(0, weight=0)
+                self.rowconfigure(0, weight=1)
+                self.columnconfigure(0, weight=1)
+                self.columnconfigure(1, weight=0)
         # Label
         if True:
-            self.label = ttk.Label(self, text=label_text, anchor=label_anchor, width=label_width)
-            self.label.grid(row=0, column=0, sticky='ne', padx=2, pady=2)
+            self.label = ttk.Label(self, text=label_text, anchor=label_anchor)
+            if sided:
+                self.label.grid(row=0, column=0, sticky='ne', padx=2, pady=2)
+            else:
+                self.label.grid(row=0, column=0, columnspan=2,
+                                sticky='nsew', padx=2, pady=2)
+            if label_width:
+                self.label['width'] = label_width
 
         # Text
         if True:
-            self.text = tk.Text(self, width=text_width, height=text_height, wrap=tk.WORD)
-            self.text.grid(row=0, column=1, sticky='nsew', padx=2, pady=2)
+            self.text = tk.Text(self, height=text_height, wrap=tk.WORD)
+            self.disabled_color = parent.winfo_toplevel().style.colors.secondary
+            self.enabled_color = self.text.cget('fg')
+            if sided:
+                self.text.grid(row=0, column=1, sticky='nsew', padx=2, pady=2)
+            else:
+                self.text.grid(row=1, column=0, sticky='nsew', padx=2, pady=2)
+
             self.set(text_value)
+            if text_width:
+                self.text['width'] = text_width
+            if text_height:
+                self.text['height'] = text_height
 
         # Scroll bar
         if True:
             y_scroll = ttk.Scrollbar(self, orient='vertical', command=self.text.yview)
-            y_scroll.grid(row=0, column=2, sticky='ns')
+            if sided:
+                y_scroll.grid(row=0, column=2, sticky='ns')
+            else:
+                y_scroll.grid(row=1, column=1, sticky='ns')
             self.text.configure(yscrollcommand=y_scroll.set)
             self.text.bind('<MouseWheel>', self.on_mouse_wheel)
             y_scroll.bind('<MouseWheel>', self.on_mouse_wheel)
@@ -853,17 +894,27 @@ class LabelText (ttk.Frame):
     def enable(self):
         self.label.config(style='TLabel')
         self.text.config(state='normal')
+        self.text.config(fg=self.enabled_color)
 
     def disable(self):
         self.label.config(style='secondary.TLabel')
         self.text.config(state='disabled')
+        self.text.config(fg=self.disabled_color)
+
+    def readonly(self):
+        self.label.config(style='TLabel')
+        self.text.config(state='disabled')
+        self.text.config(fg=self.enabled_color)
 
     def get(self):
         return str(self.text.get('1.0', tk.END)).rstrip('\n')
 
     def set(self, value):
+        state = self.text.cget('state')
+        self.text.config(state='normal')
         self.text.delete('1.0', tk.END)
         self.text.insert('1.0', value)
+        self.text.config(state=state)
 
 
 class LabelSpinbox(ttk.Frame):
@@ -895,8 +946,8 @@ class LabelSpinbox(ttk.Frame):
     def __init__(self, parent,
                  label_text='label:',
                  label_anchor='e',
-                 label_width=10,
-                 entry_width=5,
+                 label_width=None,
+                 entry_width=None,
                  entry_method=None,
                  spin_start=0,
                  spin_end=10,
@@ -919,15 +970,21 @@ class LabelSpinbox(ttk.Frame):
 
         # Label
         if True:
-            self.label = ttk.Label(self, text=label_text, anchor=label_anchor, width=label_width)
+            self.label = ttk.Label(self, text=label_text, anchor=label_anchor)
             self.label.grid(row=0, column=0, sticky='ew', padx=2)
+
+            if label_width:
+                self.label['width'] = label_width
 
         # Spinbox
         if True:
             self.variable = tk.DoubleVar(value=spin_start)
-            self.spin = ttk.Spinbox(self, textvariable=self.variable, justify='center', width=entry_width,
+            self.spin = ttk.Spinbox(self, textvariable=self.variable, justify='center',
                                     from_=spin_start, to=spin_end, increment=spin_increment)
             self.spin.grid(row=0, column=1, sticky='ew', padx=2)
+
+            if entry_width:
+                self.spin['width'] = entry_width
 
         # Bind method
         if True:

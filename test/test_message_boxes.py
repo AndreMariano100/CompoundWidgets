@@ -34,6 +34,10 @@ def show_warning_box():
     cw.WarningBox(root, message='This is a Warning box!').show()
 
 
+def show_success_box():
+    cw.SuccessBox(root, message='This is a Success box!').show()
+
+
 # Root
 root = tk.Tk()
 root.title('Message Box Testing')
@@ -55,8 +59,11 @@ button.grid(row=2, column=0, sticky='nsew', padx=10, pady=10)
 button = ttk.Button(root, text='Warning Box', command=show_warning_box)
 button.grid(row=3, column=0, sticky='nsew', padx=10, pady=10)
 
-button = ttk.Button(root, text='Tool Tip')
+button = ttk.Button(root, text='Success Box', command=show_success_box)
 button.grid(row=4, column=0, sticky='nsew', padx=10, pady=10)
+
+button = ttk.Button(root, text='Tool Tip')
+button.grid(row=5, column=0, sticky='nsew', padx=10, pady=10)
 tool_tip_text = "This is a sample help text, that will be shown on a pop up window in the form of a tool tip"
 cw.Tooltip(button, text=tool_tip_text, wrap_length=200)
 

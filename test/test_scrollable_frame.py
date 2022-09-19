@@ -16,16 +16,16 @@ root.columnconfigure(0, weight=1)
 root.rowconfigure(0, weight=1)
 
 # Create frame instance
-frame = cw.ScrollableFrame(root)
+frame = cw.ScrollableFrame(root, style='warning.TFrame')
 frame.grid(row=0, column=0, sticky='nsew', padx=10, pady=10)
 # The scroll is not active while all widgets fit in the frame
 
 # To add widgets to the frame, they shall be children of its 'widgets_frame' as follows
-frame.widgets_frame.columnconfigure(0, weight=1)
-for i in range(20):
-    label = ttk.Label(frame.widgets_frame, text=f'This is label {i}')
-    label.grid(row=i, column=0, sticky='nsew', pady=5)
+frame.columnconfigure(0, weight=1)
+for i in range(10):
+    label = ttk.Label(frame, text=f'This is label {i}', style='secondary.Inverse.TLabel')
+    label.grid(row=i, column=0, sticky='nsew', pady=5, padx=20)
 
-# the srollable frame does not behave apropriatelly if you use two of the on the same container
+# the scrollable frame does not behave apropriately if you use two of the on the same container
 
 root.mainloop()

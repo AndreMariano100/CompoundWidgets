@@ -8,3 +8,6 @@ Change Log
 0.1.5 (19/04/2022) - Test files added
 0.1.6 (25/05/2022) - Corrections on frames widgets
 0.1.7 (18/07/2022) - ttk.spinbox added for float values (LabelSpinbox)
+0.1.8 (18/07/2022) - Image upload correction
+0.1.9 (18/07/2022) - LabelText disabled foreground color correction
+0.1.10 (18/09/2022) - SuccessBox Added

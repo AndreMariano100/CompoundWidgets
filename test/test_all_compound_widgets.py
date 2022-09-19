@@ -16,7 +16,7 @@ if True:
 
     frame.columnconfigure(0, weight=1)
 
-    led_button_1 = cw.LedButton(frame, label_text='First Button', label_width=20,
+    led_button_1 = cw.LedButton(frame, label_text='First Button', label_width=10,
                                 label_method=lambda e: print('first led button'))
     led_button_1.grid(row=0, column=0, sticky='nsew', pady=(10, 0), padx=10)
 
@@ -24,7 +24,7 @@ if True:
                                 label_method=lambda e: print('second led button'))
     led_button_2.grid(row=1, column=0, sticky='nsew', pady=(10, 0), padx=10)
 
-    led_button_3 = cw.LedButton(frame, label_text='Third Button', label_width=15,
+    led_button_3 = cw.LedButton(frame, label_text='Third Button', label_width=10,
                                 label_method=lambda e: print('third led button'))
     led_button_3.grid(row=2, column=0, sticky='nsew', pady=10, padx=10)
     led_button_3.disable()
@@ -37,7 +37,7 @@ if True:
 
     frame.columnconfigure(0, weight=1)
 
-    led_button_1 = cw.CheckLedButton(frame, label_text='First Button', label_width=20,
+    led_button_1 = cw.CheckLedButton(frame, label_text='First Button', label_width=10,
                                      label_method=lambda e: print('first led button'))
     led_button_1.grid(row=0, column=0, sticky='nsew', pady=(10, 0), padx=10)
 
@@ -45,7 +45,7 @@ if True:
                                      label_method=lambda e: print('second led button'))
     led_button_2.grid(row=1, column=0, sticky='nsew', pady=(10, 0), padx=10)
 
-    led_button_3 = cw.CheckLedButton(frame, label_text='Third Button', label_width=15,
+    led_button_3 = cw.CheckLedButton(frame, label_text='Third Button', label_width=10,
                                      label_method=lambda e: print('third led button'))
     led_button_3.grid(row=2, column=0, sticky='nsew', pady=10, padx=10)
     led_button_3.disable()
@@ -136,9 +136,18 @@ if True:
     frame = ttk.LabelFrame(root, text='Label Text')
     frame.grid(row=1, column=2, columnspan=2, sticky='nsew', padx=10, pady=10)
     frame.rowconfigure(0, weight=1)
-    local_list = ('Label Text 1', 'Label Text 2')
+    local_list = ('Label Text 1', 'Label Text 2', 'Label Text 3')
+    sided = (False, True, True)
     for i, item in enumerate(local_list):
-        w = cw.LabelText(frame, label_text=item)
+        w = cw.LabelText(frame, label_text=item, sided=sided[i])
         w.grid(row=0, column=i, sticky='nsew')
+        if i == 1:
+            w.disable()
+        elif i == 2:
+            w.readonly()
+
+        w.set(item)
+
+
 
 root.mainloop()

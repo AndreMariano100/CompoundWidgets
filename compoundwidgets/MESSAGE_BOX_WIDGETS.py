@@ -30,13 +30,13 @@ class OkCancelBox(tk.Toplevel):
             label = ttk.Label(self, text=message, anchor='center', justify='center', padding=10, wraplength=300)
             label.grid(row=0, column=0, columnspan=2, sticky='nsew')
 
-            cancel_button = ttk.Button(self, text="Cancel", command=lambda: self.adjust_var(0), width=10,
-                                       style='danger.TButton')
-            cancel_button.grid(row=1, column=0, sticky='nsew', padx=30, pady=(0, 10))
-
             ok_button = ttk.Button(self, text="OK", command=lambda: self.adjust_var(1), width=10,
                                    style='success.TButton')
-            ok_button.grid(row=1, column=1, sticky='nsew', padx=30, pady=(0, 10))
+            ok_button.grid(row=1, column=0, sticky='nsew', padx=30, pady=(0, 10))
+
+            cancel_button = ttk.Button(self, text="Cancel", command=lambda: self.adjust_var(0), width=10,
+                                       style='danger.TButton')
+            cancel_button.grid(row=1, column=1, sticky='nsew', padx=30, pady=(0, 10))
 
         # Determine relative position
         if True:
@@ -91,13 +91,13 @@ class YesNoBox(tk.Toplevel):
             label = ttk.Label(self, text=message, anchor='center', justify='center', padding=10, wraplength=300)
             label.grid(row=0, column=0, columnspan=2, sticky='nsew')
 
-            no_button = ttk.Button(self, text="NO", command=lambda: self.adjust_var(0), width=10,
-                                   style='danger.TButton')
-            no_button.grid(row=1, column=0, sticky='nsew', padx=30, pady=(0, 10))
-
             yes_button = ttk.Button(self, text="YES", command=lambda: self.adjust_var(1), width=10,
                                     style='success.TButton')
-            yes_button.grid(row=1, column=1, sticky='nsew', padx=30, pady=(0, 10))
+            yes_button.grid(row=1, column=0, sticky='nsew', padx=30, pady=(0, 10))
+
+            no_button = ttk.Button(self, text="NO", command=lambda: self.adjust_var(0), width=10,
+                                   style='danger.TButton')
+            no_button.grid(row=1, column=1, sticky='nsew', padx=30, pady=(0, 10))
 
         # Determine relative position
         if True:
@@ -210,6 +210,51 @@ class WarningBox(tk.Toplevel):
 
             ok_button = ttk.Button(self, text="OK", command=lambda: self.destroy(), width=10,
                                    style='danger.TButton')
+            ok_button.grid(row=1, column=0, sticky='nsew', padx=30, pady=(0, 10))
+
+        # Determine relative position
+        if True:
+            position_x = parent.winfo_x()
+            position_y = parent.winfo_y()
+            height = parent.winfo_height()
+            width = parent.winfo_width()
+
+            local_height = self.minsize()[1]
+            local_width = self.minsize()[0]
+
+            final_position = (position_x + width / 2 - local_width / 2, position_y + height / 2 - local_height / 2)
+            self.geometry('%dx%d+%d+%d' % (local_width, local_height, final_position[0], final_position[1]))
+            self.grab_set()
+
+    def show(self):
+        self.deiconify()
+        self.wait_window()
+        return
+
+
+class SuccessBox(tk.Toplevel):
+    """ Creates a message box with the same style as the main application """
+
+    def __init__(self, parent, message):
+
+        # Configuration
+        if True:
+            super().__init__(parent)
+            self.minsize(350, 150)
+            self.columnconfigure(0, weight=1)
+            self.rowconfigure(0, weight=1)
+            self.rowconfigure(1, weight=0)
+            self.overrideredirect(True)
+            self.config(padx=10, pady=10, bd=1, relief='raised')
+            self.lift()
+
+        # Widgets
+        if True:
+            label = ttk.Label(self, text=message, anchor='center', justify='center', padding=10, wraplength=300)
+            label.grid(row=0, column=0, sticky='nsew')
+
+            ok_button = ttk.Button(self, text="OK", command=lambda: self.destroy(), width=10,
+                                   style='success.TButton')
             ok_button.grid(row=1, column=0, sticky='nsew', padx=30, pady=(0, 10))
 
         # Determine relative position
