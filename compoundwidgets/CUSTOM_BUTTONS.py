@@ -142,3 +142,23 @@ class RemoveFromReport(ttk.Button):
         self.configure(text='EXCLUIR\t\t', style='danger.TButton', width=13, image=tk_image, compound='right',
                        padding=4)
         self.image = tk_image
+
+
+class AddNewButton(ttk.Button):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        image_path = os.path.join(ROOT_DIR, 'add_new.png')
+        tk_image = open_image(file_name=image_path, size_x=20, size_y=20)
+
+        self.configure(style='primary.TButton', image=tk_image, padding=0)
+        self.image = tk_image
+
+
+class EraseButton(ttk.Button):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        image_path = os.path.join(ROOT_DIR, 'trash_can.png')
+        tk_image = open_image(file_name=image_path, size_x=20, size_y=20)
+
+        self.configure(style='primary.TButton', image=tk_image, padding=0)
+        self.image = tk_image

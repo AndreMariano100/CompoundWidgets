@@ -1,4 +1,4 @@
-__version__ = "0.1.11"
+__version__ = "0.1.12"
 __author__ = 'Andre Mariano'
 __all__ = ['COMPOUND_WIDGETS', 'CUSTOM_BUTTONS', 'CUSTOM_FRAMES', 'MESSAGE_BOX_WIDGETS', 'IMAGES']
 
@@ -11,12 +11,14 @@ from .COMPOUND_WIDGETS import LabelText
 from .COMPOUND_WIDGETS import LedButton
 from .COMPOUND_WIDGETS import RadioLedButton
 
+from .CUSTOM_BUTTONS import AddNewButton
 from .CUSTOM_BUTTONS import AddToReport
 from .CUSTOM_BUTTONS import BackButton
 from .CUSTOM_BUTTONS import CalculateButton
 from .CUSTOM_BUTTONS import CancelButton
 from .CUSTOM_BUTTONS import ClearButton
 from .CUSTOM_BUTTONS import EditReport
+from .CUSTOM_BUTTONS import EraseButton
 from .CUSTOM_BUTTONS import HelpButton
 from .CUSTOM_BUTTONS import NoButton
 from .CUSTOM_BUTTONS import RemoveFromReport

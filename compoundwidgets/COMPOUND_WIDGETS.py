@@ -647,7 +647,8 @@ class LabelCombo (ttk.Frame):
                  combo_value='',
                  combo_list=('No values informed',),
                  combo_width=None,
-                 combo_method=None):
+                 combo_method=None,
+                 combo_method_2=None):
 
         # Parent class initialization
         super().__init__(parent)
@@ -678,8 +679,10 @@ class LabelCombo (ttk.Frame):
                 self.combobox['width'] = combo_width
 
         # Combobox bind to method
-        if True:
-            self.combobox.bind('<<ComboboxSelected>>', combo_method)
+        if combo_method:
+            self.combobox.bind('<<ComboboxSelected>>', combo_method, add='+')
+        if combo_method_2:
+            self.combobox.bind('<<ComboboxSelected>>', combo_method_2, add='+')
 
     def enable(self):
         self.label.config(style='TLabel')

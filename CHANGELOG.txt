@@ -11,3 +11,5 @@ Change Log
 0.1.8 (18/07/2022) - Image upload correction
 0.1.9 (18/07/2022) - LabelText disabled foreground color correction
 0.1.10 (18/09/2022) - SuccessBox Added
+0.1.11 (19/09/2022) - Widgets labels width corrected
+0.1.12 (19/09/2022) - Two new buttons created

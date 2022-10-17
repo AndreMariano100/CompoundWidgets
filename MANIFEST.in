@@ -1,5 +1,6 @@
 global-include *.py *.png
 recursive-include CompoundWidgets/compoundwidgets/images *
+global-include IMAGES/add_new.png
 global-include IMAGES/add_to_form.png
 global-include IMAGES/back.png
 global-include IMAGES/calculate.png
@@ -9,4 +10,5 @@ global-include IMAGES/help.png
 global-include IMAGES/no.png
 global-include IMAGES/remove_from_form.png
 global-include IMAGES/save.png
+global-include IMAGES/trash_can.png
 global-include IMAGES/yes.png
