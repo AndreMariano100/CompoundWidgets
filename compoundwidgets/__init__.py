@@ -1,6 +1,13 @@
-__version__ = "0.1.12"
+__version__ = "0.1.16"
 __author__ = 'Andre Mariano'
-__all__ = ['COMPOUND_WIDGETS', 'CUSTOM_BUTTONS', 'CUSTOM_FRAMES', 'MESSAGE_BOX_WIDGETS', 'IMAGES']
+__all__ = ['AUTOCOMPLETE_WIDGETS',
+           'COMPOUND_WIDGETS',
+           'CUSTOM_BUTTONS',
+           'CUSTOM_FRAMES',
+           'MESSAGE_BOX_WIDGETS',
+           'IMAGES']
+
+from .AUTOCOMPLETE_WIDGETS import AutocompleteEntryList
 
 from .COMPOUND_WIDGETS import CheckLedButton
 from .COMPOUND_WIDGETS import LabelCombo

@@ -1,5 +1,4 @@
 Change Log
-
 ---------------
 0.1.1 (19/04/2022) - First release
 0.1.2 (19/04/2022) - Bugs corrected
@@ -13,3 +12,7 @@ Change Log
 0.1.10 (18/09/2022) - SuccessBox Added
 0.1.11 (19/09/2022) - Widgets labels width corrected
 0.1.12 (19/09/2022) - Two new buttons created
+0.1.13 (27/10/2022) - Autocomplete Entry with list box created
+0.1.14 (27/10/2022) - Import (init) correction
+0.1.15 (27/10/2022) - Get and Set methods for the Autocomplete Entry List
+0.1.16 (27/10/2022) - Enable/Disable methods for the Autocomplete Entry List
