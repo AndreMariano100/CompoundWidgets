@@ -123,69 +123,37 @@ class AutocompleteEntryList(ttk.Frame):
         # Binds and initialization
         if True:
             self.entry_var.trace('w', self.changed)
-            self.bind("<Right>", self.selection)
-            self.lb.bind('<Return>', self.selection)
-            self.bind("<Up>", self.up)
-            self.bind("<Down>", self.down)
 
-            self.lb_up = False
+            self.lb.bind("<Right>", self.selection)
+            self.lb.bind('<Return>', self.selection)
+            self.lb.bind("<Double-Button-1>", self.selection)
 
     def changed(self, name, index, mode):
 
         if self.entry_var.get() == '':
             self.list_var.set(self.full_list)
-            self.lb_up = False
         else:
             words = self.comparison()
             if words:
-                if not self.lb_up:
-                    self.lb.bind("<Double-Button-1>", self.selection)
-                    self.lb.bind("<Right>", self.selection)
-                    self.lb_up = True
-
                 self.lb.delete(0, tk.END)
                 for w in words:
                     self.lb.insert(tk.END, w)
             else:
-                if self.lb_up:
-                    self.lb.delete(0, tk.END)
-                    self.lb.insert(tk.END, '(no match)')
-                    self.lb_up = False
+                self.lb.delete(0, tk.END)
+                self.lb.insert(tk.END, '(no match)')
 
     def selection(self, event):
 
-        if self.lb_up:
-            self.entry_var.set(self.lb.get(tk.ACTIVE))
-            self.list_var.set('')
-            self.lb_up = False
-            if self.list_method:
-                self.list_method(event)
+        if self.lb.get(tk.ACTIVE) == '(no match)':
+            return
 
-    def up(self, event):
+        if not self.lb.get(tk.ACTIVE):
+            return
 
-        if self.lb_up:
-            if self.lb.curselection() == ():
-                index = '0'
-            else:
-                index = self.lb.curselection()[0]
-            if index != '0':
-                self.lb.selection_clear(first=index)
-                index = str(int(index) - 1)
-                self.lb.selection_set(first=index)
-                self.lb.activate(index)
-
-    def down(self, event):
-
-        if self.lb_up:
-            if self.lb.curselection() == ():
-                index = '0'
-            else:
-                index = self.lb.curselection()[0]
-            if index != tk.END:
-                self.lb.selection_clear(first=index)
-                index = str(int(index) + 1)
-                self.lb.selection_set(first=index)
-                self.lb.activate(index)
+        self.entry_var.set(self.lb.get(tk.ACTIVE))
+        self.list_var.set('')
+        if self.list_method:
+            self.list_method(event)
 
     def comparison(self):
         pattern = re.compile('.*' + self.entry_var.get() + '.*')
@@ -197,6 +165,9 @@ class AutocompleteEntryList(ttk.Frame):
         self.list_var.set(new_list)
 
     def set_entry(self, new_value):
+        self.entry_var.set(new_value)
+
+    def set(self, new_value):
         self.entry_var.set(new_value)
 
     def get(self):
