@@ -930,6 +930,7 @@ class LabelSpinbox(ttk.Frame):
             label_width: label width in number of characters
             entry_width: entry width in number of characters
             entry_method: method to associate when the entry events
+            entry_type: whether the value will be a float or an integer
             spin_start: initial value
             spin_end: end_value
             spin_increment: increment
@@ -952,6 +953,7 @@ class LabelSpinbox(ttk.Frame):
                  label_width=None,
                  entry_width=None,
                  entry_method=None,
+                 entry_type='float',
                  spin_start=0,
                  spin_end=10,
                  spin_increment=1,
@@ -964,6 +966,7 @@ class LabelSpinbox(ttk.Frame):
         self.start = spin_start
         self.end = spin_end
         self.precision = spin_precision
+        self.type = entry_type
 
         # Frame configuration
         if True:
@@ -981,9 +984,18 @@ class LabelSpinbox(ttk.Frame):
 
         # Spinbox
         if True:
-            self.variable = tk.DoubleVar(value=spin_start)
-            self.spin = ttk.Spinbox(self, textvariable=self.variable, justify='center',
-                                    from_=spin_start, to=spin_end, increment=spin_increment)
+            if self.type == 'float':
+                value = spin_start
+            else:
+                value = int(spin_start)
+                self.increment = int(self.increment)
+                self.start = int(self.start)
+                self.end = int(self.end)
+
+            self.variable = tk.StringVar(value=str(value))
+
+            self.spin = ttk.Spinbox(self, textvariable=self.variable, justify='center', command=self.spin_selected,
+                                    from_=self.start, to=self.end, increment=self.increment)
             self.spin.grid(row=0, column=1, sticky='ew', padx=2)
 
             if entry_width:
@@ -995,6 +1007,21 @@ class LabelSpinbox(ttk.Frame):
             self.spin.bind("<FocusOut>", entry_method)
             self.spin.bind("<<Increment>>", self._do_on_increment)
             self.spin.bind("<<Decrement>>", self._do_on_decrement)
+            self.spin.bind("<ButtonRelease-1>", self.spin_selected, add='+')
+
+    def spin_selected(self, event=None):
+        self.update()
+        current = float(self.variable.get().replace(',', '.'))
+        if current < self.start:
+            current = self.start
+        elif current > self.end:
+            current = self.end
+
+        if self.type == 'int':
+            self.variable.set(int(current))
+        else:
+            self.variable.set(current)
+        self.spin.event_generate('<Return>')
 
     def enable(self):
         self.label.config(style='TLabel')
@@ -1020,22 +1047,38 @@ class LabelSpinbox(ttk.Frame):
 
         if direction == 'up':
             sign = 1
-            if self.get() >= self.end:
-                self.set(self.end)
+            if self.type == 'float':
+                if float(self.get()) >= self.end:
+                    self.set(self.end)
 
+                else:
+                    self.set(float(self.get()) + sign * self.increment)
             else:
-                self.set(self.get() + sign * self.increment)
+                if int(self.get()) >= self.end:
+                    self.set(int(self.end))
+
+                else:
+                    self.set(int(self.get()) + sign * self.increment)
         else:
             sign = -1
-            if self.get() <= self.start:
-                self.set(self.start)
+            if self.type == 'float':
+                if float(self.get()) <= self.start:
+                    self.set(self.start)
 
+                else:
+                    self.set(float(self.get()) + sign * self.increment)
             else:
-                self.set(self.get() + sign * self.increment)
+                if int(self.get()) <= self.start:
+                    self.set(int(self.start))
 
+                else:
+                    self.set(int(self.get()) + sign * self.increment)
     def get(self):
         return self.variable.get()
 
     def set(self, value):
-        self.variable.set(round(value, self.precision))
+        if self.type == 'int':
+            self.variable.set(int(value))
+        else:
+            self.variable.set(round(value, self.precision))
 
