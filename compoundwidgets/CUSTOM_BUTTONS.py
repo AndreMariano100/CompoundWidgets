@@ -162,3 +162,14 @@ class EraseButton(ttk.Button):
 
         self.configure(style='primary.TButton', image=tk_image, padding=0)
         self.image = tk_image
+
+
+class QuitButton(ttk.Button):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        image_path = os.path.join(ROOT_DIR, 'quit.png')
+        tk_image = open_image(file_name=image_path, size_x=16, size_y=16)
+
+        self.configure(text='Exit\t\t', style='primary.TButton', width=13, image=tk_image, padding=4,
+                       compound='right')
+        self.image = tk_image

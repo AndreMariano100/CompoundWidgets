@@ -2,126 +2,151 @@ import tkinter as tk
 import tkinter.ttk as ttk
 
 
-class OkCancelBox(tk.Toplevel):
+class BaseTopLevelWidget(tk.Toplevel):
+    """
+    Basic TopLevel Widget for Message Boxes
+    Input:
+        parent: widget over which the progress bar will be positioned
+        icon_path: path to the icon for the widget
+        title: title message for the widget
+        message = text to be shown as an alert to the user
+    """
+
+    def __init__(self, parent, icon_path, title, message):
+
+        # Configuration
+        if True:
+            super().__init__(parent)
+            self.iconbitmap(icon_path)
+            self.title(title)
+            self.minsize(250, 120)
+            self.columnconfigure(0, weight=1)
+            self.columnconfigure(1, weight=0)
+            self.columnconfigure(2, weight=0)
+            self.rowconfigure(0, weight=1)
+            self.rowconfigure(1, weight=0)
+            self.rowconfigure(2, weight=0)
+            self.lift()
+
+        # Widgets
+        if True:
+            self.label = ttk.Label(self, text=message, justify='left', padding=5)
+            self.label.grid(row=0, column=0, columnspan=3, sticky='nsew')
+
+            separator = ttk.Separator(self, orient='horizontal', style='secondary.Horizontal.TSeparator')
+            separator.grid(row=1, column=0, columnspan=3, sticky='nsew')
+
+            self.control_var = tk.IntVar(value=0)
+
+            if self.label.winfo_reqwidth() > self.minsize()[0]:
+                self.minsize(self.label.winfo_reqwidth() + 20, 120)
+                self.update()
+
+        # Determine relative position
+        if True:
+            position_x = parent.winfo_x()
+            position_y = parent.winfo_y()
+            height = parent.winfo_height()
+            width = parent.winfo_width()
+
+            local_height = self.minsize()[1]
+            local_width = self.minsize()[0]
+
+            final_position = (position_x + width / 2 - local_width / 2, position_y + height / 2 - local_height / 2)
+            self.geometry('%dx%d+%d+%d' % (local_width, local_height, final_position[0], final_position[1]))
+            self.grab_set()
+
+    def adjust_var(self, option):
+        self.control_var.set(option)
+        self.destroy()
+
+    def show(self):
+        self.deiconify()
+        self.wait_window()
+        value = self.control_var.get()
+        return value
+
+
+class OkCancelBox(BaseTopLevelWidget):
     """
     Creates a OK/CANCEL message box with the same style as the main application
     Input:
         parent: widget over which the progress bar will be positioned
+        icon_path: path to the icon for the widget
+        title: title message for the widget
         message = text to be shown as an alert to the user
     """
 
-    def __init__(self, parent, message):
+    def __init__(self, parent, icon_path, title, message):
 
-        # Configuration
-        if True:
-            super().__init__(parent)
-            self.minsize(350, 150)
-            self.columnconfigure(0, weight=1)
-            self.columnconfigure(1, weight=1)
-            self.rowconfigure(0, weight=1)
-            self.rowconfigure(1, weight=0)
-            self.overrideredirect(True)
-            self.config(padx=10, pady=10, bd=1, relief='raised')
-            self.lift()
+        super().__init__(parent, icon_path, title, message)
 
-        # Widgets
-        if True:
-            self.control_var = tk.IntVar(value=0)
-            label = ttk.Label(self, text=message, anchor='center', justify='center', padding=10, wraplength=300)
-            label.grid(row=0, column=0, columnspan=2, sticky='nsew')
+        cancel_button = ttk.Button(self, text="CANCEL", command=lambda: self.adjust_var(0), width=8,
+                                   style='secondary.TButton')
+        cancel_button.grid(row=2, column=1, sticky='nsew', pady=5)
 
-            ok_button = ttk.Button(self, text="OK", command=lambda: self.adjust_var(1), width=10,
-                                   style='success.TButton')
-            ok_button.grid(row=1, column=0, sticky='nsew', padx=30, pady=(0, 10))
-
-            cancel_button = ttk.Button(self, text="Cancel", command=lambda: self.adjust_var(0), width=10,
-                                       style='danger.TButton')
-            cancel_button.grid(row=1, column=1, sticky='nsew', padx=30, pady=(0, 10))
-
-        # Determine relative position
-        if True:
-            position_x = parent.winfo_x()
-            position_y = parent.winfo_y()
-            height = parent.winfo_height()
-            width = parent.winfo_width()
-
-            local_height = self.minsize()[1]
-            local_width = self.minsize()[0]
-
-            final_position = (position_x + width / 2 - local_width / 2, position_y + height / 2 - local_height / 2)
-            self.geometry('%dx%d+%d+%d' % (local_width, local_height, final_position[0], final_position[1]))
-            self.grab_set()
-
-    def adjust_var(self, option):
-        self.control_var.set(option)
-        self.destroy()
-
-    def show(self):
-        self.deiconify()
-        self.wait_window()
-        value = self.control_var.get()
-        return value
+        ok_button = ttk.Button(self, text="OK", command=lambda: self.adjust_var(1), width=8,
+                               style='primary.TButton')
+        ok_button.grid(row=2, column=2, sticky='nsew', padx=5, pady=5)
 
 
-class YesNoBox(tk.Toplevel):
+class YesNoBox(BaseTopLevelWidget):
     """
     Creates a Yes/No message box with the same style as the main application
     Input:
         parent: widget over which the progress bar will be positioned
-        message = text to be shown as a question to the user
+        icon_path: path to the icon for the widget
+        title: title message for the widget
+        message = text to be shown as an alert to the user
     """
 
-    def __init__(self, parent, message):
+    def __init__(self, parent, icon_path, title, message):
 
-        # Configuration
-        if True:
-            super().__init__(parent)
-            self.minsize(350, 150)
-            self.columnconfigure(0, weight=1)
-            self.columnconfigure(1, weight=1)
-            self.rowconfigure(0, weight=1)
-            self.rowconfigure(1, weight=0)
-            self.overrideredirect(True)
-            self.config(padx=10, pady=10, bd=1, relief='raised')
-            self.lift()
+        super().__init__(parent, icon_path, title, message)
 
-        # Widgets
-        if True:
-            self.control_var = tk.IntVar(value=0)
-            label = ttk.Label(self, text=message, anchor='center', justify='center', padding=10, wraplength=300)
-            label.grid(row=0, column=0, columnspan=2, sticky='nsew')
+        no_button = ttk.Button(self, text="NO", command=lambda: self.adjust_var(0), width=8,
+                               style='secondary.TButton')
+        no_button.grid(row=2, column=1, sticky='nsew', pady=5)
+        yes_button = ttk.Button(self, text="YES", command=lambda: self.adjust_var(1), width=8,
+                                style='primary.TButton')
+        yes_button.grid(row=2, column=2, sticky='nsew', padx=5, pady=5)
 
-            yes_button = ttk.Button(self, text="YES", command=lambda: self.adjust_var(1), width=10,
-                                    style='success.TButton')
-            yes_button.grid(row=1, column=0, sticky='nsew', padx=30, pady=(0, 10))
 
-            no_button = ttk.Button(self, text="NO", command=lambda: self.adjust_var(0), width=10,
-                                   style='danger.TButton')
-            no_button.grid(row=1, column=1, sticky='nsew', padx=30, pady=(0, 10))
+class WarningBox(BaseTopLevelWidget):
+    """
+    Creates a message box with the same style as the main application
+        Input:
+        parent: widget over which the progress bar will be positioned
+        icon_path: path to the icon for the widget
+        title: title message for the widget
+        message = text to be shown as an alert to the user
+    """
 
-        # Determine relative position
-        if True:
-            position_x = parent.winfo_x()
-            position_y = parent.winfo_y()
-            height = parent.winfo_height()
-            width = parent.winfo_width()
+    def __init__(self, parent, icon_path, title, message):
 
-            local_height = self.minsize()[1]
-            local_width = self.minsize()[0]
+        super().__init__(parent, icon_path, title, message)
+        self.label.config(style='danger.TLabel')
+        ok_button = ttk.Button(self, text="OK", command=lambda: self.destroy(), width=8,
+                               style='danger.TButton')
+        ok_button.grid(row=2, column=2, sticky='nsew', padx=5, pady=5)
 
-            final_position = (position_x + width / 2 - local_width / 2, position_y + height / 2 - local_height / 2)
-            self.geometry('%dx%d+%d+%d' % (local_width, local_height, final_position[0], final_position[1]))
-            self.grab_set()
 
-    def adjust_var(self, option):
-        self.control_var.set(option)
-        self.destroy()
+class SuccessBox(BaseTopLevelWidget):
+    """
+    Creates a message box with the same style as the main application
+    Input:
+        parent: widget over which the progress bar will be positioned
+        icon_path: path to the icon for the widget
+        title: title message for the widget
+        message = text to be shown as an alert to the user
+    """
 
-    def show(self):
-        self.deiconify()
-        self.wait_window()
-        value = self.control_var.get()
-        return value
+    def __init__(self, parent, icon_path, title, message):
+
+        super().__init__(parent, icon_path, title, message)
+        ok_button = ttk.Button(self, text="OK", command=lambda: self.destroy(), width=8,
+                               style='primary.TButton')
+        ok_button.grid(row=2, column=2, sticky='nsew', padx=5, pady=5)
 
 
 class ProgressBar(tk.Toplevel):
@@ -185,96 +210,6 @@ class ProgressBar(tk.Toplevel):
     def update_bar(self, value):
         self.progress_var.set(value/self.final_value)
         self.update_idletasks()
-
-
-class WarningBox(tk.Toplevel):
-    """ Creates a message box with the same style as the main application """
-
-    def __init__(self, parent, message):
-
-        # Configuration
-        if True:
-            super().__init__(parent)
-            self.minsize(350, 150)
-            self.columnconfigure(0, weight=1)
-            self.rowconfigure(0, weight=1)
-            self.rowconfigure(1, weight=0)
-            self.overrideredirect(True)
-            self.config(padx=10, pady=10, bd=1, relief='raised')
-            self.lift()
-
-        # Widgets
-        if True:
-            label = ttk.Label(self, text=message, anchor='center', justify='center', padding=10, wraplength=300)
-            label.grid(row=0, column=0, sticky='nsew')
-
-            ok_button = ttk.Button(self, text="OK", command=lambda: self.destroy(), width=10,
-                                   style='danger.TButton')
-            ok_button.grid(row=1, column=0, sticky='nsew', padx=30, pady=(0, 10))
-
-        # Determine relative position
-        if True:
-            position_x = parent.winfo_x()
-            position_y = parent.winfo_y()
-            height = parent.winfo_height()
-            width = parent.winfo_width()
-
-            local_height = self.minsize()[1]
-            local_width = self.minsize()[0]
-
-            final_position = (position_x + width / 2 - local_width / 2, position_y + height / 2 - local_height / 2)
-            self.geometry('%dx%d+%d+%d' % (local_width, local_height, final_position[0], final_position[1]))
-            self.grab_set()
-
-    def show(self):
-        self.deiconify()
-        self.wait_window()
-        return
-
-
-class SuccessBox(tk.Toplevel):
-    """ Creates a message box with the same style as the main application """
-
-    def __init__(self, parent, message):
-
-        # Configuration
-        if True:
-            super().__init__(parent)
-            self.minsize(350, 150)
-            self.columnconfigure(0, weight=1)
-            self.rowconfigure(0, weight=1)
-            self.rowconfigure(1, weight=0)
-            self.overrideredirect(True)
-            self.config(padx=10, pady=10, bd=1, relief='raised')
-            self.lift()
-
-        # Widgets
-        if True:
-            label = ttk.Label(self, text=message, anchor='center', justify='center', padding=10, wraplength=300)
-            label.grid(row=0, column=0, sticky='nsew')
-
-            ok_button = ttk.Button(self, text="OK", command=lambda: self.destroy(), width=10,
-                                   style='success.TButton')
-            ok_button.grid(row=1, column=0, sticky='nsew', padx=30, pady=(0, 10))
-
-        # Determine relative position
-        if True:
-            position_x = parent.winfo_x()
-            position_y = parent.winfo_y()
-            height = parent.winfo_height()
-            width = parent.winfo_width()
-
-            local_height = self.minsize()[1]
-            local_width = self.minsize()[0]
-
-            final_position = (position_x + width / 2 - local_width / 2, position_y + height / 2 - local_height / 2)
-            self.geometry('%dx%d+%d+%d' % (local_width, local_height, final_position[0], final_position[1]))
-            self.grab_set()
-
-    def show(self):
-        self.deiconify()
-        self.wait_window()
-        return
 
 
 class Tooltip:
@@ -360,3 +295,86 @@ class Tooltip:
         if self.top_level:
             self.top_level.destroy()
         self.top_level = None
+
+
+class TimedBox(tk.Toplevel):
+    """
+    Basic TopLevel Widget for Message Boxes
+    Input:
+        parent = widget over which the progress bar will be positioned
+        message = text to be shown as an alert to the user
+        time = time in seconds for the pop-up window display
+        style = color scheme for the window
+    """
+
+    def __init__(self, parent, message, time=1, style=None):
+
+        # Configuration
+        if True:
+            super().__init__(parent)
+            self.overrideredirect(True)
+            try:
+                self.time = int(time)
+            except ValueError:
+                self.time = 1
+            self.minsize(250, 120)
+            self.columnconfigure(0, weight=1)
+            self.columnconfigure(1, weight=0)
+            self.rowconfigure(0, weight=1)
+            self.rowconfigure(1, weight=0)
+            self.rowconfigure(2, weight=0)
+            self.lift()
+            style_dict = {
+                'danger': ('danger.TLabel','danger.TButton', 'danger.Horizontal.TProgressbar'),
+                'warning': ('warning.TLabel', 'warning.TButton', 'warning.Horizontal.TProgressbar'),
+                'info': ('info.TLabel', 'info.TButton', 'info.Horizontal.TProgressbar'),
+            }
+
+        # Widgets
+        if True:
+            label_style, button_style, progress_bar_style = \
+                style_dict.get(style, ('TLabel', 'TButton', 'TProgressbar'))
+            label = ttk.Label(self, text=message, justify='left', style=label_style)
+            label.grid(row=0, column=0, columnspan=2, sticky='nsew', padx=10, pady=10)
+
+            self.progressbar_var = tk.DoubleVar(value=0)
+            self.progressbar = ttk.Progressbar(self, maximum=1, orient='horizontal', mode='determinate',
+                                               style=progress_bar_style, variable=self.progressbar_var)
+            self.progressbar.grid(row=1, column=0, columnspan=2, sticky='nsew', padx=10)
+
+            button = ttk.Button(self, text='CLOSE', style=button_style, command= lambda: self.destroy())
+            button.grid(row=2, column=1, sticky='nsew', pady=10, padx=10)
+
+            if label.winfo_reqwidth() > self.minsize()[0]:
+                self.minsize(label.winfo_reqwidth() + 20, 120)
+                self.update()
+
+        # Determine relative position
+        if True:
+            position_x = parent.winfo_x()
+            position_y = parent.winfo_y()
+            height = parent.winfo_height()
+            width = parent.winfo_width()
+
+            local_height = self.minsize()[1]
+            local_width = self.minsize()[0]
+
+            final_position = (position_x + width / 2 - local_width / 2, position_y + height / 2 - local_height / 2)
+            self.geometry('%dx%d+%d+%d' % (local_width, local_height, final_position[0], final_position[1]))
+            self.grab_set()
+
+    def update_progress_bar(self):
+
+        steps = self.time*100
+        for i in range(steps):
+            self.after(10)
+            self.progressbar_var.set(i/steps)
+            self.progressbar.update()
+        self.destroy()
+
+
+    def show(self):
+        self.update()
+        self.deiconify()
+        self.update_progress_bar()
+        return

@@ -20,7 +20,8 @@ all_buttons = (
     cw.EditReport,
     cw.RemoveFromReport,
     cw.AddNewButton,
-    cw.EraseButton
+    cw.EraseButton,
+    cw.QuitButton
 )
 for i, widget in enumerate(all_buttons):
     widget(root).grid(row=i, column=0, padx=10, pady=10)

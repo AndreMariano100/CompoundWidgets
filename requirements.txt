@@ -1,0 +1,17 @@
+contourpy==1.0.6
+cycler==0.11.0
+et-xmlfile==1.1.0
+fonttools==4.38.0
+kiwisolver==1.4.4
+matplotlib==3.6.2
+numpy==1.23.5
+openpyxl==3.0.10
+packaging==21.3
+Pillow>=9.3.0
+pip>=22.3.1
+pyparsing==3.0.9
+python-dateutil==2.8.2
+setuptools==65.6.3
+six==1.16.0
+ttkbootstrap>=1.9.0
+wheel==0.38.4

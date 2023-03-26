@@ -8,6 +8,7 @@ global-include IMAGES/clear.png
 global-include IMAGES/edit_form.png
 global-include IMAGES/help.png
 global-include IMAGES/no.png
+global-include IMAGES/quit.png
 global-include IMAGES/remove_from_form.png
 global-include IMAGES/save.png
 global-include IMAGES/trash_can.png

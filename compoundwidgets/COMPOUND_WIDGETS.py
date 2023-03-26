@@ -356,23 +356,7 @@ class LabelEntryUnit (ttk.Frame):
         entry_max_char: maximum number of characters in the entry field
         combobox_unit: unit system for the entry
         combobox_unit_width: width of the combobox in characters
-    Methods:
-        enable method:
-            enables the widgets (state='normal')
-        disable method:
-            disables the widgets (state='disabled')
-        read_only method:
-            disabled edition of the entry widget (state='readonly')
-        get_entry method:
-            gets the value from the entry widget
-        set_entry method:
-            sets the value to the entry widget
-        get_unit method:
-            gets the value from the unit widget
-        set_unit method:
-            sets the value from the unit widget
-        get_metric_value:
-            gets the value from the entry widget already converted for the metric (SI) unit
+        combobox_unit_conversion: boolean, if set to True converts the entry value when the unit changes
     """
 
     class TemperatureCombo(ttk.Combobox):
@@ -383,13 +367,6 @@ class LabelEntryUnit (ttk.Frame):
             self.variable = tk.StringVar(value=self.values[0])
             self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
                            state='readonly')
-
-        def get(self):
-            return self.variable.get()
-
-        def set(self, value):
-            if value in self.values:
-                self.variable.set(value)
 
     class LengthCombo(ttk.Combobox):
         def __init__(self, parent, width):
@@ -402,11 +379,16 @@ class LabelEntryUnit (ttk.Frame):
             self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
                            state='readonly')
 
-        def get(self):
-            return self.variable.get()
+    class AreaCombo(ttk.Combobox):
+        def __init__(self, parent, width):
+            super().__init__(parent)
 
-        def set(self, value):
-            self.variable.set(value)
+            self.values = ('mm²', 'cm²', 'in²')
+            self.conversion_values = (1, 100, 645.16)
+
+            self.variable = tk.StringVar(value=self.values[0])
+            self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
+                           state='readonly')
 
     class PressureCombo(ttk.Combobox):
         def __init__(self, parent, width):
@@ -418,28 +400,15 @@ class LabelEntryUnit (ttk.Frame):
             self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
                            state='readonly')
 
-        def get(self):
-            return self.variable.get()
-
-        def set(self, value):
-            if value in self.values:
-                self.variable.set(value)
-
     class StressCombo(ttk.Combobox):
         def __init__(self, parent, width):
             super().__init__(parent)
 
-            self.values = ('MPa', 'GPa', 'psi', 'ksi')
-            self.conversion_values = (1, 1000, 0.006894757, 6.894757)
+            self.values = ('MPa', 'GPa', 'psi', 'ksi', 'x10³ ksi')
+            self.conversion_values = (1, 1000, 0.006894757, 6.894757, 6894.757)
             self.variable = tk.StringVar(value=self.values[0])
             self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
                            state='readonly')
-
-        def get(self):
-            return self.variable.get()
-
-        def set(self, value):
-            self.variable.set(value)
 
     class ForceCombo(ttk.Combobox):
         def __init__(self, parent, width):
@@ -450,12 +419,6 @@ class LabelEntryUnit (ttk.Frame):
             self.variable = tk.StringVar(value=self.values[0])
             self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
                            state='readonly')
-
-        def get(self):
-            return self.variable.get()
-
-        def set(self, value):
-            self.variable.set(value)
 
     class MomentCombo(ttk.Combobox):
         def __init__(self, parent, width):
@@ -476,34 +439,66 @@ class LabelEntryUnit (ttk.Frame):
             self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
                            state='readonly')
 
-        def get(self):
-            return self.variable.get()
+    class ToughnessCombo(ttk.Combobox):
+        def __init__(self, parent, width):
+            super().__init__(parent)
 
-        def set(self, value):
-            self.variable.set(value)
+            self.values = ('N/mm^(3/2)', 'MPa.√m', 'ksi.√in')
+            self.conversion_values = (1, 31.6240, 34.7485)
+            self.variable = tk.StringVar(value=self.values[0])
+            self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
+                           state='readonly')
+
+    class EnergyCombo(ttk.Combobox):
+        def __init__(self, parent, width):
+            super().__init__(parent)
+
+            self.values = ('joule', 'ft-lbf')
+            self.conversion_values = (1, 1.355818)
+            self.variable = tk.StringVar(value=self.values[0])
+            self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
+                           state='readonly')
+
+    class JIntegralCombo(ttk.Combobox):
+        def __init__(self, parent, width):
+            super().__init__(parent)
+
+            self.values = ('joule/m²', 'ft-lbf/ft²')
+            self.conversion_values = (1, 14.5939)
+            self.variable = tk.StringVar(value=self.values[0])
+            self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
+                           state='readonly')
+
 
     unit_dict = {
         'temperature': TemperatureCombo,
+        'area': AreaCombo,
         'length': LengthCombo,
         'pressure': PressureCombo,
         'stress': StressCombo,
         'force': ForceCombo,
         'moment': MomentCombo,
-        'none': NoUnitCombo
+        'none': NoUnitCombo,
+        'toughness': ToughnessCombo,
+        'energy': EnergyCombo,
+        'j-integral': JIntegralCombo
     }
+    metric_unit_list = \
+        ('mm', 'kPa', 'MPa', 'GPa', 'mm²', 'cm²',
+         'kgf/cm²', 'bar', 'N', 'kgf', 'N.m', 'kgf.m',
+         'MPa.√m', 'joule', 'joule/m²')
+    imperial_unit_list = \
+        ('in', 'psi', 'ksi', 'x10³ ksi', 'in²', 'in²',
+         'psi', 'psi', 'lbf', 'lbf', 'lbf.ft', 'lbf.ft',
+         'ksi.√in', 'ft-lbf', 'ft-lbf/ft²')
+    conversion = \
+        (25.4, 6.894757, 6.894757, 6.894757, 645.16, 6.4516,
+         0.07030696, 0.06894757, 4.448222, 0.4535924, 1.35582, 0.1382552,
+         1.0988, 1.355818, 14.5939)
 
-    def __init__(self, parent,
-                 label_text='Label:',
-                 label_anchor='e',
-                 label_width=None,
-                 entry_value='',
-                 entry_numeric=False,
-                 entry_width=None,
-                 entry_max_char=None,
-                 entry_method=None,
-                 combobox_unit=None,
-                 combobox_unit_width=8
-                 ):
+    def __init__(self, parent, label_text='Label:', label_anchor='e', label_width=None, entry_value='',
+                 entry_numeric=False, entry_width=None, entry_max_char=None, entry_method=None, combobox_unit=None,
+                 combobox_unit_width=8, combobox_unit_conversion=False):
 
         # Parent class initialization
         super().__init__(parent)
@@ -524,6 +519,7 @@ class LabelEntryUnit (ttk.Frame):
             self.label.grid(row=0, column=0, sticky='ew', padx=2)
             if label_width:
                 self.label['width'] = label_width
+
         # Entry
         if True:
             self.variable = tk.StringVar(value=entry_value)
@@ -551,14 +547,22 @@ class LabelEntryUnit (ttk.Frame):
             if not local_class:
                 raise Exception('Unit not found in current units dictionary.')
 
-            self.unit_combo = local_class(self, combobox_unit_width)
+            self.combobox_unit_conversion = combobox_unit_conversion
+            self.combobox_unit_width = combobox_unit_width
+            self.unit_combo = local_class(self, self.combobox_unit_width)
             self.unit_combo.grid(row=0, column=2, sticky='ew', padx=2)
+            self.last_unit = self.unit_combo.values[0]
 
-        # Bind method
+        # Bind methods
         if True:
             self.entry.bind("<Return>", entry_method)
             self.entry.bind("<FocusOut>", entry_method)
-            self.unit_combo.bind("<<ComboboxSelected>>", entry_method)
+
+            self.combobox_unit_conversion = combobox_unit_conversion
+            if not self.combobox_unit_conversion:
+                self.unit_combo.bind("<<ComboboxSelected>>", entry_method)
+            else:
+                self.unit_combo.bind("<<ComboboxSelected>>", self.convert_to_selected_unit)
 
     def enable(self):
         self.label.config(style='TLabel')
@@ -573,10 +577,13 @@ class LabelEntryUnit (ttk.Frame):
     def readonly(self):
         self.label.config(style='TLabel')
         self.entry.config(state='readonly')
-        self.unit_combo.config(state='readonly', values=[])
+        if not self.combobox_unit_conversion:
+            self.unit_combo.config(state='readonly', values=[])
+        else:
+            self.unit_combo.config(state='readonly', values=self.unit_combo.values)
 
     def get_entry(self):
-        return self.variable.get() or 0
+        return self.variable.get()
 
     def set_entry(self, value):
         self.variable.set(value)
@@ -584,8 +591,11 @@ class LabelEntryUnit (ttk.Frame):
     def get_unit(self):
         return self.unit_combo.get()
 
-    def set_unit(self, value):
-        self.unit_combo.set(value)
+    def set_unit(self, unit):
+        if unit in list(self.unit_combo.values):
+            self.unit_combo.set(unit)
+        else:
+            self.unit_combo.set(self.unit_combo.values[0])
 
     def get(self):
         return self.get_entry(), self.get_unit()
@@ -596,7 +606,7 @@ class LabelEntryUnit (ttk.Frame):
             self.set_entry(value)
             self.set_unit(unit)
         else:
-            raise Exception('Unit not found in current units dictionary.')
+            self.unit_combo.set(self.unit_combo.values[0])
 
     def get_metric_value(self):
 
@@ -605,16 +615,176 @@ class LabelEntryUnit (ttk.Frame):
 
         if isinstance(self.unit_combo, LabelEntryUnit.TemperatureCombo):
             if str(self.unit_combo.get()) == '°F':
-                return 5 * (float(self.get_entry()) - 32) / 9, self.unit_combo.values[0]
+                if not self.get_entry():
+                    return '', self.unit_combo.values[0]
+                else:
+                    return 5 * (float(self.get_entry()) - 32) / 9, self.unit_combo.values[0]
             return self.get_entry(), self.unit_combo.values[0]
 
         index = self.unit_combo.values.index(self.get_unit())
-        return float(self.get_entry()) * self.unit_combo.conversion_values[index], self.unit_combo.values[0]
+        if not self.get_entry():
+            return '', self.unit_combo.values[0]
+        else:
+            return float(self.get_entry()) * self.unit_combo.conversion_values[index], self.unit_combo.values[0]
+
+    def get_imperial_value(self):
+
+        value, unit = self.get_metric_value()
+        new_value, new_unit = self.convert_data_to_imperial(value, unit)
+        return new_value, new_unit
 
     def check_length(self, event):
         current = self.get_entry()
         if len(current) >= self.entry_max_char:
             self.set_entry(current[:int(self.entry_max_char)])
+
+    def convert_to_metric(self):
+        """ Convert 'self' to metric """
+
+        if isinstance(self.unit_combo, LabelEntryUnit.NoUnitCombo):
+            pass
+
+        elif isinstance(self.unit_combo, LabelEntryUnit.TemperatureCombo):
+            if str(self.unit_combo.get()) == '°F':
+                if not self.get_entry():
+                    new_value = ''
+                else:
+                    new_value = 5 * (float(self.get_entry()) - 32) / 9
+                self.set(new_value, '°C')
+        else:
+            value, unit = self.get()
+            if unit not in LabelEntryUnit.metric_unit_list:
+                index = LabelEntryUnit.imperial_unit_list.index(unit)
+                if not value:
+                    new_value = ''
+                else:
+                    new_value = round(float(value)*LabelEntryUnit.conversion[index], 2)
+                self.set(new_value, LabelEntryUnit.metric_unit_list[index])
+
+    def convert_to_imperial(self):
+        """ Convert 'self' to imperial """
+
+        if isinstance(self.unit_combo, LabelEntryUnit.NoUnitCombo):
+            pass
+
+        elif isinstance(self.unit_combo, LabelEntryUnit.TemperatureCombo):
+            if str(self.unit_combo.get()) == '°C':
+                if not self.get_entry():
+                    new_value = ''
+                else:
+                    new_value = 9 * (float(self.get_entry()) / 5) + 32
+                self.set(new_value, '°F')
+        else:
+            value, unit = self.get()
+            if unit not in LabelEntryUnit.imperial_unit_list:
+                index = LabelEntryUnit.metric_unit_list.index(unit)
+                if not value:
+                    new_value = ''
+                else:
+                    new_value = round(float(value) / LabelEntryUnit.conversion[index], 2)
+                self.set(new_value, LabelEntryUnit.imperial_unit_list[index])
+
+    @staticmethod
+    def convert_data_to_metric(value, unit):
+        """ Convert given data (value, unit) to metric"""
+
+        if unit == '-':
+            return None, None
+
+        elif unit == '°F':
+            if not value:
+                new_value = ''
+            else:
+                new_value = 5 * (float(value) - 32) / 9
+            return new_value, '°C'
+
+        else:
+            if unit not in LabelEntryUnit.metric_unit_list:
+                index = LabelEntryUnit.imperial_unit_list.index(unit)
+                if not value:
+                    new_value = ''
+                else:
+                    new_value = round(float(value)*LabelEntryUnit.conversion[index], 2)
+                return new_value, LabelEntryUnit.metric_unit_list[index]
+
+    @staticmethod
+    def convert_data_to_imperial(value, unit):
+        """ Convert given data (value, unit) to imperial """
+        if unit == '-':
+            return None, None
+
+        elif unit == '°C':
+            if not value:
+                new_value = ''
+            else:
+                new_value = 9 * (float(value) / 5) + 32
+            return new_value, '°F'
+
+        else:
+            if unit not in LabelEntryUnit.imperial_unit_list:
+                index = LabelEntryUnit.metric_unit_list.index(unit)
+                if not value:
+                    new_value = ''
+                else:
+                    new_value = round(float(value) / LabelEntryUnit.conversion[index], 2)
+                return new_value, LabelEntryUnit.imperial_unit_list[index]
+
+    def lock_unit(self):
+        self.unit_combo.config(state='readonly', values=[], style='TLabel',
+                               width=self.combobox_unit_width+4)
+
+    def unlock_unit(self):
+        self.unit_combo.config(state='readonly', values=self.unit_combo.values, style='TCombobox',
+                               width=self.combobox_unit_width)
+
+    def convert_to_selected_unit(self, event=None):
+        """ Method to convert the value everytime a unit is changed """
+
+        last_value = self.get_entry()
+        new_unit = self.get_unit()
+        last_unit = self.last_unit
+
+        if isinstance(self.unit_combo, LabelEntryUnit.NoUnitCombo):
+            pass
+
+        elif isinstance(self.unit_combo, LabelEntryUnit.TemperatureCombo):
+            if last_unit == new_unit:
+                pass
+            else:
+                if new_unit == '°F':
+                    if not last_value:
+                        new_value = ''
+                    else:
+                        new_value = 9 * (float(last_value) / 5) + 32
+                        new_value = round(new_value, 3)
+                    self.last_unit = '°F'
+                    self.set(new_value, '°F')
+                else:
+                    if not last_value:
+                        new_value = ''
+                    else:
+                        new_value = 5 * (float(last_value) - 32) / 9
+                        new_value = round(new_value, 3)
+                    self.last_unit = '°C'
+                    self.set(new_value, '°C')
+        else:
+            if last_unit == new_unit:
+                pass
+            else:
+                old_index = self.unit_combo.values.index(last_unit)
+                new_index = self.unit_combo.values.index(new_unit)
+                if not last_value:
+                    new_value = ''
+                else:
+                    # Convert from old index to index 1
+                    intermediary_value = float(last_value) * self.unit_combo.conversion_values[old_index]
+
+                    # Convert from index 1 to new index
+                    new_value = intermediary_value / self.unit_combo.conversion_values[new_index]
+                    new_value = round(new_value, 3)
+
+                self.last_unit = new_unit
+                self.set(new_value, new_unit)
 
 
 class LabelCombo (ttk.Frame):
@@ -793,6 +963,225 @@ class LabelEntry (ttk.Frame):
     def readonly(self):
         self.label.config(style='TLabel')
         self.entry.config(state='readonly')
+
+    def get(self):
+        return self.variable.get()
+
+    def set(self, value):
+        self.variable.set(value)
+
+
+class LabelEntryButton (ttk.Frame):
+    """
+    Create a compound widget, with a label, an entry field and a button.
+    Input:
+        parent: container in which the widgets will be created
+        label_text: string to be shown on the label
+        label_anchor - position of the text within the label
+        label_width: label width in number of characters
+        entry_value: initial value to show at the entry (if any)
+        entry_numeric: whether the entry accepts only numbers
+        entry_width: entry width in number of characters
+        entry_method: method to associate when the entry events
+        entry_max_char: maximum number of characters in the entry field
+        button_text: string to be shown on the label
+        button_width: width of the label im characters
+        button_method: method to bind to the label
+    Methods:
+        enable method:
+            enables the widgets (state='normal')
+        disable method:
+            disables the widgets (state='disabled')
+        read_only method:
+            disabled edition of the entry widget (state='readonly')
+        get method:
+            gets the value from the entry widget
+        set method:
+            sets the value to the entry widget
+    """
+
+    def __init__(self, parent,
+                 label_text='label:',
+                 label_anchor='e',
+                 entry_value='',
+                 label_width=None,
+                 entry_numeric=False,
+                 entry_width=None,
+                 entry_max_char=None,
+                 entry_method=None,
+                 button_text='',
+                 button_width=None,
+                 button_method=None
+    ):
+
+        # Parent class initialization
+        super().__init__(parent)
+
+        # Entry validation for numbers
+        validate_numbers = self.register(float_only)
+        validate_chars = self.register(max_chars)
+
+        # Frame configuration
+        if True:
+            self.rowconfigure(0, weight=1)
+            self.columnconfigure(0, weight=1)
+            self.columnconfigure(1, weight=0)
+            self.columnconfigure(2, weight=0)
+
+        # Label
+        if True:
+            self.label = ttk.Label(self, text=label_text, anchor=label_anchor)
+            self.label.grid(row=0, column=0, sticky='ew', padx=2)
+
+            if label_width:
+                self.label['width'] = label_width
+
+        # Entry
+        if True:
+            self.variable = tk.StringVar(value=entry_value)
+            self.entry = ttk.Entry(self, textvariable=self.variable, justify='center')
+            self.entry.grid(row=0, column=1, sticky='ew', padx=2)
+
+            if entry_width:
+                self.entry['width'] = entry_width
+
+            if entry_method:
+                self.entry.bind("<Return>", entry_method)
+                self.entry.bind("<FocusOut>", entry_method)
+
+            if entry_numeric:
+                self.entry.config(validate='all', validatecommand=(validate_numbers, '%d', '%P', '%S', entry_max_char))
+
+            elif entry_max_char:
+                self.entry.config(validate='all', validatecommand=(validate_chars, '%d', '%P', entry_max_char))
+
+        # Button
+        if True:
+            self.button = ttk.Button(self, text=button_text, width=button_width)
+            self.button.grid(row=0, column=2, sticky='ew', padx=2)
+
+            if button_method:
+                self.button.configure(command=button_method)
+
+    def enable(self):
+        self.label.config(style='TLabel')
+        self.entry.config(state='normal')
+        self.button.config(state='normal')
+
+    def disable(self):
+        self.label.config(style='secondary.TLabel')
+        self.entry.config(state='disabled')
+        self.button.config(state='disabled')
+
+    def readonly(self):
+        self.label.config(style='TLabel')
+        self.entry.config(state='readonly')
+        self.button.config(state='normal')
+
+    def get(self):
+        return self.variable.get()
+
+    def set(self, value):
+        self.variable.set(value)
+
+
+class LabelComboButton (ttk.Frame):
+    """
+    Create a compound widget, with a label and a combo box within a ttk Frame.
+    Input:
+        parent - container in which the widgets will be created
+        label_text - string to be shown on the label
+        label_anchor - position of the text within the label
+        label_width: label width in number of characters
+        combo_value - initial value to show at the combo box (if any)
+        combo_list - list of values to be shown at the combo box
+        combo_width: combo box width in number of characters
+        combo_method: method to associate when combo box is selected
+        button_text: string to be shown on the label
+        button_width: width of the label im characters
+        button_method: method to bind to the label
+    Methods:
+        enable method:
+            enables the widgets (state='normal')
+        disable method:
+            disables the widgets (state='disabled')
+        get method:
+            gets the value from the combo box widget
+        set method:
+            sets the value to the combo box widget
+    """
+
+    def __init__(self, parent,
+                 label_text='Label:',
+                 label_anchor='e',
+                 label_width=None,
+                 combo_value='',
+                 combo_list=('No values informed',),
+                 combo_width=None,
+                 combo_method=None,
+                 combo_method_2=None,
+                 button_text='',
+                 button_width=None,
+                 button_method=None
+                 ):
+
+        # Parent class initialization
+        super().__init__(parent)
+
+        # Frame configuration
+        if True:
+            self.rowconfigure(0, weight=1)
+            self.columnconfigure(0, weight=1)
+            self.columnconfigure(1, weight=0)
+            self.columnconfigure(2, weight=0)
+
+        # Label configuration
+        if True:
+            self.label = ttk.Label(self, text=label_text, anchor=label_anchor)
+            self.label.grid(row=0, column=0, sticky='ew', padx=2)
+
+            if label_width:
+                self.label['width'] = label_width
+
+        # Combobox configuration
+        if True:
+            self.combo_list = combo_list
+            self.variable = tk.StringVar(value=combo_value)
+            self.combobox = ttk.Combobox(self, textvariable=self.variable, justify='center',
+                                         values=combo_list, state='readonly')
+            self.combobox.grid(row=0, column=1, sticky='ew', padx=2)
+
+            if combo_width:
+                self.combobox['width'] = combo_width
+
+        # Combobox bind to method
+        if combo_method:
+            self.combobox.bind('<<ComboboxSelected>>', combo_method, add='+')
+        if combo_method_2:
+            self.combobox.bind('<<ComboboxSelected>>', combo_method_2, add='+')
+
+        # Button
+        if True:
+            self.button = ttk.Button(self, text=button_text, width=button_width)
+            self.button.grid(row=0, column=2, sticky='ew', padx=2)
+
+            if button_method:
+                self.button.configure(command=button_method)
+
+    def enable(self):
+        self.label.config(style='TLabel')
+        self.combobox.config(state='readonly', values=self.combo_list)
+        self.button.config(state='normal')
+
+    def disable(self):
+        self.label.config(style='secondary.TLabel')
+        self.combobox.config(state='disabled')
+        self.button.config(state='disabled')
+
+    def readonly(self):
+        self.label.config(style='TLabel')
+        self.combobox.config(state='readonly', values=[])
+        self.button.config(state='normal')
 
     def get(self):
         return self.variable.get()

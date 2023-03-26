@@ -148,6 +148,4 @@ if True:
 
         w.set(item)
 
-
-
 root.mainloop()

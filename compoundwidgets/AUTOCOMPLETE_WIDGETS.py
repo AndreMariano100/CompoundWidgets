@@ -35,15 +35,6 @@ def max_chars(action, value, max_length):
     return True
 
 
-local_list = \
-    ['a', 'actions', 'additional', 'also', 'an', 'and', 'angle', 'are', 'as', 'be', 'bind', 'bracket', 'brackets',
-     'button', 'can', 'cases', 'configure', 'course', 'detail', 'enter', 'event', 'events', 'example', 'field',
-     'fields', 'for', 'give', 'important', 'in', 'information', 'is', 'it', 'just', 'key', 'keyboard', 'kind',
-     'leave', 'left', 'like', 'manager', 'many', 'match', 'modifier', 'most', 'of', 'or', 'others', 'out', 'part',
-     'simplify', 'space', 'specifier', 'specifies', 'string;', 'that', 'the', 'there', 'to', 'type', 'unless',
-     'use', 'used', 'user', 'various', 'ways', 'we', 'window', 'wish', 'you']
-
-
 class AutocompleteEntryList(ttk.Frame):
     def __init__(self,
                  parent,
@@ -112,6 +103,7 @@ class AutocompleteEntryList(ttk.Frame):
 
             # List box
             self.full_list = full_list
+            self.caps_full_list = [item.upper() for item in full_list]
             self.list_method = list_method
             self.list_var = tk.StringVar(value=self.full_list)
             self.lb = tk.Listbox(self.container, listvariable=self.list_var, height=list_height,
@@ -156,12 +148,21 @@ class AutocompleteEntryList(ttk.Frame):
             self.list_method(event)
 
     def comparison(self):
-        pattern = re.compile('.*' + self.entry_var.get() + '.*')
-        return [w for w in self.full_list if re.match(pattern, w)]
+
+        pattern = re.compile('.*' + self.entry_var.get().upper() + '.*')
+        index = []
+        for i, name in enumerate(self.caps_full_list):
+            if re.match(pattern, name):
+                index.append(i)
+
+        result = [w for i, w in enumerate(self.full_list) if i in index]
+
+        return result
 
     def set_list(self, new_list):
         self.entry_var.set('')
         self.full_list = new_list
+        self.caps_full_list = [item.upper() for item in new_list]
         self.list_var.set(new_list)
 
     def set_entry(self, new_value):
@@ -182,16 +183,3 @@ class AutocompleteEntryList(ttk.Frame):
         self.label.config(style='TLabel')
         self.entry.config(state='normal')
         self.lb.config(state='normal')
-
-
-if __name__ == '__main__':
-    def show_event(event):
-        print(event.widget)
-
-    root = tk.Tk()
-    root.columnconfigure(0, weight=1)
-    root.rowconfigure(0, weight=1)
-    entry = AutocompleteEntryList(parent=root, full_list=local_list, list_height=20, list_method=show_event)
-    entry.grid(row=0, column=0)
-
-    root.mainloop()

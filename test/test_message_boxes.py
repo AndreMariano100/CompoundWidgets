@@ -1,3 +1,4 @@
+import os
 import tkinter.ttk as ttk
 import tkinter as tk
 import compoundwidgets as cw
@@ -7,7 +8,8 @@ import time
 
 # Methods for testing the message boxes
 def show_ok_cancel_box():
-    answer = cw.OkCancelBox(root, message='This is a OK / Cancel message box.\nTest the answers!').show()
+    answer = cw.OkCancelBox(root, icon_path=icon_path, title='OK Cancel Box',
+                            message='This is a OK / Cancel message box.\nTest the answers!').show()
     if answer:
         print(f'Selected OK ({answer})')
     else:
@@ -15,7 +17,8 @@ def show_ok_cancel_box():
 
 
 def show_yes_no_box():
-    answer = cw.YesNoBox(root, message='This is a Yes / No message box.\nTest the answers!').show()
+    answer = cw.YesNoBox(root, icon_path=icon_path, title='Yes No Box',
+                         message='This is a Yes / No message box.\nTest the answers!').show()
     if answer:
         print(f'Selected Yes ({answer})')
     else:
@@ -31,16 +34,21 @@ def show_progress_bar():
 
 
 def show_warning_box():
-    cw.WarningBox(root, message='This is a Warning box!').show()
+    cw.WarningBox(root, icon_path=icon_path, title='Warning Box',
+                  message='This is a Warning box!').show()
 
 
 def show_success_box():
-    cw.SuccessBox(root, message='This is a Success box!').show()
+    cw.SuccessBox(root, icon_path=icon_path, title='Success Box',
+                  message='This is a Success box!').show()
 
 
 # Root
 root = tk.Tk()
 root.title('Message Box Testing')
+image_path = os.getcwd().replace('test', 'compoundwidgets\IMAGES')
+icon_path = os.path.join(image_path, 'engineering.ico')
+root.iconbitmap(icon_path)
 root.style = Style(theme='darkly')
 root.geometry(f'400x300+200+50')
 root.columnconfigure(0, weight=1)
