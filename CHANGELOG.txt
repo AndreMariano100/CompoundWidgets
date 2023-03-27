@@ -36,3 +36,6 @@ Change Log
 0.1.34 (22/03/2023) - LabelComboButton created
 0.1.35 (22/03/2023) - LabelEntryUnit with automatic conversion feature
 0.1.36 (26/03/2023) - LabelEntryUnit unit conversion correction for empty Entry
+0.1.37 (26/03/2023) - Autocomplete listbox event added
+0.1.38 (27/03/2023) - Conversion correction
+0.1.39 (27/03/2023) - Further conversion correction and improvements in the LabelEntryUnit

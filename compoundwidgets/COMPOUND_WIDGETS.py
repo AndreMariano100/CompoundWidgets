@@ -394,8 +394,9 @@ class LabelEntryUnit (ttk.Frame):
         def __init__(self, parent, width):
             super().__init__(parent)
 
-            self.values = ('MPa', 'kgf/cm²', 'psi', 'bar', 'kPa', 'ksi')
-            self.conversion_values = (1, 0.0980665, 0.006894757, 0.1, 0.001, 6.894757)
+            self.values = ('kPa', 'bar', 'kgf/cm²', 'MPa', 'ksi', 'psi')
+            self.conversion_values = (1, 100, 98.0665, 1000, 689.4757, 6.894757)
+
             self.variable = tk.StringVar(value=self.values[0])
             self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
                            state='readonly')
@@ -404,8 +405,8 @@ class LabelEntryUnit (ttk.Frame):
         def __init__(self, parent, width):
             super().__init__(parent)
 
-            self.values = ('MPa', 'GPa', 'psi', 'ksi', 'x10³ ksi')
-            self.conversion_values = (1, 1000, 0.006894757, 6.894757, 6894.757)
+            self.values = ('MPa', 'GPa', 'ksi', 'x10³ ksi', 'psi')
+            self.conversion_values = (1, 1000, 6.894757, 6894.757, 0.006894757)
             self.variable = tk.StringVar(value=self.values[0])
             self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
                            state='readonly')
@@ -484,17 +485,39 @@ class LabelEntryUnit (ttk.Frame):
         'j-integral': JIntegralCombo
     }
     metric_unit_list = \
-        ('mm', 'kPa', 'MPa', 'GPa', 'mm²', 'cm²',
-         'kgf/cm²', 'bar', 'N', 'kgf', 'N.m', 'kgf.m',
-         'MPa.√m', 'joule', 'joule/m²')
+        ('mm',  #LengthCombo
+         'mm²', 'cm²',  #AreaCombo
+         'kPa', 'kPa', 'bar', 'kgf/cm²', 'MPa',  #PressureCombo
+         'kPa', 'GPa',  # StressCombo
+         'N', 'kgf',  #ForceCombo
+         'N.m', 'kgf.m',  #MomentCombo
+         '-',  #NoUnitCombo
+         'N/mm^(3/2)', 'MPa.√m',  #ToughnessCombo
+         'joule',  #EnergyCombo
+         'joule/m²'  #JIntegralCombo
+         )
     imperial_unit_list = \
-        ('in', 'psi', 'ksi', 'x10³ ksi', 'in²', 'in²',
-         'psi', 'psi', 'lbf', 'lbf', 'lbf.ft', 'lbf.ft',
-         'ksi.√in', 'ft-lbf', 'ft-lbf/ft²')
+        ('in',
+         'in²', 'in²',
+         'psi', 'ksi', 'ksi', 'ksi', 'ksi',
+         'x10³ ksi', 'x10³ ksi',
+         'lbf', 'lbf',
+         'lbf.ft', 'lbf.ft',
+         '-',
+         'ksi.√in', 'ksi.√in',
+         'ft-lbf',
+         'ft-lbf/ft²')
     conversion = \
-        (25.4, 6.894757, 6.894757, 6.894757, 645.16, 6.4516,
-         0.07030696, 0.06894757, 4.448222, 0.4535924, 1.35582, 0.1382552,
-         1.0988, 1.355818, 14.5939)
+        (25.4,
+         645.16, 6.4516,
+         6.894757, 6894.757, 68.94757, 70.30696, 6.894757,
+         6.894757e6, 6.894757,
+         4.448222, 0.4535924,
+         1.35582, 0.1382552,
+         1,
+         34.7485, 1.0988,
+         1.355818,
+         14.5939)
 
     def __init__(self, parent, label_text='Label:', label_anchor='e', label_width=None, entry_value='',
                  entry_numeric=False, entry_width=None, entry_max_char=None, entry_method=None, combobox_unit=None,
@@ -564,6 +587,7 @@ class LabelEntryUnit (ttk.Frame):
             else:
                 self.unit_combo.bind("<<ComboboxSelected>>", self.convert_to_selected_unit)
 
+    # Widget state methods ---------------------------------------------------------------------------------------------
     def enable(self):
         self.label.config(style='TLabel')
         self.entry.config(state='normal')
@@ -582,6 +606,20 @@ class LabelEntryUnit (ttk.Frame):
         else:
             self.unit_combo.config(state='readonly', values=self.unit_combo.values)
 
+    def lock_unit(self):
+        self.unit_combo.config(state='readonly', values=[], style='TLabel',
+                               width=self.combobox_unit_width+4)
+
+    def unlock_unit(self):
+        self.unit_combo.config(state='readonly', values=self.unit_combo.values, style='TCombobox',
+                               width=self.combobox_unit_width)
+
+    def check_length(self, event):
+        current = self.get_entry()
+        if len(current) >= self.entry_max_char:
+            self.set_entry(current[:int(self.entry_max_char)])
+
+    # Widget set and get methods ---------------------------------------------------------------------------------------
     def get_entry(self):
         return self.variable.get()
 
@@ -594,8 +632,10 @@ class LabelEntryUnit (ttk.Frame):
     def set_unit(self, unit):
         if unit in list(self.unit_combo.values):
             self.unit_combo.set(unit)
+            self.last_unit = unit
         else:
             self.unit_combo.set(self.unit_combo.values[0])
+            self.last_unit = self.unit_combo.values[0]
 
     def get(self):
         return self.get_entry(), self.get_unit()
@@ -603,23 +643,29 @@ class LabelEntryUnit (ttk.Frame):
     def set(self, value, unit):
         self.variable.set(value)
         if unit in list(self.unit_combo.values):
-            self.set_entry(value)
             self.set_unit(unit)
+            self.last_unit = unit
         else:
             self.unit_combo.set(self.unit_combo.values[0])
+            self.last_unit = self.unit_combo.values[0]
 
+    # Widget conversion methods ----------------------------------------------------------------------------------------
     def get_metric_value(self):
+        """
+        Returns the current value converted to the equivalent metric unit.
+        The selected metric unit is the first from the combobox values.
+        """
 
         if isinstance(self.unit_combo, LabelEntryUnit.NoUnitCombo):
             return self.get_entry(), '-'
 
         if isinstance(self.unit_combo, LabelEntryUnit.TemperatureCombo):
-            if str(self.unit_combo.get()) == '°F':
+            if str(self.get_unit()) == '°F':
                 if not self.get_entry():
-                    return '', self.unit_combo.values[0]
+                    return '', '°C'
                 else:
-                    return 5 * (float(self.get_entry()) - 32) / 9, self.unit_combo.values[0]
-            return self.get_entry(), self.unit_combo.values[0]
+                    return 5 * (float(self.get_entry()) - 32) / 9, '°C'
+            return self.get_entry(), '°C'
 
         index = self.unit_combo.values.index(self.get_unit())
         if not self.get_entry():
@@ -628,65 +674,50 @@ class LabelEntryUnit (ttk.Frame):
             return float(self.get_entry()) * self.unit_combo.conversion_values[index], self.unit_combo.values[0]
 
     def get_imperial_value(self):
+        """
+        Returns the current value converted to the equivalent imperial unit.
+        The selected imperial unit is the last from the combobox values.
+        """
 
-        value, unit = self.get_metric_value()
-        new_value, new_unit = self.convert_data_to_imperial(value, unit)
-        return new_value, new_unit
+        if isinstance(self.unit_combo, LabelEntryUnit.NoUnitCombo):
+            return self.get_entry(), '-'
 
-    def check_length(self, event):
-        current = self.get_entry()
-        if len(current) >= self.entry_max_char:
-            self.set_entry(current[:int(self.entry_max_char)])
+        if isinstance(self.unit_combo, LabelEntryUnit.TemperatureCombo):
+            if str(self.get_unit()) == '°C':
+                if not self.get_entry():
+                    return '', '°F'
+                else:
+                    return 9 * float(self.get_entry())/5 + 32, '°F'
+            return self.get_entry(), '°F'
+
+        index = self.unit_combo.values.index(self.get_unit())
+        if not self.get_entry():
+            return '', self.unit_combo.values[-1]
+        else:
+            last_value = self.get_entry()
+            intermediary_value = float(last_value) * self.unit_combo.conversion_values[index]
+            new_value = intermediary_value / self.unit_combo.conversion_values[-1]
+            new_value = round(new_value, 8)
+            return new_value, self.unit_combo.values[-1]
 
     def convert_to_metric(self):
         """ Convert 'self' to metric """
 
-        if isinstance(self.unit_combo, LabelEntryUnit.NoUnitCombo):
-            pass
-
-        elif isinstance(self.unit_combo, LabelEntryUnit.TemperatureCombo):
-            if str(self.unit_combo.get()) == '°F':
-                if not self.get_entry():
-                    new_value = ''
-                else:
-                    new_value = 5 * (float(self.get_entry()) - 32) / 9
-                self.set(new_value, '°C')
-        else:
-            value, unit = self.get()
-            if unit not in LabelEntryUnit.metric_unit_list:
-                index = LabelEntryUnit.imperial_unit_list.index(unit)
-                if not value:
-                    new_value = ''
-                else:
-                    new_value = round(float(value)*LabelEntryUnit.conversion[index], 2)
-                self.set(new_value, LabelEntryUnit.metric_unit_list[index])
+        new_value, new_unit = self.get_metric_value()
+        self.set(new_value, new_unit)
 
     def convert_to_imperial(self):
         """ Convert 'self' to imperial """
 
-        if isinstance(self.unit_combo, LabelEntryUnit.NoUnitCombo):
-            pass
-
-        elif isinstance(self.unit_combo, LabelEntryUnit.TemperatureCombo):
-            if str(self.unit_combo.get()) == '°C':
-                if not self.get_entry():
-                    new_value = ''
-                else:
-                    new_value = 9 * (float(self.get_entry()) / 5) + 32
-                self.set(new_value, '°F')
-        else:
-            value, unit = self.get()
-            if unit not in LabelEntryUnit.imperial_unit_list:
-                index = LabelEntryUnit.metric_unit_list.index(unit)
-                if not value:
-                    new_value = ''
-                else:
-                    new_value = round(float(value) / LabelEntryUnit.conversion[index], 2)
-                self.set(new_value, LabelEntryUnit.imperial_unit_list[index])
+        new_value, new_unit = self.get_imperial_value()
+        self.set(new_value, new_unit)
 
     @staticmethod
     def convert_data_to_metric(value, unit):
-        """ Convert given data (value, unit) to metric"""
+        """
+        Convert any given data (value, unit) to metric.
+        Uses the main conversion lists for the operation.
+        """
 
         if unit == '-':
             return None, None
@@ -704,12 +735,16 @@ class LabelEntryUnit (ttk.Frame):
                 if not value:
                     new_value = ''
                 else:
-                    new_value = round(float(value)*LabelEntryUnit.conversion[index], 2)
+                    new_value = round(float(value)*LabelEntryUnit.conversion[index], 8)
                 return new_value, LabelEntryUnit.metric_unit_list[index]
+            return value, unit
 
     @staticmethod
     def convert_data_to_imperial(value, unit):
-        """ Convert given data (value, unit) to imperial """
+        """
+        Convert any given data (value, unit) to imperial.
+        Uses the main conversion lists for the operation.
+        """
         if unit == '-':
             return None, None
 
@@ -726,19 +761,14 @@ class LabelEntryUnit (ttk.Frame):
                 if not value:
                     new_value = ''
                 else:
-                    new_value = round(float(value) / LabelEntryUnit.conversion[index], 2)
+                    new_value = round(float(value) / LabelEntryUnit.conversion[index], 8)
                 return new_value, LabelEntryUnit.imperial_unit_list[index]
-
-    def lock_unit(self):
-        self.unit_combo.config(state='readonly', values=[], style='TLabel',
-                               width=self.combobox_unit_width+4)
-
-    def unlock_unit(self):
-        self.unit_combo.config(state='readonly', values=self.unit_combo.values, style='TCombobox',
-                               width=self.combobox_unit_width)
+            return value, unit
 
     def convert_to_selected_unit(self, event=None):
-        """ Method to convert the value everytime a unit is changed """
+        """
+        Method to convert the value everytime a unit is changed.
+        """
 
         last_value = self.get_entry()
         new_unit = self.get_unit()
@@ -756,7 +786,7 @@ class LabelEntryUnit (ttk.Frame):
                         new_value = ''
                     else:
                         new_value = 9 * (float(last_value) / 5) + 32
-                        new_value = round(new_value, 3)
+                        new_value = round(new_value, 8)
                     self.last_unit = '°F'
                     self.set(new_value, '°F')
                 else:
@@ -764,9 +794,12 @@ class LabelEntryUnit (ttk.Frame):
                         new_value = ''
                     else:
                         new_value = 5 * (float(last_value) - 32) / 9
-                        new_value = round(new_value, 3)
+                        new_value = round(new_value, 8)
                     self.last_unit = '°C'
                     self.set(new_value, '°C')
+
+                print(f'New data: {new_value} {self.last_unit}')
+
         else:
             if last_unit == new_unit:
                 pass
@@ -781,7 +814,7 @@ class LabelEntryUnit (ttk.Frame):
 
                     # Convert from index 1 to new index
                     new_value = intermediary_value / self.unit_combo.conversion_values[new_index]
-                    new_value = round(new_value, 3)
+                    new_value = round(new_value, 8)
 
                 self.last_unit = new_unit
                 self.set(new_value, new_unit)
@@ -1462,6 +1495,7 @@ class LabelSpinbox(ttk.Frame):
 
                 else:
                     self.set(int(self.get()) + sign * self.increment)
+
     def get(self):
         return self.variable.get()
 

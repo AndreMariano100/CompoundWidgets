@@ -119,6 +119,7 @@ class AutocompleteEntryList(ttk.Frame):
             self.lb.bind("<Right>", self.selection)
             self.lb.bind('<Return>', self.selection)
             self.lb.bind("<Double-Button-1>", self.selection)
+            self.lb.bind("<<ListboxSelected>>", self.selection)
 
     def changed(self, name, index, mode):
 
