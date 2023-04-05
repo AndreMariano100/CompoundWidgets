@@ -9,32 +9,32 @@ class CollapsableFrame(ttk.Frame):
         parent - container for the frame
         title - title of the frame
         open_start - whether the frame initiates opened or closed
+        style - input or output (color scheme for data input or data output)
     """
 
-    def __init__(self, parent, title='Frame Title', open_start=True, **kwargs):
+    def __init__(self, parent, title='Frame Title', open_start=True, style='input', disabled=False, **kwargs):
 
         # Main container
         if True:
-            self.container = ttk.Frame(parent, style='primary.TFrame')
+            self.container = ttk.Frame(parent)
             self.container.columnconfigure(0, weight=1)
             self.container.rowconfigure(0, weight=1)
             self.container.rowconfigure(1, weight=1)
 
         # Title frame @ main container
         if True:
-            title_frame = ttk.Frame(self.container, style='primary.TFrame')
-            title_frame.grid(row=0, column=0, sticky='nsew')
-            title_frame.rowconfigure(0, weight=1)
-            title_frame.columnconfigure(0, weight=1)
-            title_frame.columnconfigure(1, weight=0)
+            self.title_frame = ttk.Frame(self.container)
+            self.title_frame.grid(row=0, column=0, sticky='nsew')
+            self.title_frame.rowconfigure(0, weight=1)
+            self.title_frame.columnconfigure(0, weight=1)
+            self.title_frame.columnconfigure(1, weight=0)
 
-            title_label = ttk.Label(title_frame, style='primary.Inverse.TLabel', font=('OpenSans', 12),
-                                    padding=5, text=title)
-            title_label.grid(row=0, column=0, sticky='nsew')
-            title_label.bind('<ButtonRelease-1>', self.check_collapse)
+            self.title_label = ttk.Label(self.title_frame, font=('OpenSans', 12), padding=5, text=title)
+            self.title_label.grid(row=0, column=0, sticky='nsew')
+            self.title_label.bind('<ButtonRelease-1>', self.check_collapse)
 
-            self.collapse_button = ttk.Label(title_frame, text='-', style='primary.TButton',
-                                             font=('OpenSans', 12, 'bold'), width=2, padding=0)
+            self.collapse_button = ttk.Label(self.title_frame, text='-', font=('OpenSans', 12, 'bold'),
+                                             width=2, padding=0)
             self.collapse_button.grid(row=0, column=1, sticky='nsew')
             self.collapse_button.bind('<ButtonRelease-1>', self.check_collapse)
 
@@ -42,6 +42,128 @@ class CollapsableFrame(ttk.Frame):
         if True:
             super().__init__(self.container, **kwargs)
             self.grid(row=1, column=0, sticky='nsew', padx=2, pady=2)
+            self.rowconfigure(0, weight=1)
+            self.columnconfigure(0, weight=1)
+
+        # Delegate content geometry methods to container frame
+        _methods = vars(tk.Grid).keys()
+        for method in _methods:
+            if "grid" in method:
+                # prefix content frame methods with 'content_'
+                setattr(self, f"content_{method}", getattr(self, method))
+                # overwrite content frame methods from container frame
+                setattr(self, method, getattr(self.container, method))
+
+        # Collapsed start adjust
+        if not open_start:
+            self.collapse_frame()
+
+        # Assigns the widget color scheme
+        self.style = style
+
+        # Status flag: disabled / enabled
+        if disabled:
+            self.disabled = True
+            self.disable()
+        else:
+            self.disabled = False
+            self.enable()
+
+    def check_collapse(self, event):
+
+        widget_under_cursor = event.widget.winfo_containing(event.x_root, event.y_root)
+        if widget_under_cursor != event.widget:
+            return
+
+        if self.collapse_button.cget('text') == '-':
+            self.collapse_frame()
+        else:
+            self.expand_frame()
+
+    def collapse_frame(self):
+        self.collapse_button.configure(text='+')
+        self.rowconfigure(1, weight=0)
+        self.content_grid_remove()
+
+    def expand_frame(self):
+        if not self.disabled:
+            self.collapse_button.configure(text='-')
+            self.rowconfigure(1, weight=1)
+            self.content_grid()
+
+    def is_collapsed(self):
+        if self.collapse_button.cget('text') == '-':
+            return False
+        return True
+
+    def disable(self):
+        self.collapse_frame()
+        self.disabled = True
+        self.container.configure(style='secondary.TFrame')
+        self.title_frame.configure(style='secondary.TFrame')
+        self.title_label.configure(style='secondary.Inverse.TLabel')
+        self.collapse_button.configure(style='secondary.TButton')
+
+    def enable(self):
+        self.disabled = False
+        if self.style.upper() == 'INPUT':
+            self.apply_input_style()
+        else:
+            self.apply_output_style()
+
+    def apply_input_style(self):
+        self.container.configure(style='primary.TFrame')
+        self.title_frame.configure(style='primary.TFrame')
+        self.title_label.configure(style='primary.Inverse.TLabel')
+        self.collapse_button.configure(style='primary.TButton')
+
+    def apply_output_style(self):
+        self.container.configure(style='success.TFrame')
+        self.title_frame.configure(style='success.TFrame')
+        self.title_label.configure(style='success.Inverse.TLabel')
+        self.collapse_button.configure(style='success.TButton')
+
+
+class VCollapsableFrame(ttk.Frame):
+    """
+    Creates a horizontal collapsable frame
+    Input:
+        parent - container for the frame
+        title - title of the frame
+        open_start - whether the frame initiates opened or closed
+    """
+
+    def __init__(self, parent, title='Frame Title', open_start=True, **kwargs):
+
+        # Main container
+        if True:
+            self.container = ttk.Frame(parent, style='primary.TFrame')
+            self.container.rowconfigure(0, weight=1)
+            self.container.columnconfigure(0, weight=0)
+            self.container.columnconfigure(1, weight=1)
+
+        # Title frame @ main container
+        if True:
+            title_frame = ttk.Frame(self.container, style='primary.TFrame')
+            title_frame.grid(row=0, column=0, sticky='nsew')
+            title_frame.columnconfigure(0, weight=1)
+            title_frame.rowconfigure(0, weight=1)
+            title_frame.rowconfigure(1, weight=0)
+
+            title_label = ttk.Label(title_frame, style='primary.Inverse.TLabel', font=('OpenSans', 12),
+                                    padding=5, text=title, wraplength=1, anchor='center', justify='center')
+            title_label.grid(row=1, column=0, sticky='nsew')
+            title_label.bind('<ButtonRelease-1>', self.check_collapse)
+
+            self.collapse_button = ttk.Label(title_frame, text='-', style='primary.TButton',
+                                             font=('OpenSans', 12, 'bold'), width=2, padding=0)
+            self.collapse_button.grid(row=0, column=0, sticky='nsew')
+            self.collapse_button.bind('<ButtonRelease-1>', self.check_collapse)
+
+        # Self initialization
+        if True:
+            super().__init__(self.container, **kwargs)
+            self.grid(row=0, column=1, sticky='nsew', padx=2, pady=2)
             self.rowconfigure(0, weight=1)
             self.columnconfigure(0, weight=1)
 

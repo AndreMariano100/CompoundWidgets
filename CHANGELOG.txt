@@ -39,3 +39,7 @@ Change Log
 0.1.37 (26/03/2023) - Autocomplete listbox event added
 0.1.38 (27/03/2023) - Conversion correction
 0.1.39 (27/03/2023) - Further conversion correction and improvements in the LabelEntryUnit
+0.1.40 (27/03/2023) - Collapsable frame update
+0.1.41 (31/03/2023) - New conversion method added to LabelEntryUnit
+0.1.42 (31/03/2023) - Toughness combo preferred metric unit changed
+0.1.43 (05/04/2023) - 'Font' option added to the compound widgets

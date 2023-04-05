@@ -54,7 +54,7 @@ class LedButton (ttk.Frame):
             changes the color of the canvas to the deselected one
     """
 
-    def __init__(self, parent, label_text='Label', label_width=10, label_method=None):
+    def __init__(self, parent, label_text='Label', label_width=10, label_method=None, font=None):
 
         # Parent class initialization
         super().__init__(parent)
@@ -86,6 +86,8 @@ class LedButton (ttk.Frame):
             self.label = ttk.Label(self, text=label_text, anchor='w', style='secondary.TButton', padding=2,
                                    width=label_width)
             self.label.grid(row=0, column=1, sticky='nsew')
+            if font:
+                self.label.config(font=font)
 
         # Bind mouse button click event
         self.color_canvas.bind('<Button-1>', self.select)
@@ -148,7 +150,7 @@ class CheckLedButton (ttk.Frame):
             checks whether the button is currently selected
     """
 
-    def __init__(self, parent, label_text='Label', label_width=10, label_method=None):
+    def __init__(self, parent, label_text='Label', label_width=10, label_method=None, font=None):
 
         # Parent class initialization
         super().__init__(parent)
@@ -186,6 +188,8 @@ class CheckLedButton (ttk.Frame):
             self.label = ttk.Label(self, text=label_text, anchor='w', style='secondary.TButton', padding=2,
                                    width=label_width)
             self.label.grid(row=0, column=2, sticky='nsew')
+            if font:
+                self.label.config(font=font)
 
         # Bind method
         self.color_canvas_1.bind('<ButtonRelease-1>', self.check_hover)
@@ -248,6 +252,7 @@ class RadioLedButton(ttk.Frame):
         label_width: width of the label im characters
         label_method: method to bind to the label
         control_variable: variable that will group the buttons for "radio button" like operation
+        font: label font
     Methods:
         enable method:
             enables the widgets (state='normal')
@@ -263,7 +268,7 @@ class RadioLedButton(ttk.Frame):
 
     control_variable_dict = {}
 
-    def __init__(self, parent, label_text='Label', label_width=10, label_method=None, control_variable=None):
+    def __init__(self, parent, label_text='Label', label_width=10, label_method=None, control_variable=None, font=None):
 
         super().__init__(parent)
         self.label_method = label_method
@@ -300,6 +305,8 @@ class RadioLedButton(ttk.Frame):
             self.label = ttk.Label(self, text=label_text, anchor='w', justify='left', style='secondary.TButton',
                                    padding=1, width=label_width)
             self.label.grid(row=0, column=1, sticky='nsew')
+            if font:
+                self.label.config(font=font)
 
         self.color_canvas.bind('<ButtonRelease-1>', self.check_hover)
         self.label.bind('<ButtonRelease-1>', self.check_hover)
@@ -405,8 +412,8 @@ class LabelEntryUnit (ttk.Frame):
         def __init__(self, parent, width):
             super().__init__(parent)
 
-            self.values = ('MPa', 'GPa', 'ksi', 'x10³ ksi', 'psi')
-            self.conversion_values = (1, 1000, 6.894757, 6894.757, 0.006894757)
+            self.values = ('MPa', 'GPa', 'x10³ ksi', 'psi', 'ksi')
+            self.conversion_values = (1, 1000, 6894.757, 0.006894757, 6.894757)
             self.variable = tk.StringVar(value=self.values[0])
             self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
                            state='readonly')
@@ -444,8 +451,8 @@ class LabelEntryUnit (ttk.Frame):
         def __init__(self, parent, width):
             super().__init__(parent)
 
-            self.values = ('N/mm^(3/2)', 'MPa.√m', 'ksi.√in')
-            self.conversion_values = (1, 31.6240, 34.7485)
+            self.values = ('MPa.√m', 'N/mm^(3/2)', 'ksi.√in')
+            self.conversion_values = (1, 0.031621553, 1.0988015)
             self.variable = tk.StringVar(value=self.values[0])
             self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
                            state='readonly')
@@ -519,7 +526,7 @@ class LabelEntryUnit (ttk.Frame):
          1.355818,
          14.5939)
 
-    def __init__(self, parent, label_text='Label:', label_anchor='e', label_width=None, entry_value='',
+    def __init__(self, parent, label_text='Label:', label_anchor='e', label_width=None, font=None, entry_value='',
                  entry_numeric=False, entry_width=None, entry_max_char=None, entry_method=None, combobox_unit=None,
                  combobox_unit_width=8, combobox_unit_conversion=False):
 
@@ -543,6 +550,9 @@ class LabelEntryUnit (ttk.Frame):
             if label_width:
                 self.label['width'] = label_width
 
+            if font:
+                self.label.config(font=font)
+
         # Entry
         if True:
             self.variable = tk.StringVar(value=entry_value)
@@ -551,6 +561,9 @@ class LabelEntryUnit (ttk.Frame):
 
             if entry_width:
                 self.entry['width'] = entry_width
+
+            if font:
+                self.entry.config(font=font)
 
         # Restrict numeric values
         if entry_numeric:
@@ -798,8 +811,6 @@ class LabelEntryUnit (ttk.Frame):
                     self.last_unit = '°C'
                     self.set(new_value, '°C')
 
-                print(f'New data: {new_value} {self.last_unit}')
-
         else:
             if last_unit == new_unit:
                 pass
@@ -818,6 +829,57 @@ class LabelEntryUnit (ttk.Frame):
 
                 self.last_unit = new_unit
                 self.set(new_value, new_unit)
+
+    def convert_to_given_unit(self, old_data, given_unit):
+        """
+        Method to convert a given data to a new unit.
+        """
+
+        last_value = old_data[0]
+        last_unit = old_data[1]
+        new_unit = given_unit
+
+        if isinstance(self.unit_combo, LabelEntryUnit.NoUnitCombo):
+            return last_value, last_unit
+
+        elif isinstance(self.unit_combo, LabelEntryUnit.TemperatureCombo):
+            if last_unit == new_unit:
+                return last_value, last_unit
+
+            else:
+                if new_unit == '°F':
+                    if not last_value:
+                        new_value = ''
+                    else:
+                        new_value = 9 * (float(last_value) / 5) + 32
+                        new_value = round(new_value, 8)
+                    return new_value, '°F'
+                else:
+                    if not last_value:
+                        new_value = ''
+                    else:
+                        new_value = 5 * (float(last_value) - 32) / 9
+                        new_value = round(new_value, 8)
+                    return new_value, '°C'
+
+        else:
+            if last_unit == new_unit:
+                return last_value, last_unit
+
+            else:
+                old_index = self.unit_combo.values.index(last_unit)
+                new_index = self.unit_combo.values.index(new_unit)
+                if not last_value:
+                    new_value = ''
+                else:
+                    # Convert from old index to index 1
+                    intermediary_value = float(last_value) * self.unit_combo.conversion_values[old_index]
+
+                    # Convert from index 1 to new index
+                    new_value = intermediary_value / self.unit_combo.conversion_values[new_index]
+                    new_value = round(new_value, 8)
+
+                return new_value, new_unit
 
 
 class LabelCombo (ttk.Frame):
@@ -851,7 +913,8 @@ class LabelCombo (ttk.Frame):
                  combo_list=('No values informed',),
                  combo_width=None,
                  combo_method=None,
-                 combo_method_2=None):
+                 combo_method_2=None,
+                 font=None):
 
         # Parent class initialization
         super().__init__(parent)
@@ -869,6 +932,8 @@ class LabelCombo (ttk.Frame):
 
             if label_width:
                 self.label['width'] = label_width
+            if font:
+                self.label.config(font=font)
 
         # Combobox configuration
         if True:
@@ -940,7 +1005,8 @@ class LabelEntry (ttk.Frame):
                  entry_numeric=False,
                  entry_width=None,
                  entry_max_char=None,
-                 entry_method=None):
+                 entry_method=None,
+                 font=None):
 
         # Parent class initialization
         super().__init__(parent)
@@ -962,6 +1028,8 @@ class LabelEntry (ttk.Frame):
 
             if label_width:
                 self.label['width'] = label_width
+            if font:
+                self.label.config(font=font)
 
         # Entry
         if True:
@@ -1044,7 +1112,8 @@ class LabelEntryButton (ttk.Frame):
                  entry_method=None,
                  button_text='',
                  button_width=None,
-                 button_method=None
+                 button_method=None,
+                 font=None
     ):
 
         # Parent class initialization
@@ -1068,6 +1137,8 @@ class LabelEntryButton (ttk.Frame):
 
             if label_width:
                 self.label['width'] = label_width
+            if font:
+                self.label.config(font=font)
 
         # Entry
         if True:
@@ -1087,6 +1158,9 @@ class LabelEntryButton (ttk.Frame):
 
             elif entry_max_char:
                 self.entry.config(validate='all', validatecommand=(validate_chars, '%d', '%P', entry_max_char))
+
+            if font:
+                self.entry.config(font=font)
 
         # Button
         if True:
@@ -1155,7 +1229,8 @@ class LabelComboButton (ttk.Frame):
                  combo_method_2=None,
                  button_text='',
                  button_width=None,
-                 button_method=None
+                 button_method=None,
+                 font=None
                  ):
 
         # Parent class initialization
@@ -1175,6 +1250,8 @@ class LabelComboButton (ttk.Frame):
 
             if label_width:
                 self.label['width'] = label_width
+            if font:
+                self.label.config(font=font)
 
         # Combobox configuration
         if True:
@@ -1253,7 +1330,8 @@ class LabelText (ttk.Frame):
                  text_width=None,
                  text_height=None,
                  text_method=None,
-                 sided=True):
+                 sided=True,
+                 font=None):
 
         # Parent class initialization
         super().__init__(parent)
@@ -1280,6 +1358,8 @@ class LabelText (ttk.Frame):
                                 sticky='nsew', padx=2, pady=2)
             if label_width:
                 self.label['width'] = label_width
+            if font:
+                self.label.config(font=font)
 
         # Text
         if True:
@@ -1296,6 +1376,8 @@ class LabelText (ttk.Frame):
                 self.text['width'] = text_width
             if text_height:
                 self.text['height'] = text_height
+            if font:
+                self.text.config(font=font)
 
         # Scroll bar
         if True:
@@ -1379,7 +1461,8 @@ class LabelSpinbox(ttk.Frame):
                  spin_start=0,
                  spin_end=10,
                  spin_increment=1,
-                 spin_precision=1
+                 spin_precision=1,
+                 font=None
                  ):
 
         # Parent class initialization
@@ -1403,6 +1486,8 @@ class LabelSpinbox(ttk.Frame):
 
             if label_width:
                 self.label['width'] = label_width
+            if font:
+                self.label.config(font=font)
 
         # Spinbox
         if True:

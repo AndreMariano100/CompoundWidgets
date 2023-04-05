@@ -16,6 +16,9 @@ root.style = Style(theme='darkly')
 root.rowconfigure(0, weight=0)
 root.rowconfigure(1, weight=0)
 root.rowconfigure(2, weight=0)
+root.rowconfigure(4, weight=0)
+root.columnconfigure(0, weight=1)
+
 
 # Minimum information: parent for the frame
 frame_1 = cw.CollapsableFrame(root)
@@ -41,6 +44,23 @@ frame_3.grid(row=2, column=0, sticky='nsew', padx=10, pady=(0, 10))
 frame_3.rowconfigure(0, weight=1)
 frame_3.columnconfigure(0, weight=1)
 label = ttk.Label(frame_3, text='This is the 3rd collapsable frame', padding=50, anchor='center')
+label.grid(row=0, column=0, sticky='nsew')
+
+# Frame for two horizontal collapsable frame
+frame_4 = ttk.Frame(root)
+frame_4.grid(row=3, column=0, columnspan=2, sticky='nsew', padx=10, pady=(0, 10))
+frame_4.columnconfigure(0, weight=0)
+frame_4.columnconfigure(1, weight=0)
+frame_4.rowconfigure(0, weight=1)
+
+v_frame_1 = cw.VCollapsableFrame(frame_4, title='Vertical 1', open_start=True)
+v_frame_1.grid(row=0, column=0, sticky='nsew')
+label = ttk.Label(v_frame_1, text='This is the first vertical collapsable frame', padding=50, anchor='center')
+label.grid(row=0, column=0, sticky='nsew')
+
+v_frame_2 = cw.VCollapsableFrame(frame_4, title='Vertical 2', open_start=False)
+v_frame_2.grid(row=0, column=1, sticky='nsew', padx=(10, 0))
+label = ttk.Label(v_frame_2, text='This is the second vertical collapsable frame', padding=50, anchor='center')
 label.grid(row=0, column=0, sticky='nsew')
 
 root.mainloop()

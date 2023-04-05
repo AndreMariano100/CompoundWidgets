@@ -7,13 +7,13 @@ from ttkbootstrap import Style
 
 # Methods for testing the message boxes
 def show_danger_box():
-    cw.TimedBox(root, message='This is a timed box: 3 seconds', time=3, style='danger').show()
+    cw.TimedBox(root, message='This is a timed box: 1 seconds', time=1, style='danger').show()
 
 def show_warning_box():
-    cw.TimedBox(root, message='This is a timed box: 2 seconds', time=2, style='warning').show()
+    cw.TimedBox(root, message='This is a timed box: 0.5 seconds', time=0.5, style='warning').show()
 
 def show_info_box():
-    cw.TimedBox(root, message='This is a timed box: 1 seconds', time=1, style='info').show()
+    cw.TimedBox(root, message='This is a timed box: 0.2 seconds', time=0.2, style='info').show()
 
 
 def show_generic_box():

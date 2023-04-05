@@ -1,4 +1,4 @@
-__version__ = "0.1.39"
+__version__ = "0.1.43"
 __author__ = 'Andre Mariano'
 __all__ = ['AUTOCOMPLETE_WIDGETS',
            'COMPOUND_WIDGETS',
@@ -37,6 +37,7 @@ from .CUSTOM_BUTTONS import YesButton
 
 from .CUSTOM_FRAMES import CollapsableFrame
 from .CUSTOM_FRAMES import ScrollableFrame
+from .CUSTOM_FRAMES import VCollapsableFrame
 
 from .MESSAGE_BOX_WIDGETS import OkCancelBox
 from .MESSAGE_BOX_WIDGETS import ProgressBar

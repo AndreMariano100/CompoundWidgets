@@ -313,10 +313,7 @@ class TimedBox(tk.Toplevel):
         if True:
             super().__init__(parent)
             self.overrideredirect(True)
-            try:
-                self.time = int(time)
-            except ValueError:
-                self.time = 1
+            self.total_time_ms = 1000 * time
             self.minsize(250, 120)
             self.columnconfigure(0, weight=1)
             self.columnconfigure(1, weight=0)
@@ -338,15 +335,16 @@ class TimedBox(tk.Toplevel):
             label.grid(row=0, column=0, columnspan=2, sticky='nsew', padx=10, pady=10)
 
             self.progressbar_var = tk.DoubleVar(value=0)
-            self.progressbar = ttk.Progressbar(self, maximum=1, orient='horizontal', mode='determinate',
-                                               style=progress_bar_style, variable=self.progressbar_var)
+            self.progressbar = ttk.Progressbar(self, maximum=self.total_time_ms, orient='horizontal',
+                                               mode='determinate', style=progress_bar_style,
+                                               variable=self.progressbar_var)
             self.progressbar.grid(row=1, column=0, columnspan=2, sticky='nsew', padx=10)
 
             button = ttk.Button(self, text='CLOSE', style=button_style, command= lambda: self.destroy())
             button.grid(row=2, column=1, sticky='nsew', pady=10, padx=10)
 
             if label.winfo_reqwidth() > self.minsize()[0]:
-                self.minsize(label.winfo_reqwidth() + 20, 120)
+                self.minsize(label.winfo_reqwidth() + 40, 120)
                 self.update()
 
         # Determine relative position
@@ -365,10 +363,12 @@ class TimedBox(tk.Toplevel):
 
     def update_progress_bar(self):
 
-        steps = self.time*100
-        for i in range(steps):
-            self.after(10)
-            self.progressbar_var.set(i/steps)
+        step_number = 50
+        step = int(self.total_time_ms / step_number)
+
+        for i in range(step_number):
+            self.after(step)
+            self.progressbar_var.set((i + 1) * step)
             self.progressbar.update()
         self.destroy()
 
