@@ -27,6 +27,7 @@ from .CUSTOM_BUTTONS import EditReport
 from .CUSTOM_BUTTONS import EraseButton
 from .CUSTOM_BUTTONS import HelpButton
 from .CUSTOM_BUTTONS import NoButton
+from .CUSTOM_BUTTONS import OKButton
 from .CUSTOM_BUTTONS import QuitButton
 from .CUSTOM_BUTTONS import RemoveFromReport
 from .CUSTOM_BUTTONS import SaveButton
