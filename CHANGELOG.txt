@@ -43,3 +43,4 @@ Change Log
 0.1.41 (31/03/2023) - New conversion method added to LabelEntryUnit
 0.1.42 (31/03/2023) - Toughness combo preferred metric unit changed
 0.1.43 (05/04/2023) - 'Font' option added to the compound widgets
+0.2.00 (06/04/2023) - General revision of all widgets

@@ -1,370 +1,583 @@
 import tkinter as tk
-import tkinter.ttk as ttk
+import ttkbootstrap as ttk
+from .scripts import *
 
 
-def float_only(action, value, text, max_length=None):
-    """ Checks that only float related characters are accepted as input """
-
-    permitted = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '-']
-    if action == '1':
-        if str(max_length) != 'None':
-            if len(value) > int(max_length):
-                return False
-        if value == '.' and text == '.':
-            return False
-        elif value == '-' and text == '-':
-            return True
-        elif text in permitted:
-            try:
-                float(value)
-                return True
-            except ValueError:
-                return False
-        else:
-            return False
-    else:
-        return True
-
-
-def max_chars(action, value, max_length):
-    """ Checks for the maximum number of characters """
-    if action == '1':
-        if len(value) > int(max_length):
-            return False
-    return True
-
-
-class LedButton (ttk.Frame):
+class LabelCombo (ttk.Frame):
     """
-    Create a compound widget, with a color canvas (left) and a label (right).
-    The master (application top level) shall have a ttkbootstrap Style defined.
-    Input:
-        parent: container in which the widgets will be created
-        label_text: string to be shown on the label
-        label_width: width of the label im characters
-        label_method: method to bind to the label
-    Methods:
-        enable method:
-            enables the widgets (state='normal')
-        disable method:
-            disables the widgets (state='disabled')
-        select method:
-            changes the color of the canvas to the selected one
-        deselect method:
-            changes the color of the canvas to the deselected one
+    Compound widget, with a label and a combobox within a frame.
+    Parameters:
+        parent: parent widget
+        label_text: label text value
+        label_anchor: anchor position for the text within the label
+        label_width: minimum width of the label
+        combo_value: initial value to show at the combobox (if any)
+        combo_list: list of values to be shown at the combobox
+        combo_width: combo box minimum width
+        combo_method: method to associate when combobox is selected
+        font: font to be used for the label
+    Methods for the user:
+        set(value): sets a value to the combobox widget
+        get(): gets the current value from the combobox widget
+        disable(): turns the whole widget 'off'
+        enable(): turns the whole widget 'on'
+        readonly(): turn the whole widget 'readonly' (non-editable)
     """
 
-    def __init__(self, parent, label_text='Label', label_width=10, label_method=None, font=None):
+    def __init__(self, parent,
+                 label_text='Label:', label_anchor='e', label_width=None,
+                 combo_value='', combo_list=('No values informed',), combo_width=None,
+                 combo_method=None, font=None):
 
         # Parent class initialization
         super().__init__(parent)
-        self.label_method = label_method
-
-        # Gets the current style from the top level container
-        style = parent.winfo_toplevel().style
-
-        # Gets the active/inactive colors from the style
-        if True:
-            self.selected_color = style.colors.info
-            self.deselected_color = style.colors.fg
-            self.disable_color = style.colors.light
 
         # Frame configuration
         if True:
             self.rowconfigure(0, weight=1)
-            self.columnconfigure(0, weight=0)
-            self.columnconfigure(1, weight=1)
-
-        # Canvas
-        if True:
-            self.color_canvas = tk.Canvas(self, bd=0, width=10, height=0, highlightthickness=0)
-            self.color_canvas.grid(row=0, column=0, sticky='nsew')
-            self.color_canvas.configure(background=self.deselected_color)
-
-        # Label
-        if True:
-            self.label = ttk.Label(self, text=label_text, anchor='w', style='secondary.TButton', padding=2,
-                                   width=label_width)
-            self.label.grid(row=0, column=1, sticky='nsew')
-            if font:
-                self.label.config(font=font)
-
-        # Bind mouse button click event
-        self.color_canvas.bind('<Button-1>', self.select)
-        self.label.bind('<Button-1>', self.select)
-        self.color_canvas.bind('<ButtonRelease-1>', self.check_hover)
-        self.label.bind('<ButtonRelease-1>', self.check_hover)
-
-    def check_hover(self, event):
-        """ Checks whether the mouse is still over the widget before calling the assigned method """
-
-        if str(self.label.cget('state')) == 'disabled':
-            return
-
-        self.deselect()
-        current_widget = event.widget.winfo_containing(event.x_root, event.y_root)
-        if current_widget == event.widget:
-            self.label_method(event)
-
-    def enable(self):
-        self.color_canvas.config(bg=self.deselected_color)
-        self.label.config(state='normal')
-
-    def disable(self):
-        self.color_canvas.config(bg=self.disable_color)
-        self.label.config(state='disabled')
-
-    def select(self, event=None):
-        if str(self.label.cget('state')) == 'disabled':
-            return
-        self.color_canvas.config(bg=self.selected_color)
-        # self.label.config(style='primary.TButton')
-
-    def deselect(self, event=None):
-        if str(self.label.cget('state')) == 'disabled':
-            return
-        self.color_canvas.config(bg=self.deselected_color)
-        # self.label.config(style='secondary.TButton')
-
-
-class CheckLedButton (ttk.Frame):
-    """
-    Create a compound widget, with a color canvas (left) and a label (right).
-    The master (application top level) shall have a ttkbootstrap Style defined.
-    This button remains ON until once again selected
-    Input:
-        parent: container in which the widgets will be created
-        label_text: string to be shown on the label
-        label_width: width of the label im characters
-        label_method: method to bind to the label
-    Methods:
-        enable method:
-            enables the widgets (state='normal')
-        disable method:
-            disables the widgets (state='disabled')
-        select method:
-            changes the color of the canvas to the selected one
-        deselect method:
-            changes the color of the canvas to the deselected one
-        is_selected:
-            checks whether the button is currently selected
-    """
-
-    def __init__(self, parent, label_text='Label', label_width=10, label_method=None, font=None):
-
-        # Parent class initialization
-        super().__init__(parent)
-        self.label_method = label_method
-
-        # Gets the current style from the top level container
-        style = parent.winfo_toplevel().style
-
-        # Gets the active/inactive colors from the style
-        if True:
-            self.selected_color = style.colors.info
-            self.deselected_color = style.colors.fg
-            self.disable_color = style.colors.light
-            self.bg_color = style.colors.secondary
-
-        # Frame configuration
-        if True:
-            self.rowconfigure(0, weight=1)
-            self.columnconfigure(0, weight=0)
+            self.columnconfigure(0, weight=1)
             self.columnconfigure(1, weight=0)
-            self.columnconfigure(2, weight=1)
 
-        # Canvas
+        # Label configuration
         if True:
-            self.color_canvas_1 = tk.Canvas(self, bd=0, width=10, height=0, highlightthickness=0)
-            self.color_canvas_1.grid(row=0, column=0, sticky='nsew', padx=(1, 0))
-            self.color_canvas_1.configure(background=self.deselected_color)
+            self.label = ttk.Label(self, text=label_text, anchor=label_anchor)
+            self.label.grid(row=0, column=0, sticky='ew', padx=2)
 
-            self.color_canvas_2 = tk.Canvas(self, bd=0, width=10, height=0, highlightthickness=0)
-            self.color_canvas_2.grid(row=0, column=1, sticky='nsew', padx=(0, 1))
-            self.color_canvas_2.configure(background=self.bg_color)
-
-        # Label
-        if True:
-            self.label = ttk.Label(self, text=label_text, anchor='w', style='secondary.TButton', padding=2,
-                                   width=label_width)
-            self.label.grid(row=0, column=2, sticky='nsew')
+            if label_width:
+                self.label['width'] = label_width
             if font:
                 self.label.config(font=font)
+
+        # Combobox configuration
+        if True:
+            self.combo_list = combo_list
+            self.variable = tk.StringVar(value=combo_value)
+            self.combobox = ttk.Combobox(self, textvariable=self.variable, justify='center',
+                                         values=combo_list, state='readonly')
+            self.combobox.grid(row=0, column=1, sticky='ew', padx=2)
+
+            if combo_width:
+                self.combobox['width'] = combo_width
 
         # Bind method
-        self.color_canvas_1.bind('<ButtonRelease-1>', self.check_hover)
-        self.color_canvas_2.bind('<ButtonRelease-1>', self.check_hover)
-        self.label.bind('<ButtonRelease-1>', self.check_hover)
-
-    def check_hover(self, event):
-        """ Checks whether the mouse is still over the widget before releasing the assigned method """
-
-        if str(self.label.cget('state')) == 'disabled':
-            return
-
-        widget_under_cursor = event.widget.winfo_containing(event.x_root, event.y_root)
-
-        if widget_under_cursor in (self.color_canvas_1, self.color_canvas_2, self.label):
-            if self.is_selected():
-                self.deselect()
-            else:
-                self.select()
-                self.label_method(event)
+        if combo_method:
+            self.combobox.bind('<<ComboboxSelected>>', combo_method, add='+')
 
     def enable(self):
-        self.color_canvas_1.config(bg=self.deselected_color)
-        self.color_canvas_2.config(bg=self.bg_color)
-        self.label.config(state='normal')
+        self.label.config(style='TLabel')
+        self.combobox.config(state='readonly', values=self.combo_list)
 
     def disable(self):
-        self.color_canvas_1.config(bg=self.disable_color)
-        self.color_canvas_2.config(bg=self.bg_color)
-        self.label.config(state='disabled')
+        self.variable.set('')
+        self.label.config(style='secondary.TLabel')
+        self.combobox.config(state='disabled')
 
-    def select(self):
-        if str(self.label.cget('state')) == 'disabled':
+    def readonly(self):
+        self.label.config(style='TLabel')
+        self.combobox.config(state='readonly', values=[])
+
+    def get(self):
+        return self.variable.get()
+
+    def set(self, value):
+        if str(self.combobox.cget('state')) == 'disabled':
             return
-        self.color_canvas_1.config(bg=self.bg_color)
-        self.color_canvas_2.config(bg=self.selected_color)
-        # self.label.config(style='primary.TButton')
-
-    def deselect(self):
-        if str(self.label.cget('state')) == 'disabled':
-            return
-        self.color_canvas_1.config(bg=self.deselected_color)
-        self.color_canvas_2.config(bg=self.bg_color)
-        # self.label.config(style='secondary.TButton')
-
-    def is_selected(self):
-        if self.color_canvas_2.cget('bg') == self.selected_color:
-            return True
+        if value in self.combo_list:
+            self.variable.set(value)
         else:
-            return False
+            self.variable.set('')
 
 
-class RadioLedButton(ttk.Frame):
+class LabelEntry (ttk.Frame):
     """
-    Create a compound widget, with a color canvas and a label.
-    The set of instance with the same control variable will work as radio buttons.
-    Input:
-        parent: container in which the widgets will be created
-        label_text: string to be shown on the label
-        label_width: width of the label im characters
-        label_method: method to bind to the label
-        control_variable: variable that will group the buttons for "radio button" like operation
-        font: label font
-    Methods:
-        enable method:
-            enables the widgets (state='normal')
-        disable method:
-            disables the widgets (state='disabled')
-        select method:
-            changes the color of the canvas to the selected one
-        deselect method:
-            changes the color of the canvas to the deselected one
-        is_selected:
-            checks whether the button is currently selected
+    Create a compound widget, with a label and an entry field within a frame.
+    Parameters:
+        parent: parent widget
+        label_text: label text value
+        label_anchor: anchor position for the text within the label
+        label_width: minimum width of the label
+        entry_value: initial value to show at the entry (if any)
+        entry_numeric: whether the entry accepts only numbers
+        entry_width: entry width in number of characters
+        entry_method: method to associate with the entry events
+        entry_max_char: maximum number of characters in the entry field
+        font: font to be used for the label and for the entry
+    Methods for the user:
+        set(value): sets a value to the entry widget
+        get(): gets the current value from the entry widget
+        disable(): turns the whole widget 'off'
+        enable(): turns the whole widget 'on'
+        readonly(): turn the whole widget 'readonly' (non-editable)
     """
 
-    control_variable_dict = {}
+    def __init__(self, parent,
+                 label_text='label:', label_anchor='e', label_width=None,
+                 entry_value='', entry_numeric=False, entry_width=None,
+                 entry_max_char=None, entry_method=None, font=None):
 
-    def __init__(self, parent, label_text='Label', label_width=10, label_method=None, control_variable=None, font=None):
-
+        # Parent class initialization
         super().__init__(parent)
-        self.label_method = label_method
-        self.control_variable = control_variable
 
-        if control_variable in RadioLedButton.control_variable_dict:
-            RadioLedButton.control_variable_dict[control_variable].append(self)
-        else:
-            RadioLedButton.control_variable_dict[control_variable] = [self]
-
-        # Gets the current style from the top level container
-        style = parent.winfo_toplevel().style
-
-        # Gets the active/inactive colors from the style
-        if True:
-            self.selected_color = style.colors.info
-            self.deselected_color = style.colors.fg
-            self.disabled_color = style.colors.light
+        # Entry validation for numbers
+        validate_numbers = self.register(float_only)
+        validate_chars = self.register(max_chars)
+        self.entry_numeric = entry_numeric
+        self.entry_max_chars = entry_max_char
 
         # Frame configuration
         if True:
             self.rowconfigure(0, weight=1)
-            self.columnconfigure(0, weight=0)
-            self.columnconfigure(1, weight=1)
+            self.columnconfigure(0, weight=1)
+            self.columnconfigure(1, weight=0)
 
-        # Canvas
+        # Label configuration
         if True:
-            self.color_canvas = tk.Canvas(self, bd=0, width=10, height=0, highlightthickness=0)
-            self.color_canvas.grid(row=0, column=0, sticky='nsew')
-            self.color_canvas.configure(background=self.deselected_color)
+            self.label = ttk.Label(self, text=label_text, anchor=label_anchor)
+            self.label.grid(row=0, column=0, sticky='ew', padx=2)
 
-        # Label
-        if True:
-            self.label = ttk.Label(self, text=label_text, anchor='w', justify='left', style='secondary.TButton',
-                                   padding=1, width=label_width)
-            self.label.grid(row=0, column=1, sticky='nsew')
+            if label_width:
+                self.label['width'] = label_width
             if font:
                 self.label.config(font=font)
 
-        self.color_canvas.bind('<ButtonRelease-1>', self.check_hover)
-        self.label.bind('<ButtonRelease-1>', self.check_hover)
+        # Entry configuration
+        if True:
+            self.variable = tk.StringVar(value=entry_value)
+            self.entry = ttk.Entry(self, textvariable=self.variable, justify='center')
+            self.entry.grid(row=0, column=1, sticky='ew', padx=2)
 
-    def check_hover(self, event):
-        if str(self.label.cget('state')) == 'disabled':
-            return
+            if entry_width:
+                self.entry['width'] = entry_width
 
-        widget_under_cursor = event.widget.winfo_containing(event.x_root, event.y_root)
-        if widget_under_cursor not in (self.color_canvas, self.label):
-            return
+            if font:
+                self.entry.config(font=font)
 
-        for widget in list(self.control_variable_dict[self.control_variable]):
-            if str(widget) == str(event.widget.winfo_parent()):
-                widget.select()
-                self.label_method(event)
-            else:
-                widget.deselect()
+            # Restrict numeric values
+            if entry_numeric:
+                if not isfloat(entry_value):
+                    self.variable.set('')
+                self.entry.config(validate='all', validatecommand=(validate_numbers, '%d', '%P', '%S', entry_max_char))
 
-    def select(self):
-        self.color_canvas.config(bg=self.selected_color)
-        # self.label.config(style='primary.TButton')
+            # Restrict max characters
+            if entry_max_char:
+                entry_value = str(entry_value[:entry_max_char])
+                self.variable.set(entry_value)
+                self.entry.config(validate='all', validatecommand=(validate_chars, '%d', '%P', entry_max_char))
 
-    def deselect(self):
-        self.color_canvas.config(bg=self.deselected_color)
-        # self.label.config(style='secondary.TButton')
+        # Bind method
+        if True:
+            self.entry.bind("<Return>", entry_method)
+            self.entry.bind("<FocusOut>", entry_method)
 
     def enable(self):
-        self.color_canvas.config(bg=self.deselected_color)
-        self.label.config(state='normal')
+        self.label.config(style='TLabel')
+        self.entry.config(state='normal')
 
     def disable(self):
-        self.color_canvas.config(bg=self.disabled_color)
-        self.label.config(state='disabled')
+        self.variable.set('')
+        self.label.config(style='secondary.TLabel')
+        self.entry.config(state='disabled')
 
-    def is_selected(self):
-        if self.color_canvas.cget('bg') == self.selected_color:
-            return True
-        return False
+    def readonly(self):
+        self.label.config(style='TLabel')
+        self.entry.config(state='readonly')
+
+    def get(self):
+        return self.variable.get()
+
+    def set(self, value):
+        if str(self.entry.cget('state')) == 'disabled':
+            return
+        if self.entry_numeric and not(isfloat(value)):
+            return
+        if self.entry_max_chars:
+            value = str(value)[:self.entry_max_chars]
+        self.variable.set(value)
+
+
+class LabelText (ttk.Frame):
+    """
+    Compound widget, with a label and a text field within a frame.
+    Parameters:
+        parent: parent widget
+        label_text: label text value
+        label_anchor: anchor position for the text within the label
+        label_width: minimum width of the label
+        text_width: text width in number of characters
+        text_height: text width in number of lines
+        text_method: method to associate when the text widget loosed focus
+        text_value: initial value to show at the text (if any)
+        sided: True for label and text side by side, False for text below label
+        font: font to be used for the label and for the text
+    Methods for the user:
+        set(text): sets a text to the text widget
+        get(): gets the current text from the text widget
+        disable(): turns the whole widget 'off'
+        enable(): turns the whole widget 'on'
+        readonly(): turn the whole widget 'readonly' (non-editable)
+    """
+
+    def __init__(self, parent,
+                 label_text='label:', label_anchor='e', label_width=None,
+                 text_value='', text_width=None, text_height=None, text_method=None,
+                 sided=True, font=None):
+
+        # Parent class initialization
+        super().__init__(parent)
+
+        # Frame configuration
+        if True:
+            if sided:
+                self.rowconfigure(0, weight=1)
+                self.columnconfigure(0, weight=0)
+                self.columnconfigure(1, weight=1)
+                self.columnconfigure(2, weight=0)
+            else:
+                self.rowconfigure(0, weight=0)
+                self.rowconfigure(0, weight=1)
+                self.columnconfigure(0, weight=1)
+                self.columnconfigure(1, weight=0)
+
+        # Label configuration
+        if True:
+            self.label = ttk.Label(self, text=label_text, anchor=label_anchor)
+
+            if sided:
+                self.label.grid(row=0, column=0, sticky='ne', padx=2, pady=2)
+            else:
+                self.label.grid(row=0, column=0, columnspan=2,
+                                sticky='nsew', padx=2, pady=2)
+            if label_width:
+                self.label['width'] = label_width
+            if font:
+                self.label.config(font=font)
+
+        # Text configuration
+        if True:
+            self.text = tk.Text(self, wrap=tk.WORD, spacing1=2, padx=2, pady=2)
+            self.enabled_color = self.text.cget('fg')
+            self.disabled_color = parent.winfo_toplevel().style.colors.secondary
+            if sided:
+                self.text.grid(row=0, column=1, sticky='nsew', padx=2, pady=2)
+            else:
+                self.text.grid(row=1, column=0, sticky='nsew', padx=2, pady=2)
+
+            if text_width:
+                self.text['width'] = text_width
+            if text_height:
+                self.text['height'] = text_height
+            if font:
+                self.text.config(font=font)
+            self.set(text_value)
+
+        # Scroll bar for the text widget
+        if True:
+            y_scroll = ttk.Scrollbar(self, orient='vertical', command=self.text.yview)
+            if sided:
+                y_scroll.grid(row=0, column=2, sticky='ns')
+            else:
+                y_scroll.grid(row=1, column=1, sticky='ns')
+            self.text.configure(yscrollcommand=y_scroll.set)
+            self.text.bind('<MouseWheel>', self._on_mouse_wheel)
+            y_scroll.bind('<MouseWheel>', self._on_mouse_wheel)
+
+        # Bind method
+        if text_method:
+            self.text.bind("<FocusOut>", text_method)
+
+    def _on_mouse_wheel(self, event):
+        self.text.yview_scroll(int(-1 * event.delta / 120), 'units')
+
+    def enable(self):
+        self.label.config(style='TLabel')
+        self.text.config(state='normal')
+        self.text.config(fg=self.enabled_color)
+
+    def disable(self):
+        self.label.config(style='secondary.TLabel')
+        self.set('')
+        self.text.config(state='disabled')
+        self.text.config(fg=self.disabled_color)
+
+    def readonly(self):
+        self.label.config(style='TLabel')
+        self.text.config(state='disabled')
+        self.text.config(fg=self.enabled_color)
+
+    def get(self):
+        return str(self.text.get('1.0', tk.END)).rstrip('\n')
+
+    def set(self, value):
+        if self.text.cget('fg') == self.disabled_color:
+            return
+        original_state = self.text.cget('state')
+        self.text.config(state='normal')
+        self.text.delete('1.0', tk.END)
+        self.text.insert('1.0', value)
+        self.text.config(state=original_state)
+
+
+class LabelSpinbox(ttk.Frame):
+    """
+    Create a compound widget, with a label and a spinbox within a frame.
+    Parameters:
+        parent: parent widget
+        label_text: label text value
+        label_anchor: anchor position for the text within the label
+        label_width: minimum width of the label
+        entry_value: initial value to show at the entry (if any)
+        entry_width: entry width in number of characters
+        entry_method: method to associate with the entry events
+        entry_type: whether the value will be a float or an integer
+        spin_start: initial spinbox value
+        spin_end: spinbox end_value
+        spin_increment: spinbox increment
+        spin_precision: number of decimal places to show for float type spinbox
+    Methods for the user:
+        set(value): sets a value to the spinbox widget
+        get(): gets the current value from the spinbox widget
+        disable(): turns the whole widget 'off'
+        enable(): turns the whole widget 'on'
+        readonly(): turn the whole widget 'readonly' (non-editable)
+        """
+
+    def __init__(self, parent,
+                 label_text='label:', label_anchor='e', label_width=None,
+                 entry_value=None, entry_width=None, entry_method=None, entry_type='float',
+                 spin_start=0, spin_end=10, spin_increment=1, spin_precision=2,
+                 font=None
+                 ):
+
+        # Parent class initialization
+        super().__init__(parent)
+
+        # Spinbox atributes initialization
+        self.start = spin_start
+        self.end = spin_end
+        self.increment = spin_increment
+        self.precision = spin_precision
+        self.type = entry_type
+        self.initial_value = entry_value
+
+        # Frame configuration
+        if True:
+            self.rowconfigure(0, weight=1)
+            self.columnconfigure(0, weight=1)
+            self.columnconfigure(1, weight=0)
+
+        # Label configuration
+        if True:
+            self.label = ttk.Label(self, text=label_text, anchor=label_anchor)
+            self.label.grid(row=0, column=0, sticky='ew', padx=2)
+
+            if label_width:
+                self.label['width'] = label_width
+            if font:
+                self.label.config(font=font)
+
+        # Spinbox configuration
+        if True:
+            if entry_value and str(entry_value):
+                if isfloat(entry_value):
+                    if self.start <= entry_value <= self.end:
+                        value = entry_value
+                    else:
+                        value = spin_start
+                else:
+                    value = spin_start
+            else:
+                if self.type == 'float':
+                    value = spin_start
+                else:
+                    value = int(spin_start)
+                    self.start = int(self.start)
+                    self.end = int(self.end)
+                    self.increment = int(self.increment)
+
+            self.variable = tk.StringVar(value=str(value))
+
+            self.spin = ttk.Spinbox(self, textvariable=self.variable, justify='center', command=self._spin_selected,
+                                    from_=self.start, to=self.end, increment=self.increment)
+            self.spin.grid(row=0, column=1, sticky='ew', padx=2)
+
+            if entry_width:
+                self.spin['width'] = entry_width
+            if font:
+                self.spin.config(font=font)
+
+        # Bind method
+        if True:
+            self.spin.bind("<Return>", entry_method, add='+')
+            self.spin.bind("<Return>", self._check_user_value, add='+')
+            self.spin.bind("<FocusOut>", entry_method, add='+')
+            self.spin.bind("<FocusOut>", self._check_user_value, add='+')
+            self.spin.bind("<<Increment>>", self._do_on_increment)
+            self.spin.bind("<<Decrement>>", self._do_on_decrement)
+            self.spin.bind("<ButtonRelease-1>", self._spin_selected, add='+')
+
+    def _spin_selected(self, event=None):
+        self._check_user_value()
+        self.spin.event_generate('<Return>')
+
+    def _do_on_increment(self):
+        self._do_upon_clicking_arrows("up")
+        return "break"
+
+    def _do_on_decrement(self):
+        self._do_upon_clicking_arrows("down")
+        return "break"
+
+    def _do_upon_clicking_arrows(self, direction):
+
+        if direction == 'up':
+            if self.type == 'float':
+                if float(self.get()) >= self.end:
+                    value = self.end
+                else:
+                    value = min(float(self.end), float(self.get()) + self.increment)
+                self.set(float(value))
+
+            else:
+                if int(self.get()) >= self.end:
+                    value = self.end
+                else:
+                    value = min(self.end, int(self.get()) + self.increment)
+                self.set(int(value))
+
+        else:
+            if self.type == 'float':
+                if float(self.get()) <= self.start:
+                    value = self.start
+                else:
+                    value = max(float(self.start), float(self.get()) - self.increment)
+                self.set(float(value))
+
+            else:
+                if int(self.get()) <= self.start:
+                    value = self.start
+                else:
+                    value = max(self.start, int(self.get()) - self.increment)
+                self.set(int(value))
+
+    def _check_user_value(self, event=None):
+        self.update()
+        current = float(self.variable.get().replace(',', '.'))
+        if current < self.start:
+            current = self.start
+        elif current > self.end:
+            current = self.end
+
+        if self.type == 'int':
+            self.variable.set(str(int(current)))
+        else:
+            self.variable.set(str(current))
+
+    def enable(self):
+        self.label.config(style='TLabel')
+        self.spin.config(state='normal')
+
+        if not str(self.get()):
+            if self.initial_value is not None:
+                self.set(self.initial_value)
+            else:
+                self.set(self.start)
+            self._check_user_value()
+
+    def disable(self):
+        self.variable.set('')
+        self.label.config(style='secondary.TLabel')
+        self.spin.config(state='disabled')
+
+    def readonly(self):
+        self.label.config(style='TLabel')
+        self.spin.config(state='readonly')
+
+    def get(self):
+        return self.variable.get()
+
+    def set(self, value):
+        if value is None:
+            new_value = self.start
+
+        elif isfloat(value):
+            if value < self.start:
+                new_value = self.start
+            elif value > self.end:
+                new_value = self.end
+            else:
+                new_value = value
+        else:
+            new_value = self.start
+
+        if self.type == 'int':
+            self.variable.set(str(int(new_value)))
+        else:
+            self.variable.set(round(new_value, self.precision))
 
 
 class LabelEntryUnit (ttk.Frame):
     """
-    Creates a compound widget, with a label, an entry field, and a combobox with applicable units (metric and imperial).
-    Input:
-        parent: container in which the widgets will be created
-        label_text: string to be shown on the label
-        label_anchor: position of the text within the label
-        label_width: width of the label in characters
+    Compound widget, with a label, an entry field, and a combobox with applicable units (metric and imperial).
+    Parameters:
+        parent: parent widget
+        label_text: label text value
+        label_anchor: anchor position for the text within the label
+        label_width: minimum width of the label
         entry_value: initial value to show at the entry (if any)
-        entry_numeric: whether the entry accepts only numbers
         entry_width: entry width in number of characters
-        entry_method: method to associate when the entry events
-        entry_max_char: maximum number of characters in the entry field
+        entry_method: method to associate with the entry events
         combobox_unit: unit system for the entry
         combobox_unit_width: width of the combobox in characters
-        combobox_unit_conversion: boolean, if set to True converts the entry value when the unit changes
+        combobox_unit_conversion: boolean, if set to True converts the entry value when the unit is changed
+        font: font to be used in the label and for the entry
+        precision: number of decimal points to show to the user
+    Methods for the user:
+        disable(): turns the whole widget 'off'
+        enable(): turns the whole widget 'on'
+        readonly(): turn the whole widget 'readonly' (non-editable)
+        lock_unit(): does not allow the unit combobox to change
+        unlock_unit(): unlocks the unit combobox allowing change
+        activate_self_conversion(): turns the widget in a unit converter
+        deactivate_self_conversion(): deactivates the conversion feature
+
+        get_entry(): gets the current value from the entry widget only
+        set_entry(value): sets a value to the entry widget only
+        get_unit(): gets the current value from the unit combobox only
+        set_unit(value): sets a value to the unit combobox only
+        get(): gets the current value and current unit
+        set(value, unit): sets a value and an unit
+
+        get_metric_value(): gets the current value and unit converted to the equivalent metric unit
+        get_imperial_value(): gets the current value and unit converted to the equivalent imperial unit
+        convert_to_metric(): converts the current screen value to the equivalent metric unit
+        convert_to_imperial(): converts the current screen value to the equivalent imperial unit
+
+        (almost) Static Methods: return (Value, Unit)
+        convert_data_to_metric(value, unit): converts the given pair to the equivalent metric unit
+        convert_data_to_imperial(value, unit): converts the given pair to the equivalent imperial unit
+        convert_to_given_unit((old_value, old_unit), new_unit): converts the given pair to the given unit
+    Internal Classes:
+        NoUnitCombo: ('-')
+        TemperatureCombo: ('°C', '°F')
+        LengthCombo: ('mm', 'cm', 'in')
+        AreaCombo: ('mm²', 'cm²', 'in²')
+        PressureCombo: ('kPa', 'bar', 'kgf/cm²', 'MPa', 'atmosphere', 'ksi', 'psi')
+        StressCombo: ('MPa', 'GPa', 'x10³ ksi', 'psi', 'ksi')
+        ForceCombo: ('N', 'kgf', 'lbf')
+        MomentCombo: ('N.m', 'kgf.m', 'lbf.ft')
+        EnergyCombo: ('joule', 'ft-lbf')
+        ToughnessCombo: ('MPa.√m', 'N/mm^(3/2)', 'ksi.√in')
+        JIntegralCombo: ('joule/m²', 'ft-lbf/ft²')
     """
+
+    class NoUnitCombo(ttk.Combobox):
+        def __init__(self, parent, width):
+            super().__init__(parent)
+
+            self.values = ('-',)
+            self.variable = tk.StringVar(value='-')
+            self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
+                           state='readonly')
 
     class TemperatureCombo(ttk.Combobox):
         def __init__(self, parent, width):
@@ -379,8 +592,8 @@ class LabelEntryUnit (ttk.Frame):
         def __init__(self, parent, width):
             super().__init__(parent)
 
-            self.values = ('mm', 'in')
-            self.conversion_values = (1, 25.4)
+            self.values = ('mm', 'cm', 'in')
+            self.conversion_values = (1, 10, 25.4)
 
             self.variable = tk.StringVar(value=self.values[0])
             self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
@@ -401,8 +614,8 @@ class LabelEntryUnit (ttk.Frame):
         def __init__(self, parent, width):
             super().__init__(parent)
 
-            self.values = ('kPa', 'bar', 'kgf/cm²', 'MPa', 'ksi', 'psi')
-            self.conversion_values = (1, 100, 98.0665, 1000, 689.4757, 6.894757)
+            self.values = ('kPa', 'bar', 'kgf/cm²', 'MPa', 'atmosphere', 'ksi', 'psi')
+            self.conversion_values = (1, 100, 98.0665, 1000, 101.325, 689.4757, 6.894757)
 
             self.variable = tk.StringVar(value=self.values[0])
             self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
@@ -438,12 +651,13 @@ class LabelEntryUnit (ttk.Frame):
             self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
                            state='readonly')
 
-    class NoUnitCombo(ttk.Combobox):
+    class EnergyCombo(ttk.Combobox):
         def __init__(self, parent, width):
             super().__init__(parent)
 
-            self.values = ('-',)
-            self.variable = tk.StringVar(value='-')
+            self.values = ('joule', 'ft-lbf')
+            self.conversion_values = (1, 1.355818)
+            self.variable = tk.StringVar(value=self.values[0])
             self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
                            state='readonly')
 
@@ -453,16 +667,6 @@ class LabelEntryUnit (ttk.Frame):
 
             self.values = ('MPa.√m', 'N/mm^(3/2)', 'ksi.√in')
             self.conversion_values = (1, 0.031621553, 1.0988015)
-            self.variable = tk.StringVar(value=self.values[0])
-            self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
-                           state='readonly')
-
-    class EnergyCombo(ttk.Combobox):
-        def __init__(self, parent, width):
-            super().__init__(parent)
-
-            self.values = ('joule', 'ft-lbf')
-            self.conversion_values = (1, 1.355818)
             self.variable = tk.StringVar(value=self.values[0])
             self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
                            state='readonly')
@@ -477,36 +681,35 @@ class LabelEntryUnit (ttk.Frame):
             self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
                            state='readonly')
 
-
     unit_dict = {
+        'none': NoUnitCombo,
         'temperature': TemperatureCombo,
-        'area': AreaCombo,
         'length': LengthCombo,
+        'area': AreaCombo,
         'pressure': PressureCombo,
         'stress': StressCombo,
         'force': ForceCombo,
         'moment': MomentCombo,
-        'none': NoUnitCombo,
-        'toughness': ToughnessCombo,
         'energy': EnergyCombo,
+        'toughness': ToughnessCombo,
         'j-integral': JIntegralCombo
     }
     metric_unit_list = \
-        ('mm',  #LengthCombo
-         'mm²', 'cm²',  #AreaCombo
-         'kPa', 'kPa', 'bar', 'kgf/cm²', 'MPa',  #PressureCombo
+        ('mm', 'cm',  # LengthCombo
+         'mm²', 'cm²',  # AreaCombo
+         'kPa', 'kPa', 'bar', 'kgf/cm²', 'MPa', 'atmosphere',  # PressureCombo
          'kPa', 'GPa',  # StressCombo
-         'N', 'kgf',  #ForceCombo
-         'N.m', 'kgf.m',  #MomentCombo
-         '-',  #NoUnitCombo
-         'N/mm^(3/2)', 'MPa.√m',  #ToughnessCombo
-         'joule',  #EnergyCombo
-         'joule/m²'  #JIntegralCombo
+         'N', 'kgf',  # ForceCombo
+         'N.m', 'kgf.m',  # MomentCombo
+         '-',  # NoUnitCombo
+         'N/mm^(3/2)', 'MPa.√m',  # ToughnessCombo
+         'joule',  # EnergyCombo
+         'joule/m²'  # JIntegralCombo
          )
     imperial_unit_list = \
-        ('in',
+        ('in', 'in',
          'in²', 'in²',
-         'psi', 'ksi', 'ksi', 'ksi', 'ksi',
+         'psi', 'ksi', 'ksi', 'ksi', 'ksi', 'psi',
          'x10³ ksi', 'x10³ ksi',
          'lbf', 'lbf',
          'lbf.ft', 'lbf.ft',
@@ -515,9 +718,9 @@ class LabelEntryUnit (ttk.Frame):
          'ft-lbf',
          'ft-lbf/ft²')
     conversion = \
-        (25.4,
+        (25.4, 2.54,
          645.16, 6.4516,
-         6.894757, 6894.757, 68.94757, 70.30696, 6.894757,
+         6.894757, 6894.757, 68.94757, 70.30696, 6.894757, 0.06804596,
          6.894757e6, 6.894757,
          4.448222, 0.4535924,
          1.35582, 0.1382552,
@@ -526,9 +729,13 @@ class LabelEntryUnit (ttk.Frame):
          1.355818,
          14.5939)
 
-    def __init__(self, parent, label_text='Label:', label_anchor='e', label_width=None, font=None, entry_value='',
-                 entry_numeric=False, entry_width=None, entry_max_char=None, entry_method=None, combobox_unit=None,
-                 combobox_unit_width=8, combobox_unit_conversion=False):
+    # imperial_unit_list[index] * conversion[index] => metric_unit_list[index]
+
+    def __init__(self, parent,
+                 label_text='Label:', label_anchor='e', label_width=None,
+                 entry_value='', entry_width=None, entry_method=None,
+                 combobox_unit=None, combobox_unit_width=8, combobox_unit_conversion=False,
+                 font=None, precision=2):
 
         # Parent class initialization
         super().__init__(parent)
@@ -543,20 +750,21 @@ class LabelEntryUnit (ttk.Frame):
             self.columnconfigure(1, weight=0)
             self.columnconfigure(2, weight=0)
 
-        # Label
+        # Label configuration
         if True:
             self.label = ttk.Label(self, text=label_text, anchor=label_anchor)
             self.label.grid(row=0, column=0, sticky='ew', padx=2)
+
             if label_width:
                 self.label['width'] = label_width
-
             if font:
                 self.label.config(font=font)
 
-        # Entry
+        # Entry configuration
         if True:
-            self.variable = tk.StringVar(value=entry_value)
-            self.entry = ttk.Entry(self, textvariable=self.variable, justify='center')
+            self.precision = precision
+            self.entry_variable = tk.StringVar(value=entry_value)
+            self.entry = ttk.Entry(self, textvariable=self.entry_variable, justify='center')
             self.entry.grid(row=0, column=1, sticky='ew', padx=2)
 
             if entry_width:
@@ -565,16 +773,13 @@ class LabelEntryUnit (ttk.Frame):
             if font:
                 self.entry.config(font=font)
 
-        # Restrict numeric values
-        if entry_numeric:
-            self.entry.config(validate='all', validatecommand=(validate_numbers, '%d', '%P', '%S'))
+            # Restrict numeric values
+            if True:
+                if not isfloat(entry_value):
+                    self.entry_variable.set('')
+                self.entry.config(validate='all', validatecommand=(validate_numbers, '%d', '%P', '%S'))
 
-        # Restrict maximum number of characters
-        if entry_max_char:
-            self.entry_max_char = entry_max_char
-            self.entry.bind('<Key>', self.check_length)
-
-        # Unit Combobox
+        # Unit combobox configuration
         if True:
             if not combobox_unit:
                 combobox_unit = 'none'
@@ -588,30 +793,37 @@ class LabelEntryUnit (ttk.Frame):
             self.unit_combo = local_class(self, self.combobox_unit_width)
             self.unit_combo.grid(row=0, column=2, sticky='ew', padx=2)
             self.last_unit = self.unit_combo.values[0]
+            self.combobox_variable = self.unit_combo.variable
+            self.is_locked = False
 
         # Bind methods
         if True:
+            self.entry_method = entry_method
             self.entry.bind("<Return>", entry_method)
             self.entry.bind("<FocusOut>", entry_method)
 
-            self.combobox_unit_conversion = combobox_unit_conversion
             if not self.combobox_unit_conversion:
                 self.unit_combo.bind("<<ComboboxSelected>>", entry_method)
             else:
-                self.unit_combo.bind("<<ComboboxSelected>>", self.convert_to_selected_unit)
+                self.unit_combo.bind("<<ComboboxSelected>>", self._convert_to_selected_unit)
 
     # Widget state methods ---------------------------------------------------------------------------------------------
     def enable(self):
+        self.unlock_unit()
         self.label.config(style='TLabel')
         self.entry.config(state='normal')
         self.unit_combo.config(state='readonly', values=self.unit_combo.values)
 
     def disable(self):
+        self.unlock_unit()
+        self.entry_variable.set('')
+        self.combobox_variable.set('')
         self.label.config(style='secondary.TLabel')
         self.entry.config(state='disabled')
         self.unit_combo.config(state='disabled')
 
     def readonly(self):
+        self.unlock_unit()
         self.label.config(style='TLabel')
         self.entry.config(state='readonly')
         if not self.combobox_unit_conversion:
@@ -620,47 +832,63 @@ class LabelEntryUnit (ttk.Frame):
             self.unit_combo.config(state='readonly', values=self.unit_combo.values)
 
     def lock_unit(self):
+        if not self.get_unit():
+            return
         self.unit_combo.config(state='readonly', values=[], style='TLabel',
                                width=self.combobox_unit_width+4)
+        self.is_locked = True
 
     def unlock_unit(self):
         self.unit_combo.config(state='readonly', values=self.unit_combo.values, style='TCombobox',
                                width=self.combobox_unit_width)
+        self.is_locked = False
 
-    def check_length(self, event):
-        current = self.get_entry()
-        if len(current) >= self.entry_max_char:
-            self.set_entry(current[:int(self.entry_max_char)])
+    def activate_self_conversion(self):
+        self.unlock_unit()
+        self.enable()
+        self.entry.config(state='readonly')
+        self.combobox_unit_conversion = True
+        self.unit_combo.bind("<<ComboboxSelected>>", self._convert_to_selected_unit)
+
+    def deactivate_self_conversion(self):
+        self.enable()
+        self.combobox_unit_conversion = False
+        self.unit_combo.bind("<<ComboboxSelected>>", self.entry_method)
 
     # Widget set and get methods ---------------------------------------------------------------------------------------
     def get_entry(self):
-        return self.variable.get()
+        return self.entry_variable.get()
 
     def set_entry(self, value):
-        self.variable.set(value)
+        if str(self.entry.cget('state')) == 'disabled':
+            return
+        if not(isfloat(value)):
+            return
+        self.entry_variable.set("%0.*f" % (self.precision, float(value)))
 
     def get_unit(self):
-        return self.unit_combo.get()
+        return self.combobox_variable.get()
 
     def set_unit(self, unit):
+        if str(self.unit_combo.cget('state')) == 'disabled':
+            return
+
+        if self.is_locked:
+            return
+
         if unit in list(self.unit_combo.values):
-            self.unit_combo.set(unit)
+            self.combobox_variable.set(unit)
             self.last_unit = unit
         else:
-            self.unit_combo.set(self.unit_combo.values[0])
+            self.combobox_variable.set(self.unit_combo.values[0])
             self.last_unit = self.unit_combo.values[0]
 
     def get(self):
         return self.get_entry(), self.get_unit()
 
     def set(self, value, unit):
-        self.variable.set(value)
-        if unit in list(self.unit_combo.values):
-            self.set_unit(unit)
-            self.last_unit = unit
-        else:
-            self.unit_combo.set(self.unit_combo.values[0])
-            self.last_unit = self.unit_combo.values[0]
+        self.set_entry(value)
+        self.set_unit(unit)
 
     # Widget conversion methods ----------------------------------------------------------------------------------------
     def get_metric_value(self):
@@ -710,18 +938,19 @@ class LabelEntryUnit (ttk.Frame):
             last_value = self.get_entry()
             intermediary_value = float(last_value) * self.unit_combo.conversion_values[index]
             new_value = intermediary_value / self.unit_combo.conversion_values[-1]
-            new_value = round(new_value, 8)
             return new_value, self.unit_combo.values[-1]
 
     def convert_to_metric(self):
         """ Convert 'self' to metric """
-
+        if self.is_locked:
+            return
         new_value, new_unit = self.get_metric_value()
         self.set(new_value, new_unit)
 
     def convert_to_imperial(self):
         """ Convert 'self' to imperial """
-
+        if self.is_locked:
+            return
         new_value, new_unit = self.get_imperial_value()
         self.set(new_value, new_unit)
 
@@ -748,7 +977,7 @@ class LabelEntryUnit (ttk.Frame):
                 if not value:
                     new_value = ''
                 else:
-                    new_value = round(float(value)*LabelEntryUnit.conversion[index], 8)
+                    new_value = float(value)*LabelEntryUnit.conversion[index]
                 return new_value, LabelEntryUnit.metric_unit_list[index]
             return value, unit
 
@@ -774,61 +1003,9 @@ class LabelEntryUnit (ttk.Frame):
                 if not value:
                     new_value = ''
                 else:
-                    new_value = round(float(value) / LabelEntryUnit.conversion[index], 8)
+                    new_value = float(value) / LabelEntryUnit.conversion[index]
                 return new_value, LabelEntryUnit.imperial_unit_list[index]
             return value, unit
-
-    def convert_to_selected_unit(self, event=None):
-        """
-        Method to convert the value everytime a unit is changed.
-        """
-
-        last_value = self.get_entry()
-        new_unit = self.get_unit()
-        last_unit = self.last_unit
-
-        if isinstance(self.unit_combo, LabelEntryUnit.NoUnitCombo):
-            pass
-
-        elif isinstance(self.unit_combo, LabelEntryUnit.TemperatureCombo):
-            if last_unit == new_unit:
-                pass
-            else:
-                if new_unit == '°F':
-                    if not last_value:
-                        new_value = ''
-                    else:
-                        new_value = 9 * (float(last_value) / 5) + 32
-                        new_value = round(new_value, 8)
-                    self.last_unit = '°F'
-                    self.set(new_value, '°F')
-                else:
-                    if not last_value:
-                        new_value = ''
-                    else:
-                        new_value = 5 * (float(last_value) - 32) / 9
-                        new_value = round(new_value, 8)
-                    self.last_unit = '°C'
-                    self.set(new_value, '°C')
-
-        else:
-            if last_unit == new_unit:
-                pass
-            else:
-                old_index = self.unit_combo.values.index(last_unit)
-                new_index = self.unit_combo.values.index(new_unit)
-                if not last_value:
-                    new_value = ''
-                else:
-                    # Convert from old index to index 1
-                    intermediary_value = float(last_value) * self.unit_combo.conversion_values[old_index]
-
-                    # Convert from index 1 to new index
-                    new_value = intermediary_value / self.unit_combo.conversion_values[new_index]
-                    new_value = round(new_value, 8)
-
-                self.last_unit = new_unit
-                self.set(new_value, new_unit)
 
     def convert_to_given_unit(self, old_data, given_unit):
         """
@@ -852,14 +1029,12 @@ class LabelEntryUnit (ttk.Frame):
                         new_value = ''
                     else:
                         new_value = 9 * (float(last_value) / 5) + 32
-                        new_value = round(new_value, 8)
                     return new_value, '°F'
                 else:
                     if not last_value:
                         new_value = ''
                     else:
                         new_value = 5 * (float(last_value) - 32) / 9
-                        new_value = round(new_value, 8)
                     return new_value, '°C'
 
         else:
@@ -877,53 +1052,106 @@ class LabelEntryUnit (ttk.Frame):
 
                     # Convert from index 1 to new index
                     new_value = intermediary_value / self.unit_combo.conversion_values[new_index]
-                    new_value = round(new_value, 8)
 
                 return new_value, new_unit
 
+    def _convert_to_selected_unit(self, event=None):
+        """
+        Method to convert the value everytime a unit is changed.
+        """
 
-class LabelCombo (ttk.Frame):
+        last_value = self.get_entry()
+        new_unit = self.get_unit()
+        last_unit = self.last_unit
+
+        if isinstance(self.unit_combo, LabelEntryUnit.NoUnitCombo):
+            pass
+
+        elif isinstance(self.unit_combo, LabelEntryUnit.TemperatureCombo):
+            if last_unit == new_unit:
+                pass
+            else:
+                if new_unit == '°F':
+                    if not last_value:
+                        new_value = ''
+                    else:
+                        new_value = 9 * (float(last_value) / 5) + 32
+                    self.last_unit = '°F'
+                    self.set(new_value, '°F')
+                else:
+                    if not last_value:
+                        new_value = ''
+                    else:
+                        new_value = 5 * (float(last_value) - 32) / 9
+                    self.last_unit = '°C'
+                    self.set(new_value, '°C')
+
+        else:
+            if last_unit == new_unit:
+                pass
+            else:
+                old_index = self.unit_combo.values.index(last_unit)
+                new_index = self.unit_combo.values.index(new_unit)
+                if not last_value:
+                    new_value = ''
+                else:
+                    # Convert from old index to index 1
+                    intermediary_value = float(last_value) * self.unit_combo.conversion_values[old_index]
+
+                    # Convert from index 1 to new index
+                    new_value = intermediary_value / self.unit_combo.conversion_values[new_index]
+
+                self.last_unit = new_unit
+                self.set(new_value, new_unit)
+
+
+class LabelEntryButton (ttk.Frame):
     """
-    Create a compound widget, with a label and a combo box within a ttk Frame.
+    Create a compound widget, with a label, an entry field and a button within a frame.
     Input:
-        parent - container in which the widgets will be created
-        label_text - string to be shown on the label
-        label_anchor - position of the text within the label
-        label_width: label width in number of characters
-        combo_value - initial value to show at the combo box (if any)
-        combo_list - list of values to be shown at the combo box
-        combo_width: combo box width in number of characters
-        combo_method: method to associate when combo box is selected
-    Methods:
-        enable method:
-            enables the widgets (state='normal')
-        disable method:
-            disables the widgets (state='disabled')
-        get method:
-            gets the value from the combo box widget
-        set method:
-            sets the value to the combo box widget
+        parent: parent widget
+        label_text: label text value
+        label_anchor: anchor position for the text within the label
+        label_width: minimum width of the label
+        entry_value: initial value to show at the entry (if any)
+        entry_numeric: whether the entry accepts only numbers
+        entry_width: entry width in number of characters
+        entry_method: method to associate with the entry events
+        entry_max_char: maximum number of characters in the entry field
+        button_text: string to be shown on the button
+        button_width: width of the button in characters
+        button_method: method to bind to the button
+        font: font to be used for the label, the entry and the button
+    Methods for the user:
+        set(value): sets a value to the entry widget
+        get(): gets the current value from the entry widget
+        disable(): turns the whole widget 'off'
+        enable(): turns the whole widget 'on'
+        readonly(): turn the whole widget 'readonly' (non-editable)
     """
 
     def __init__(self, parent,
-                 label_text='Label:',
-                 label_anchor='e',
-                 label_width=None,
-                 combo_value='',
-                 combo_list=('No values informed',),
-                 combo_width=None,
-                 combo_method=None,
-                 combo_method_2=None,
+                 label_text='label:', label_anchor='e', label_width=None,
+                 entry_value='', entry_numeric=False, entry_width=None,
+                 entry_max_char=None, entry_method=None,
+                 button_text='', button_width=None, button_method=None,
                  font=None):
 
         # Parent class initialization
         super().__init__(parent)
+
+        # Entry validation for numbers
+        validate_numbers = self.register(float_only)
+        validate_chars = self.register(max_chars)
+        self.entry_numeric = entry_numeric
+        self.entry_max_chars = entry_max_char
 
         # Frame configuration
         if True:
             self.rowconfigure(0, weight=1)
             self.columnconfigure(0, weight=1)
             self.columnconfigure(1, weight=0)
+            self.columnconfigure(2, weight=0)
 
         # Label configuration
         if True:
@@ -935,103 +1163,7 @@ class LabelCombo (ttk.Frame):
             if font:
                 self.label.config(font=font)
 
-        # Combobox configuration
-        if True:
-            self.combo_list = combo_list
-            self.variable = tk.StringVar(value=combo_value)
-            self.combobox = ttk.Combobox(self, textvariable=self.variable, justify='center',
-                                         values=combo_list, state='readonly')
-            self.combobox.grid(row=0, column=1, sticky='ew', padx=2)
-
-            if combo_width:
-                self.combobox['width'] = combo_width
-
-        # Combobox bind to method
-        if combo_method:
-            self.combobox.bind('<<ComboboxSelected>>', combo_method, add='+')
-        if combo_method_2:
-            self.combobox.bind('<<ComboboxSelected>>', combo_method_2, add='+')
-
-    def enable(self):
-        self.label.config(style='TLabel')
-        self.combobox.config(state='readonly', values=self.combo_list)
-
-    def disable(self):
-        self.label.config(style='secondary.TLabel')
-        self.combobox.config(state='disabled')
-
-    def readonly(self):
-        self.label.config(style='TLabel')
-        self.combobox.config(state='readonly', values=[])
-
-    def get(self):
-        return self.variable.get()
-
-    def set(self, value):
-        self.variable.set(value)
-
-
-class LabelEntry (ttk.Frame):
-    """
-    Create a compound widget, with a label and an entry field.
-    Input:
-        parent: container in which the widgets will be created
-        label_text: string to be shown on the label
-        label_anchor - position of the text within the label
-        label_width: label width in number of characters
-        entry_value: initial value to show at the entry (if any)
-        entry_numeric: whether the entry accepts only numbers
-        entry_width: entry width in number of characters
-        entry_method: method to associate when the entry events
-        entry_max_char: maximum number of characters in the entry field
-    Methods:
-        enable method:
-            enables the widgets (state='normal')
-        disable method:
-            disables the widgets (state='disabled')
-        read_only method:
-            disabled edition of the entry widget (state='readonly')
-        get method:
-            gets the value from the entry widget
-        set method:
-            sets the value to the entry widget
-    """
-
-    def __init__(self, parent,
-                 label_text='label:',
-                 label_anchor='e',
-                 entry_value='',
-                 label_width=None,
-                 entry_numeric=False,
-                 entry_width=None,
-                 entry_max_char=None,
-                 entry_method=None,
-                 font=None):
-
-        # Parent class initialization
-        super().__init__(parent)
-
-        # Entry validation for numbers
-        validate_numbers = self.register(float_only)
-        validate_chars = self.register(max_chars)
-
-        # Frame configuration
-        if True:
-            self.rowconfigure(0, weight=1)
-            self.columnconfigure(0, weight=1)
-            self.columnconfigure(1, weight=0)
-
-        # Label
-        if True:
-            self.label = ttk.Label(self, text=label_text, anchor=label_anchor)
-            self.label.grid(row=0, column=0, sticky='ew', padx=2)
-
-            if label_width:
-                self.label['width'] = label_width
-            if font:
-                self.label.config(font=font)
-
-        # Entry
+        # Entry configuration
         if True:
             self.variable = tk.StringVar(value=entry_value)
             self.entry = ttk.Entry(self, textvariable=self.variable, justify='center')
@@ -1040,198 +1172,94 @@ class LabelEntry (ttk.Frame):
             if entry_width:
                 self.entry['width'] = entry_width
 
-        # Restrict numeric values
-        if entry_numeric:
-            self.entry.config(validate='all', validatecommand=(validate_numbers, '%d', '%P', '%S', entry_max_char))
-
-        # Restrict max characters
-        elif entry_max_char:
-            self.entry.config(validate='all', validatecommand=(validate_chars, '%d', '%P', entry_max_char))
-
-        # Entry bind to method
-        if True:
-            self.entry.bind("<Return>", entry_method)
-            self.entry.bind("<FocusOut>", entry_method)
-
-    def enable(self):
-        self.label.config(style='TLabel')
-        self.entry.config(state='normal')
-
-    def disable(self):
-        self.label.config(style='secondary.TLabel')
-        self.entry.config(state='disabled')
-
-    def readonly(self):
-        self.label.config(style='TLabel')
-        self.entry.config(state='readonly')
-
-    def get(self):
-        return self.variable.get()
-
-    def set(self, value):
-        self.variable.set(value)
-
-
-class LabelEntryButton (ttk.Frame):
-    """
-    Create a compound widget, with a label, an entry field and a button.
-    Input:
-        parent: container in which the widgets will be created
-        label_text: string to be shown on the label
-        label_anchor - position of the text within the label
-        label_width: label width in number of characters
-        entry_value: initial value to show at the entry (if any)
-        entry_numeric: whether the entry accepts only numbers
-        entry_width: entry width in number of characters
-        entry_method: method to associate when the entry events
-        entry_max_char: maximum number of characters in the entry field
-        button_text: string to be shown on the label
-        button_width: width of the label im characters
-        button_method: method to bind to the label
-    Methods:
-        enable method:
-            enables the widgets (state='normal')
-        disable method:
-            disables the widgets (state='disabled')
-        read_only method:
-            disabled edition of the entry widget (state='readonly')
-        get method:
-            gets the value from the entry widget
-        set method:
-            sets the value to the entry widget
-    """
-
-    def __init__(self, parent,
-                 label_text='label:',
-                 label_anchor='e',
-                 entry_value='',
-                 label_width=None,
-                 entry_numeric=False,
-                 entry_width=None,
-                 entry_max_char=None,
-                 entry_method=None,
-                 button_text='',
-                 button_width=None,
-                 button_method=None,
-                 font=None
-    ):
-
-        # Parent class initialization
-        super().__init__(parent)
-
-        # Entry validation for numbers
-        validate_numbers = self.register(float_only)
-        validate_chars = self.register(max_chars)
-
-        # Frame configuration
-        if True:
-            self.rowconfigure(0, weight=1)
-            self.columnconfigure(0, weight=1)
-            self.columnconfigure(1, weight=0)
-            self.columnconfigure(2, weight=0)
-
-        # Label
-        if True:
-            self.label = ttk.Label(self, text=label_text, anchor=label_anchor)
-            self.label.grid(row=0, column=0, sticky='ew', padx=2)
-
-            if label_width:
-                self.label['width'] = label_width
             if font:
-                self.label.config(font=font)
+                self.entry.config(font=font)
 
-        # Entry
+            # Restrict numeric values
+            if entry_numeric:
+                if not isfloat(entry_value):
+                    self.variable.set('')
+                self.entry.config(validate='all', validatecommand=(validate_numbers, '%d', '%P', '%S', entry_max_char))
+
+            # Restrict max characters
+            elif entry_max_char:
+                entry_value = str(entry_value[:entry_max_char])
+                self.variable.set(entry_value)
+                self.entry.config(validate='all', validatecommand=(validate_chars, '%d', '%P', entry_max_char))
+
+        # Button configuration
         if True:
-            self.variable = tk.StringVar(value=entry_value)
-            self.entry = ttk.Entry(self, textvariable=self.variable, justify='center')
-            self.entry.grid(row=0, column=1, sticky='ew', padx=2)
+            self.button = ttk.Button(self, text=button_text, width=button_width)
+            self.button.grid(row=0, column=2, sticky='ew', padx=2)
 
-            if entry_width:
-                self.entry['width'] = entry_width
+        # Bind methods
+        if True:
+            self.button_method = button_method
+            if button_method:
+                self.button.configure(command=button_method)
 
             if entry_method:
                 self.entry.bind("<Return>", entry_method)
                 self.entry.bind("<FocusOut>", entry_method)
 
-            if entry_numeric:
-                self.entry.config(validate='all', validatecommand=(validate_numbers, '%d', '%P', '%S', entry_max_char))
-
-            elif entry_max_char:
-                self.entry.config(validate='all', validatecommand=(validate_chars, '%d', '%P', entry_max_char))
-
-            if font:
-                self.entry.config(font=font)
-
-        # Button
-        if True:
-            self.button = ttk.Button(self, text=button_text, width=button_width)
-            self.button.grid(row=0, column=2, sticky='ew', padx=2)
-
-            if button_method:
-                self.button.configure(command=button_method)
-
     def enable(self):
         self.label.config(style='TLabel')
         self.entry.config(state='normal')
-        self.button.config(state='normal')
+        self.button.state(["!disabled"])
 
     def disable(self):
+        self.variable.set('')
         self.label.config(style='secondary.TLabel')
         self.entry.config(state='disabled')
-        self.button.config(state='disabled')
+        self.button.state(["disabled"])
 
     def readonly(self):
         self.label.config(style='TLabel')
         self.entry.config(state='readonly')
-        self.button.config(state='normal')
+        self.button.state(["!disabled"])
 
     def get(self):
         return self.variable.get()
 
     def set(self, value):
+        if str(self.entry.cget('state')) == 'disabled':
+            return
+        if self.entry_numeric and not(isfloat(value)):
+            return
+        if self.entry_max_chars:
+            value = str(value)[:self.entry_max_chars]
         self.variable.set(value)
 
 
 class LabelComboButton (ttk.Frame):
     """
-    Create a compound widget, with a label and a combo box within a ttk Frame.
+    Create a compound widget, with a label, a combobox and a button within a ttk Frame.
     Input:
-        parent - container in which the widgets will be created
-        label_text - string to be shown on the label
-        label_anchor - position of the text within the label
-        label_width: label width in number of characters
-        combo_value - initial value to show at the combo box (if any)
-        combo_list - list of values to be shown at the combo box
-        combo_width: combo box width in number of characters
-        combo_method: method to associate when combo box is selected
-        button_text: string to be shown on the label
-        button_width: width of the label im characters
-        button_method: method to bind to the label
-    Methods:
-        enable method:
-            enables the widgets (state='normal')
-        disable method:
-            disables the widgets (state='disabled')
-        get method:
-            gets the value from the combo box widget
-        set method:
-            sets the value to the combo box widget
+        parent: parent widget
+        label_text: label text value
+        label_anchor: anchor position for the text within the label
+        label_width: minimum width of the label
+        combo_value: initial value to show at the combo box (if any)
+        combo_list: list of values to be shown at the combobox
+        combo_width: combobox width in number of characters
+        combo_method: method to associate when combobox is selected
+        button_text: string to be shown on the button
+        button_width: width of the button in characters
+        button_method: method to bind to the button
+        font: font to be used for the label, the entry and the button
+    Methods for the user:
+        set(value): sets a value to the entry widget
+        get(): gets the current value from the entry widget
+        disable(): turns the whole widget 'off'
+        enable(): turns the whole widget 'on'
+        readonly(): turn the whole widget 'readonly' (non-editable)
     """
 
     def __init__(self, parent,
-                 label_text='Label:',
-                 label_anchor='e',
-                 label_width=None,
-                 combo_value='',
-                 combo_list=('No values informed',),
-                 combo_width=None,
-                 combo_method=None,
-                 combo_method_2=None,
-                 button_text='',
-                 button_width=None,
-                 button_method=None,
-                 font=None
-                 ):
+                 label_text='Label:', label_anchor='e', label_width=None,
+                 combo_value='', combo_list=('No values informed',), combo_width=None, combo_method=None,
+                 button_text='', button_width=None, button_method=None,
+                 font=None):
 
         # Parent class initialization
         super().__init__(parent)
@@ -1264,329 +1292,40 @@ class LabelComboButton (ttk.Frame):
             if combo_width:
                 self.combobox['width'] = combo_width
 
-        # Combobox bind to method
-        if combo_method:
-            self.combobox.bind('<<ComboboxSelected>>', combo_method, add='+')
-        if combo_method_2:
-            self.combobox.bind('<<ComboboxSelected>>', combo_method_2, add='+')
-
-        # Button
+        # Button configuration
         if True:
             self.button = ttk.Button(self, text=button_text, width=button_width)
             self.button.grid(row=0, column=2, sticky='ew', padx=2)
 
-            if button_method:
-                self.button.configure(command=button_method)
+        # Bind methods
+        if combo_method:
+            self.combobox.bind('<<ComboboxSelected>>', combo_method, add='+')
+        if button_method:
+            self.button.configure(command=button_method)
 
     def enable(self):
         self.label.config(style='TLabel')
         self.combobox.config(state='readonly', values=self.combo_list)
-        self.button.config(state='normal')
+        self.button.state(["!disabled"])
 
     def disable(self):
+        self.variable.set('')
         self.label.config(style='secondary.TLabel')
         self.combobox.config(state='disabled')
-        self.button.config(state='disabled')
+        self.button.state(["disabled"])
 
     def readonly(self):
         self.label.config(style='TLabel')
         self.combobox.config(state='readonly', values=[])
-        self.button.config(state='normal')
+        self.button.state(["!disabled"])
 
     def get(self):
         return self.variable.get()
 
     def set(self, value):
-        self.variable.set(value)
-
-
-class LabelText (ttk.Frame):
-    """
-    Create a compound widget, with a label and a text field.
-    Input:
-        parent: container in which the widgets will be created
-        label_text: string to be shown on the label
-        label_width: label width in number of characters
-        label_anchor: position of the text within the label
-        text_value: initial value to show at the text (if any)
-        text_width: text width in number of characters
-        text_method: method to associate when the text events
-    Methods:
-        enable method:
-            enables the widgets (state='normal')
-        disable method:
-            disables the widgets (state='disabled')
-        get method:
-            gets the value from the entry widget
-        set method:
-            sets the value to the entry widget
-    """
-
-    def __init__(self, parent,
-                 label_text='label:',
-                 label_anchor='e',
-                 label_width=None,
-                 text_value='',
-                 text_width=None,
-                 text_height=None,
-                 text_method=None,
-                 sided=True,
-                 font=None):
-
-        # Parent class initialization
-        super().__init__(parent)
-
-        # Frame configuration
-        if True:
-            if sided:
-                self.rowconfigure(0, weight=1)
-                self.columnconfigure(0, weight=0)
-                self.columnconfigure(1, weight=1)
-                self.columnconfigure(2, weight=0)
-            else:
-                self.rowconfigure(0, weight=0)
-                self.rowconfigure(0, weight=1)
-                self.columnconfigure(0, weight=1)
-                self.columnconfigure(1, weight=0)
-        # Label
-        if True:
-            self.label = ttk.Label(self, text=label_text, anchor=label_anchor)
-            if sided:
-                self.label.grid(row=0, column=0, sticky='ne', padx=2, pady=2)
-            else:
-                self.label.grid(row=0, column=0, columnspan=2,
-                                sticky='nsew', padx=2, pady=2)
-            if label_width:
-                self.label['width'] = label_width
-            if font:
-                self.label.config(font=font)
-
-        # Text
-        if True:
-            self.text = tk.Text(self, height=text_height, wrap=tk.WORD)
-            self.disabled_color = parent.winfo_toplevel().style.colors.secondary
-            self.enabled_color = self.text.cget('fg')
-            if sided:
-                self.text.grid(row=0, column=1, sticky='nsew', padx=2, pady=2)
-            else:
-                self.text.grid(row=1, column=0, sticky='nsew', padx=2, pady=2)
-
-            self.set(text_value)
-            if text_width:
-                self.text['width'] = text_width
-            if text_height:
-                self.text['height'] = text_height
-            if font:
-                self.text.config(font=font)
-
-        # Scroll bar
-        if True:
-            y_scroll = ttk.Scrollbar(self, orient='vertical', command=self.text.yview)
-            if sided:
-                y_scroll.grid(row=0, column=2, sticky='ns')
-            else:
-                y_scroll.grid(row=1, column=1, sticky='ns')
-            self.text.configure(yscrollcommand=y_scroll.set)
-            self.text.bind('<MouseWheel>', self.on_mouse_wheel)
-            y_scroll.bind('<MouseWheel>', self.on_mouse_wheel)
-
-        # Bind method
-        if True:
-            self.text.bind("<Return>", text_method)
-            self.text.bind("<FocusOut>", text_method)
-
-    def on_mouse_wheel(self, event):
-        self.text.yview_scroll(int(-1 * event.delta / 120), 'units')
-
-    def enable(self):
-        self.label.config(style='TLabel')
-        self.text.config(state='normal')
-        self.text.config(fg=self.enabled_color)
-
-    def disable(self):
-        self.label.config(style='secondary.TLabel')
-        self.text.config(state='disabled')
-        self.text.config(fg=self.disabled_color)
-
-    def readonly(self):
-        self.label.config(style='TLabel')
-        self.text.config(state='disabled')
-        self.text.config(fg=self.enabled_color)
-
-    def get(self):
-        return str(self.text.get('1.0', tk.END)).rstrip('\n')
-
-    def set(self, value):
-        state = self.text.cget('state')
-        self.text.config(state='normal')
-        self.text.delete('1.0', tk.END)
-        self.text.insert('1.0', value)
-        self.text.config(state=state)
-
-
-class LabelSpinbox(ttk.Frame):
-    """
-        Create a compound widget, with a label and a Spinbox.
-        Input:
-            parent: container in which the widgets will be created
-            label_text: string to be shown on the label
-            label_anchor - position of the text within the label
-            label_width: label width in number of characters
-            entry_width: entry width in number of characters
-            entry_method: method to associate when the entry events
-            entry_type: whether the value will be a float or an integer
-            spin_start: initial value
-            spin_end: end_value
-            spin_increment: increment
-        Methods:
-            enable method:
-                enables the widgets (state='normal')
-            disable method:
-                disables the widgets (state='disabled')
-            read_only method:
-                disabled edition of the entry widget (state='readonly')
-            get method:
-                gets the value from the entry widget
-            set method:
-                sets the value to the entry widget
-        """
-
-    def __init__(self, parent,
-                 label_text='label:',
-                 label_anchor='e',
-                 label_width=None,
-                 entry_width=None,
-                 entry_method=None,
-                 entry_type='float',
-                 spin_start=0,
-                 spin_end=10,
-                 spin_increment=1,
-                 spin_precision=1,
-                 font=None
-                 ):
-
-        # Parent class initialization
-        super().__init__(parent)
-        self.increment = spin_increment
-        self.start = spin_start
-        self.end = spin_end
-        self.precision = spin_precision
-        self.type = entry_type
-
-        # Frame configuration
-        if True:
-            self.rowconfigure(0, weight=1)
-            self.columnconfigure(0, weight=1)
-            self.columnconfigure(1, weight=0)
-
-        # Label
-        if True:
-            self.label = ttk.Label(self, text=label_text, anchor=label_anchor)
-            self.label.grid(row=0, column=0, sticky='ew', padx=2)
-
-            if label_width:
-                self.label['width'] = label_width
-            if font:
-                self.label.config(font=font)
-
-        # Spinbox
-        if True:
-            if self.type == 'float':
-                value = spin_start
-            else:
-                value = int(spin_start)
-                self.increment = int(self.increment)
-                self.start = int(self.start)
-                self.end = int(self.end)
-
-            self.variable = tk.StringVar(value=str(value))
-
-            self.spin = ttk.Spinbox(self, textvariable=self.variable, justify='center', command=self.spin_selected,
-                                    from_=self.start, to=self.end, increment=self.increment)
-            self.spin.grid(row=0, column=1, sticky='ew', padx=2)
-
-            if entry_width:
-                self.spin['width'] = entry_width
-
-        # Bind method
-        if True:
-            self.spin.bind("<Return>", entry_method)
-            self.spin.bind("<FocusOut>", entry_method)
-            self.spin.bind("<<Increment>>", self._do_on_increment)
-            self.spin.bind("<<Decrement>>", self._do_on_decrement)
-            self.spin.bind("<ButtonRelease-1>", self.spin_selected, add='+')
-
-    def spin_selected(self, event=None):
-        self.update()
-        current = float(self.variable.get().replace(',', '.'))
-        if current < self.start:
-            current = self.start
-        elif current > self.end:
-            current = self.end
-
-        if self.type == 'int':
-            self.variable.set(int(current))
+        if str(self.combobox.cget('state')) == 'disabled':
+            return
+        if value in self.combo_list:
+            self.variable.set(value)
         else:
-            self.variable.set(current)
-        self.spin.event_generate('<Return>')
-
-    def enable(self):
-        self.label.config(style='TLabel')
-        self.spin.config(state='normal')
-
-    def disable(self):
-        self.label.config(style='secondary.TLabel')
-        self.spin.config(state='disabled')
-
-    def readonly(self):
-        self.label.config(style='TLabel')
-        self.spin.config(state='readonly')
-
-    def _do_on_increment(self, *args, **kwargs):
-        self.do_upon_clicking_arrows("up")
-        return "break"
-
-    def _do_on_decrement(self, *args, **kwargs):
-        self.do_upon_clicking_arrows("down")
-        return "break"
-
-    def do_upon_clicking_arrows(self, direction):
-
-        if direction == 'up':
-            sign = 1
-            if self.type == 'float':
-                if float(self.get()) >= self.end:
-                    self.set(self.end)
-
-                else:
-                    self.set(float(self.get()) + sign * self.increment)
-            else:
-                if int(self.get()) >= self.end:
-                    self.set(int(self.end))
-
-                else:
-                    self.set(int(self.get()) + sign * self.increment)
-        else:
-            sign = -1
-            if self.type == 'float':
-                if float(self.get()) <= self.start:
-                    self.set(self.start)
-
-                else:
-                    self.set(float(self.get()) + sign * self.increment)
-            else:
-                if int(self.get()) <= self.start:
-                    self.set(int(self.start))
-
-                else:
-                    self.set(int(self.get()) + sign * self.increment)
-
-    def get(self):
-        return self.variable.get()
-
-    def set(self, value):
-        if self.type == 'int':
-            self.variable.set(int(value))
-        else:
-            self.variable.set(round(value, self.precision))
-
+            self.variable.set('')
