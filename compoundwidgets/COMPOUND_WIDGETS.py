@@ -113,7 +113,7 @@ class LabelEntry (ttk.Frame):
     def __init__(self, parent,
                  label_text='label:', label_anchor='e', label_width=None,
                  entry_value='', entry_numeric=False, entry_width=None,
-                 entry_max_char=None, entry_method=None, font=None):
+                 entry_max_char=None, entry_method=None, font=None, precision=2):
 
         # Parent class initialization
         super().__init__(parent)
@@ -123,6 +123,7 @@ class LabelEntry (ttk.Frame):
         validate_chars = self.register(max_chars)
         self.entry_numeric = entry_numeric
         self.entry_max_chars = entry_max_char
+        self.precision=precision
 
         # Frame configuration
         if True:
@@ -190,9 +191,13 @@ class LabelEntry (ttk.Frame):
             return
         if self.entry_numeric and not(isfloat(value)):
             return
-        if self.entry_max_chars:
-            value = str(value)[:self.entry_max_chars]
-        self.variable.set(value)
+
+        if not self.entry_numeric:
+            if self.entry_max_chars:
+                value = str(value)[:self.entry_max_chars]
+            self.variable.set(value)
+        else:
+            self.variable.set("%0.*f" % (self.precision, float(value)))
 
 
 class LabelText (ttk.Frame):
@@ -506,6 +511,7 @@ class LabelSpinbox(ttk.Frame):
                 new_value = self.end
             else:
                 new_value = value
+
         else:
             new_value = self.start
 
@@ -886,9 +892,10 @@ class LabelEntryUnit (ttk.Frame):
     def get(self):
         return self.get_entry(), self.get_unit()
 
-    def set(self, value, unit):
+    def set(self, value, unit=None):
         self.set_entry(value)
-        self.set_unit(unit)
+        if unit:
+            self.set_unit(unit)
 
     # Widget conversion methods ----------------------------------------------------------------------------------------
     def get_metric_value(self):
@@ -1135,7 +1142,7 @@ class LabelEntryButton (ttk.Frame):
                  entry_value='', entry_numeric=False, entry_width=None,
                  entry_max_char=None, entry_method=None,
                  button_text='', button_width=None, button_method=None,
-                 font=None):
+                 font=None, precision=2):
 
         # Parent class initialization
         super().__init__(parent)
@@ -1145,6 +1152,7 @@ class LabelEntryButton (ttk.Frame):
         validate_chars = self.register(max_chars)
         self.entry_numeric = entry_numeric
         self.entry_max_chars = entry_max_char
+        self.precision = precision
 
         # Frame configuration
         if True:
@@ -1226,9 +1234,13 @@ class LabelEntryButton (ttk.Frame):
             return
         if self.entry_numeric and not(isfloat(value)):
             return
-        if self.entry_max_chars:
-            value = str(value)[:self.entry_max_chars]
-        self.variable.set(value)
+
+        if not self.entry_numeric:
+            if self.entry_max_chars:
+                value = str(value)[:self.entry_max_chars]
+            self.variable.set(value)
+        else:
+            self.variable.set("%0.*f" % (self.precision, float(value)))
 
 
 class LabelComboButton (ttk.Frame):
