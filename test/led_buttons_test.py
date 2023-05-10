@@ -12,6 +12,10 @@ root.rowconfigure(0, weight=1)
 
 # First frame, testing LedButtons
 if True:
+    def led_button_status():
+        for b in all_led_button:
+            print(f'Is desabled: {b.is_disabled()}')
+
     frame = ttk.LabelFrame(root, text='Regular Led Buttons')
     frame.grid(row=0, column=0, sticky='nsew', padx=10, pady=10)
 
@@ -31,14 +35,19 @@ if True:
 
     led_button_4 = cw.LedButton(frame, label_text='Disabled', font=('Verdada', '14', 'bold'),
                                 label_method=lambda e: print('disabled led button'))
-    led_button_4.grid(row=3, column=0, sticky='nsew', pady=10, padx=10)
+    led_button_4.grid(row=3, column=0, sticky='nsew', pady=(10, 0), padx=10)
     led_button_4.disable()
-    print(led_button_1.is_disabled())
-    print(led_button_4.is_disabled())
+
+    all_led_button = (led_button_1, led_button_2, led_button_3, led_button_4)
+    status_button = ttk.Button(frame, text='Check Status', command=led_button_status)
+    status_button.grid(row=4, column=0, sticky='nsew', pady=10, padx=10)
 
 # Second frame, testing the CheckLedButton
 if True:
-    root.columnconfigure(1, weight=1)
+    def check_button_status():
+        for i, b in enumerate(all_check_buttons):
+            print(f'{i} is desabled: {b.is_disabled()}. {i} is selected: {b.is_selected()}')
+
     frame = ttk.LabelFrame(root, text='Check Led Buttons')
     frame.grid(row=0, column=1, sticky='nsew', padx=10, pady=10)
 
@@ -53,37 +62,48 @@ if True:
         'light',
         'dark'
     )
+    all_check_buttons = []
     for i, text in enumerate(label_style_dict):
         led_button = cw.CheckLedButton(frame, label_text=f'Button {i}', label_width=15, style=text,
-                                       label_method=lambda e: print(led_button.is_selected()),
                                        bg_color='black')
         led_button.grid(row=i, column=0, sticky='nsew', pady=(10, 0), padx=10)
         if i > 5:
             led_button.disable()
+        all_check_buttons.append(led_button)
+    status_button = ttk.Button(frame, text='Check Status', command=check_button_status)
+    status_button.grid(row=20, column=0, sticky='nsew', pady=10, padx=10)
 
 # Third frame, testing the RadioLedButton
 if True:
-    root.columnconfigure(2, weight=1)
+    def radio_button_status():
+        for i, b in enumerate(all_radio_buttons):
+            print(f'{i} is desabled: {b.is_disabled()}. {i} is selected: {b.is_selected()}')
+
     frame = ttk.LabelFrame(root, text='Radio Led Buttons', padding=10)
     frame.grid(row=0, column=2, sticky='nsew', padx=10, pady=10)
 
     frame.columnconfigure(0, weight=1)
     frame.columnconfigure(1, weight=1)
 
+    all_radio_buttons = []
+
     for i, text in enumerate(label_style_dict):
         led_button = cw.RadioLedButton(frame, label_text=f'Button {i}', label_width=15, style=text,
-                                       label_method=lambda e: print(led_button.is_selected()),
                                        bg_color='black', control_variable=1)
         led_button.grid(row=i, column=0, sticky='nsew', pady=(10, 0), padx=10)
         if i > 5:
             led_button.disable()
+        all_radio_buttons.append(led_button)
+
+    status_button = ttk.Button(frame, text='Check Status', command=radio_button_status)
+    status_button.grid(row=20, column=0, sticky='nsew', pady=10, padx=10)
 
     for i, text in enumerate(label_style_dict):
-        led_button = cw.RadioLedButton(frame, label_text=f'Button {i}', label_width=15, style=text,
-                                       label_method=lambda e: print(led_button.is_selected()),
+        led_button = cw.RadioLedButton(frame, label_text=f'Button {i}', label_width=15, style='secondary',
                                        bg_color='black', control_variable=2)
         led_button.grid(row=i, column=1, sticky='nsew', pady=(10, 0), padx=10)
         if i > 5:
             led_button.disable()
+
 
 root.mainloop()

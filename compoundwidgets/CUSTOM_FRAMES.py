@@ -81,6 +81,9 @@ class CollapsableFrame(ttk.Frame):
                 # overwrite content frame methods from container frame
                 setattr(self, method, getattr(self.container, method))
 
+        # if hasattr(parent, 'yview') and callable(parent.yview):
+        #     self.bind("<Configure>", lambda _: parent.yview())
+
         # Collapsed start adjust
         if not open_start:
             self.collapse_frame()
@@ -289,19 +292,20 @@ class ScrollableFrame(ttk.Frame):
     Creates a frame with a vertical scrollbar.
     Parameters:
         parent: container for the frame
+        style: bootstyle (color style)
     """
 
-    def __init__(self, master=None, **kwargs):
+    def __init__(self, master=None, style='TFrame', **kwargs):
 
         # content frame container
-        self.container = ttk.Frame(master)
+        self.container = ttk.Frame(master, bootstyle=style)
         self.container.bind("<Configure>", lambda _: self.yview())
         self.container.rowconfigure(0, weight=1)
         self.container.columnconfigure(0, weight=1)
         self.container.columnconfigure(1, weight=0)
 
         # content frame
-        super().__init__(self.container, **kwargs)
+        super().__init__(self.container, bootstyle=style, **kwargs)
         self.place(rely=0.0, relwidth=1.0)
 
         # vertical scrollbar
@@ -310,7 +314,13 @@ class ScrollableFrame(ttk.Frame):
 
         # widget event binding
         self.container.bind("<Enter>", self._on_enter, "+")
+        self.vscroll.bind("<Enter>", self._on_enter, "+")
+        self.bind("<Enter>", self._on_enter, "+")
+
         self.container.bind("<Leave>", self._on_leave, "+")
+        self.vscroll.bind("<Leave>", self._on_leave, "+")
+        self.bind("<Leave>", self._on_leave, "+")
+
         self.container.bind("<Map>", self._on_map, "+")
         self.bind("<<MapChild>>", self._on_map_child, "+")
 
@@ -394,18 +404,11 @@ class ScrollableFrame(ttk.Frame):
 
     def _on_enter(self, event):
         """Callback for when the mouse enters the widget."""
-
-        children = self.winfo_children()
-        for widget in [self, *children]:
-            bindings = widget.bind()
-            if "<MouseWheel>" not in bindings:
-                widget.bind("<MouseWheel>", self._on_mousewheel, "+")
+        self.container.bind_all("<MouseWheel>", self._on_mousewheel, "+")
 
     def _on_leave(self, event):
         """Callback for when the mouse leaves the widget."""
-        children = self.winfo_children()
-        for widget in [self, *children]:
-            widget.unbind("<MouseWheel>")
+        self.container.unbind_all("<MouseWheel>")
 
     def _on_configure(self, event):
         """Callback for when the widget is configured"""

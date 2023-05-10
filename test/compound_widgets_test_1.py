@@ -91,6 +91,10 @@ if True:
         for w in label_entry_list:
             w.enable()
 
+    def set_empty_entries():
+        for w in label_entry_list:
+            w.set('')
+
     frame = ttk.LabelFrame(root, text='Label Entries')
     frame.grid(row=0, column=1, sticky='nsew', padx=(0, 10), pady=10)
     frame.columnconfigure(0, weight=1)
@@ -100,10 +104,10 @@ if True:
     for i, item in enumerate(local_list):
         if i in range(3):
             w = cw.LabelEntry(frame, label_text=f'Label Entry {i+1}', label_width=10, entry_method=get_all_label_entries,
-                              entry_numeric=True, entry_value=item, entry_max_char=10)
+                              entry_numeric=True, entry_value=item, entry_max_char=10, trace_variable=True)
         else:
             w = cw.LabelEntry(frame, label_text=f'Label Entry {i+1}', label_width=10, entry_method=get_all_label_entries,
-                              entry_numeric=False, entry_value=item, entry_max_char=10)
+                              entry_numeric=False, entry_value=item, entry_max_char=10, trace_variable=True)
         w.grid(row=i, column=0, sticky='nsew', pady=2)
         label_entry_list.append(w)
         if i == 2:
@@ -125,6 +129,9 @@ if True:
 
     b6 = ttk.Button(frame, text='NORMAL', command=set_normal_entries)
     b6.grid(row=9, column=0, pady=2, sticky='ew', padx=2)
+
+    b7 = ttk.Button(frame, text='SET EMPTY', command=set_empty_entries)
+    b7.grid(row=10, column=0, pady=2, sticky='ew', padx=2)
 
 # Third Frame, testing LabelSpinbox
 if True:

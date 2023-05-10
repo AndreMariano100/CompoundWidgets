@@ -95,7 +95,8 @@ class LedButton (ttk.Frame):
         self._deselect()
         current_widget = event.widget.winfo_containing(event.x_root, event.y_root)
         if current_widget == event.widget:
-            self.label_method(event)
+            if self.label_method:
+                self.label_method(event)
 
     def _select(self, event=None):
         """ Canvas (led) color control """
@@ -233,7 +234,8 @@ class CheckLedButton (ttk.Frame):
                 self._deselect()
             else:
                 self._select()
-            self.label_method(event)
+            if self.label_method:
+                self.label_method(event)
 
     def _select(self):
         if str(self.label.cget('state')) == 'disabled':
@@ -378,7 +380,8 @@ class RadioLedButton(ttk.Frame):
         for widget in list(self.control_variable_dict[self.control_variable]):
             if str(widget) == str(event.widget.winfo_parent()):
                 widget._select()
-                self.label_method(event)
+                if self.label_method:
+                    self.label_method(event)
             else:
                 widget._deselect()
 

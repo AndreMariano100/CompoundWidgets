@@ -1,7 +1,7 @@
 import tkinter as tk
 import ttkbootstrap as ttk
 import re
-from .scripts import *
+from .SCRIPTS import *
 
 
 class AutocompleteEntryList(ttk.Frame):

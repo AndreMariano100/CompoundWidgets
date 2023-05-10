@@ -1,11 +1,12 @@
-__version__ = "0.2.00"
+__version__ = "0.2.12"
 __author__ = 'Andre Mariano'
 __all__ = ['AUTOCOMPLETE_WIDGETS',
            'COMPOUND_WIDGETS',
            'CUSTOM_BUTTONS',
            'CUSTOM_FRAMES',
            'MESSAGE_BOX_WIDGETS',
-           'IMAGES']
+           'IMAGES',
+           'SCRIPTS']
 
 from .AUTOCOMPLETE_WIDGETS import AutocompleteEntryList
 
@@ -37,9 +38,9 @@ from .CUSTOM_FRAMES import CollapsableFrame
 from .CUSTOM_FRAMES import ScrollableFrame
 from .CUSTOM_FRAMES import VCollapsableFrame
 
+from .LED_BUTTONS import CheckLedButton
 from .LED_BUTTONS import LedButton
 from .LED_BUTTONS import RadioLedButton
-from .LED_BUTTONS import CheckLedButton
 
 from .MESSAGE_BOX_WIDGETS import OkCancelBox
 from .MESSAGE_BOX_WIDGETS import ProgressBar
@@ -49,4 +50,4 @@ from .MESSAGE_BOX_WIDGETS import Tooltip
 from .MESSAGE_BOX_WIDGETS import WarningBox
 from .MESSAGE_BOX_WIDGETS import YesNoBox
 
-from .scripts import *
+from .SCRIPTS import *

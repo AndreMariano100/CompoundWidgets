@@ -28,7 +28,7 @@ all_buttons = (
     cw.QuitButton
 )
 for i, widget in enumerate(all_buttons):
-    widget(root).grid(row=i, column=0, padx=10, pady=2)
+    widget(root, width=12).grid(row=i, column=0, padx=10, pady=2)
 
 for i, widget in enumerate(all_buttons):
     widget(root, language='br').grid(row=i, column=1, padx=10, pady=2)

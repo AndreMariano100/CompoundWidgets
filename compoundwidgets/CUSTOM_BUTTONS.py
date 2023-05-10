@@ -1,34 +1,8 @@
 import ttkbootstrap as ttk
-from PIL import Image, ImageTk
+from .SCRIPTS import *
 import os
 
 ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), 'IMAGES'))
-
-
-def open_image(file_name: str, size_x: int, size_y: int, maximize: bool = False) -> ImageTk:
-    """
-    Function to open an image file and to adjust its dimensions as specified
-    Input:  file_name - full path to the image
-            size_x - final horizontal size of the image
-            size_y - final vertical size of the image
-            maximize -  if True enlarges the image to fit the dimensions,
-                        else if reduces the image to fit the dimensions
-    Return: tk_image - ImageTK to be inserted on a widget
-    """
-    image_final_width = size_x
-    image_final_height = size_y
-    pil_image = Image.open(file_name)
-    w, h = pil_image.size
-    if maximize:
-        final_scale = min(h / image_final_height, w / image_final_width)
-    else:
-        final_scale = max(h / image_final_height, w / image_final_width)
-    width_final = int(w / final_scale)
-    height_final = int(h / final_scale)
-    final_pil_image = pil_image.resize((width_final, height_final), Image.ANTIALIAS)
-    final_pil_image = final_pil_image.convert('RGBA')
-    tk_image = ImageTk.PhotoImage(final_pil_image)
-    return tk_image
 
 
 class YesButton(ttk.Button):

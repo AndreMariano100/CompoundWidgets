@@ -70,7 +70,7 @@ if True:
     frame.columnconfigure(0, weight=1)
 
     unit_options = ('none', 'temperature', 'length', 'area', 'pressure', 'stress',
-                    'force', 'moment', 'energy', 'toughness', 'j-integral')
+                    'force', 'moment', 'energy', 'toughness', 'j-integral', 'thermal expansion')
 
     all_label_entry_units = []
     for i, item in enumerate(unit_options):
