@@ -156,6 +156,9 @@ class AutocompleteEntryList(ttk.Frame):
         self.caps_full_list = [item.upper() for item in new_list]
         self.list_var.set(new_list)
 
+    def get_list(self):
+        return self.full_list
+
     def set_entry(self, new_value):
         """ Sets a value to the entry widget """
         if str(self.entry.cget('state')) == 'disabled':
@@ -164,9 +167,7 @@ class AutocompleteEntryList(ttk.Frame):
 
     def set(self, new_value):
         """ Sets a value to the entry widget """
-        if str(self.entry.cget('state')) == 'disabled':
-            return 
-        self.entry_var.set(new_value)
+        self.set_entry(new_value)
 
     def get(self):
         """ Gets the current value from the entry widget """
@@ -184,3 +185,76 @@ class AutocompleteEntryList(ttk.Frame):
         self.label.config(style='TLabel')
         self.entry.config(state='normal')
         self.lb.config(state='normal')
+
+
+class AutocompleteCombobox(ttk.Frame):
+
+    def __init__(self, parent, **kwargs):
+
+        # Frame configuration
+        super().__init__(parent)
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
+
+        # Does not accept other variable to control the widget
+        try:
+            kwargs.pop('textvariable')
+        except KeyError:
+            pass
+
+        # Values
+        self.values = kwargs.get('values', [])
+        kwargs.pop('values')
+
+        # Variable
+        self.entry_var = tk.StringVar(value='')
+
+        # Combobox
+        self.combobox = ttk.Combobox(self, values=self.values, state='normal', textvariable=self.entry_var, **kwargs)
+        self.combobox.grid(row=0, column=0, sticky='nsew')
+
+        # Bind method
+        self.entry_var.trace('w', self._entry_changed)
+
+    def _entry_changed(self, name, index, mode):
+        """ Keeps track of any change in the entry widget and updates the dropdown values """
+
+        if self.entry_var.get() == '':
+            self.set_values(self.values)
+
+        else:
+            words = self._comparison()
+            if words:
+                self.set_values(words)
+            else:
+                self.set_values(['(no match)'])
+
+    def _comparison(self):
+        """ Responsible for the pattern match from the entry value """
+        pattern = re.compile('.*' + self.entry_var.get().upper() + '.*')
+        index = []
+        caps_values = [item.upper() for item in self.values]
+        for i, name in enumerate(caps_values):
+            if re.match(pattern, name):
+                index.append(i)
+
+        result = [w for i, w in enumerate(self.values) if i in index]
+
+        return result
+
+
+    def set_values(self, new_list):
+        self.combobox.config(values=new_list)
+
+    def get_values(self):
+        return self.values
+
+    def set(self, new_value):
+        """ Sets a value to the entry widget """
+        if str(self.cget('state')) == 'disabled':
+            return
+        self.entry_var.set(new_value)
+
+    def get(self):
+        """ Gets the current value from the entry widget """
+        return self.entry_var.get()

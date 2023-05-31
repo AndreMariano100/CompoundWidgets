@@ -56,3 +56,9 @@ Change Log
 0.2.10 (10/05/2023) - Tracing adjusted for only 'write' action
 0.2.11 (10/05/2023) - Tracing adjusted for label entry and label combo unit
 0.2.12 (10/05/2023) - Tracing adjusted for label spin and label entry button
+0.2.13 (13/05/2023) - TypeError corrected for LabelSpinbox
+0.2.14 (13/05/2023) - TypeError corrected for LabelSpinbox (event on _do_on_increment method)
+0.2.15 (18/05/2023) - Entry precision is applied to user value on FocusOut event.
+0.2.16 (25/05/2023) - Entry method calling correction (event missing)
+0.2.17 (26/05/2023) - AutoComplete Combobox added
+0.2.18 (31/05/2023) - AutoComplete Combobox revised

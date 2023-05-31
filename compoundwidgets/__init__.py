@@ -1,4 +1,4 @@
-__version__ = "0.2.12"
+__version__ = "0.2.18"
 __author__ = 'Andre Mariano'
 __all__ = ['AUTOCOMPLETE_WIDGETS',
            'COMPOUND_WIDGETS',
@@ -9,6 +9,7 @@ __all__ = ['AUTOCOMPLETE_WIDGETS',
            'SCRIPTS']
 
 from .AUTOCOMPLETE_WIDGETS import AutocompleteEntryList
+from .AUTOCOMPLETE_WIDGETS import AutocompleteCombobox
 
 from .COMPOUND_WIDGETS import LabelCombo
 from .COMPOUND_WIDGETS import LabelComboButton

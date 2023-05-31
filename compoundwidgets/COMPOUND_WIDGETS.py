@@ -177,10 +177,23 @@ class LabelEntry(ttk.Frame):
             if self.trace_variable:
                 self.cb_name = self.variable.trace_add("write", self._update_value)
             self.entry_method = entry_method
-            self.entry.bind("<Return>", entry_method)
-            self.entry.bind("<FocusOut>", entry_method)
+            self.entry.bind("<FocusOut>", self._adjust_value, add='+')
+            if self.entry_method:
+                self.entry.bind("<Return>", self.entry_method, add='+')
 
     def _update_value(self, name, index, mode):
+        if self.entry_method:
+            self.entry.event_generate("<Return>")
+
+    def _adjust_value(self, event):
+        value = self.get()
+        if isfloat(value):
+            if self.trace_variable:
+                self.variable.trace_remove('write', self.cb_name)
+                self.variable.set("%0.*f" % (self.precision, float(value)))
+                self.cb_name = self.variable.trace_add("write", self._update_value)
+            else:
+                self.variable.set("%0.*f" % (self.precision, float(value)))
         if self.entry_method:
             self.entry.event_generate("<Return>")
 
@@ -321,7 +334,7 @@ class LabelText(ttk.Frame):
 
         # Bind method
         if text_method:
-            self.text.bind("<FocusOut>", text_method)
+            self.text.bind("<FocusOut>", text_method, add='+')
 
     def _on_mouse_wheel(self, event):
         self.text.yview_scroll(int(-1 * event.delta / 120), 'units')
@@ -417,7 +430,7 @@ class LabelSpinbox(ttk.Frame):
         if True:
             if entry_value and str(entry_value):
                 if isfloat(entry_value):
-                    if self.start <= entry_value <= self.end:
+                    if self.start <= float(entry_value) <= self.end:
                         value = entry_value
                     else:
                         value = spin_start
@@ -448,9 +461,11 @@ class LabelSpinbox(ttk.Frame):
             if trace_variable:
                 self.cb_name = self.variable.trace_add("write", self._update_value)
             self.entry_method = entry_method
-            self.spin.bind("<Return>", entry_method, add='+')
+            if self.entry_method:
+                self.spin.bind("<Return>", entry_method, add='+')
+                self.spin.bind("<FocusOut>", entry_method, add='+')
+
             self.spin.bind("<Return>", self._check_user_value, add='+')
-            self.spin.bind("<FocusOut>", entry_method, add='+')
             self.spin.bind("<FocusOut>", self._check_user_value, add='+')
             self.spin.bind("<<Increment>>", self._do_on_increment)
             self.spin.bind("<<Decrement>>", self._do_on_decrement)
@@ -464,11 +479,11 @@ class LabelSpinbox(ttk.Frame):
         self._check_user_value()
         self.spin.event_generate('<Return>')
 
-    def _do_on_increment(self):
+    def _do_on_increment(self, event=None):
         self._do_upon_clicking_arrows("up")
         return "break"
 
-    def _do_on_decrement(self):
+    def _do_on_decrement(self, event=None):
         self._do_upon_clicking_arrows("down")
         return "break"
 
@@ -506,7 +521,11 @@ class LabelSpinbox(ttk.Frame):
 
     def _check_user_value(self, event=None):
         self.update()
-        current = float(self.variable.get().replace(',', '.'))
+        try:
+            current = float(self.variable.get().replace(',', '.'))
+        except ValueError:
+            current = float(self.start)
+
         if current < self.start:
             current = self.start
         elif current > self.end:
@@ -545,6 +564,7 @@ class LabelSpinbox(ttk.Frame):
             new_value = self.start
 
         elif isfloat(value):
+            value = float(value)
             if value < self.start:
                 new_value = self.start
             elif value > self.end:
@@ -875,15 +895,28 @@ class LabelEntryUnit (ttk.Frame):
             if self.trace_variable:
                 self.cb_name = self.entry_variable.trace_add("write", self._update_value)
             self.entry_method = entry_method
-            self.entry.bind("<Return>", entry_method)
-            self.entry.bind("<FocusOut>", entry_method)
+            self.entry.bind("<FocusOut>", self._adjust_value)
+            if self.entry_method:
+                self.entry.bind("<Return>", self.entry_method, add='+')
 
             if not self.combobox_unit_conversion:
-                self.unit_combo.bind("<<ComboboxSelected>>", entry_method)
+                self.unit_combo.bind("<<ComboboxSelected>>", entry_method, add='+')
             else:
-                self.unit_combo.bind("<<ComboboxSelected>>", self._convert_to_selected_unit)
+                self.unit_combo.bind("<<ComboboxSelected>>", self._convert_to_selected_unit, add='+')
 
     def _update_value(self, name, index, mode):
+        if self.entry_method:
+            self.entry.event_generate("<Return>")
+
+    def _adjust_value(self, event):
+        value = self.get_entry()
+        if isfloat(value):
+            if self.trace_variable:
+                self.entry_variable.trace_remove('write', self.cb_name)
+                self.entry_variable.set("%0.*f" % (self.precision, float(value)))
+                self.cb_name = self.entry_variable.trace_add("write", self._update_value)
+            else:
+                self.entry_variable.set("%0.*f" % (self.precision, float(value)))
         if self.entry_method:
             self.entry.event_generate("<Return>")
 
@@ -1304,11 +1337,23 @@ class LabelEntryButton (ttk.Frame):
             if self.trace_variable:
                 self.cb_name = self.variable.trace_add("write", self._update_value)
             self.entry_method = entry_method
+            self.entry.bind("<FocusOut>", self._adjust_value, add='+')
             if entry_method:
                 self.entry.bind("<Return>", entry_method)
-                self.entry.bind("<FocusOut>", entry_method)
 
     def _update_value(self, name, index, mode):
+        if self.entry_method:
+            self.entry.event_generate("<Return>")
+
+    def _adjust_value(self, event):
+        value = self.get()
+        if isfloat(value):
+            if self.trace_variable:
+                self.variable.trace_remove('write', self.cb_name)
+                self.variable.set("%0.*f" % (self.precision, float(value)))
+                self.cb_name = self.variable.trace_add("write", self._update_value)
+            else:
+                self.variable.set("%0.*f" % (self.precision, float(value)))
         if self.entry_method:
             self.entry.event_generate("<Return>")
 
