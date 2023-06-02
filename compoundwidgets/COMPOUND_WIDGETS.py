@@ -929,7 +929,6 @@ class LabelEntryUnit (ttk.Frame):
 
     def disable(self):
         self.unlock_unit()
-
         self.set_entry('')
         self.combobox_variable.set('')
         self.label.config(style='secondary.TLabel')
@@ -944,6 +943,11 @@ class LabelEntryUnit (ttk.Frame):
             self.unit_combo.config(state='readonly', values=[])
         else:
             self.unit_combo.config(state='readonly', values=self.unit_combo.values)
+
+    def is_disabled(self):
+        if str(self.entry.cget('state')) == 'disabled':
+            return True
+        return False
 
     def lock_unit(self):
         if not self.get_unit():
@@ -1032,6 +1036,9 @@ class LabelEntryUnit (ttk.Frame):
         The selected metric unit is the first from the combobox values.
         """
 
+        if self.is_disabled():
+            return '', ''
+
         if isinstance(self.unit_combo, LabelEntryUnit.NoUnitCombo):
             return self.get_entry(), '-'
 
@@ -1054,6 +1061,9 @@ class LabelEntryUnit (ttk.Frame):
         Returns the current value converted to the equivalent imperial unit.
         The selected imperial unit is the last from the combobox values.
         """
+
+        if self.is_disabled():
+            return '', ''
 
         if isinstance(self.unit_combo, LabelEntryUnit.NoUnitCombo):
             return self.get_entry(), '-'
