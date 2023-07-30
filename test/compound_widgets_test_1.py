@@ -174,7 +174,7 @@ if True:
         w = cw.LabelSpinbox(frame, label_text=item[0], label_width=15,
                             entry_value=item[1], entry_width=10, entry_method=get_all_label_spin,
                             entry_type=item[2], spin_start=item[3], spin_end=item[4],
-                            spin_increment=item[5], spin_precision=item[6])
+                            spin_increment=item[5], spin_precision=item[6], trace_variable=True)
         w.grid(row=i, column=0, sticky='nsew', pady=2, padx=2)
         label_spin_list.append(w)
 

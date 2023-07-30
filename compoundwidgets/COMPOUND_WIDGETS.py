@@ -16,6 +16,7 @@ class LabelCombo(ttk.Frame):
         combo_width: combo box minimum width
         combo_method: method to associate when combobox is selected
         font: font to be used for the label
+        sided: True for label and combobox side by side, False for combobox below label
     Methods for the user:
         set(value): sets a value to the combobox widget
         get(): gets the current value from the combobox widget
@@ -28,16 +29,21 @@ class LabelCombo(ttk.Frame):
     def __init__(self, parent,
                  label_text='Label:', label_anchor='e', label_width=None,
                  combo_value='', combo_list=('No values informed',), combo_width=None,
-                 combo_method=None, font=None):
+                 combo_method=None, font=None, sided=True):
 
         # Parent class initialization
         super().__init__(parent)
 
         # Frame configuration
         if True:
-            self.rowconfigure(0, weight=1)
-            self.columnconfigure(0, weight=1)
-            self.columnconfigure(1, weight=0)
+            if sided:
+                self.rowconfigure(0, weight=1)
+                self.columnconfigure(0, weight=1)
+                self.columnconfigure(1, weight=0)
+            else:
+                self.rowconfigure(0, weight=1)
+                self.rowconfigure(1, weight=1)
+                self.columnconfigure(0, weight=1)
 
         # Label configuration
         if True:
@@ -55,7 +61,10 @@ class LabelCombo(ttk.Frame):
             self.variable = tk.StringVar(value=combo_value)
             self.combobox = ttk.Combobox(self, textvariable=self.variable, justify='center',
                                          values=combo_list, state='readonly')
-            self.combobox.grid(row=0, column=1, sticky='ew', padx=2)
+            if sided:
+                self.combobox.grid(row=0, column=1, sticky='ew', padx=2)
+            else:
+                self.combobox.grid(row=1, column=0, sticky='ew', padx=2, pady=(2, 0))
 
             if combo_width:
                 self.combobox['width'] = combo_width
@@ -107,6 +116,7 @@ class LabelEntry(ttk.Frame):
         entry_method: method to associate with the entry events
         entry_max_char: maximum number of characters in the entry field
         font: font to be used for the label and for the entry
+        sided: True for label and entry side by side, False for entry below label
     Methods for the user:
         set(value): sets a value to the entry widget
         get(): gets the current value from the entry widget
@@ -119,7 +129,7 @@ class LabelEntry(ttk.Frame):
                  label_text='label:', label_anchor='e', label_width=None,
                  entry_value='', entry_numeric=False, entry_width=None,
                  entry_max_char=None, entry_method=None, font=None, precision=2,
-                 trace_variable=False):
+                 trace_variable=False, sided=True):
 
         # Parent class initialization
         super().__init__(parent)
@@ -134,9 +144,14 @@ class LabelEntry(ttk.Frame):
 
         # Frame configuration
         if True:
-            self.rowconfigure(0, weight=1)
-            self.columnconfigure(0, weight=1)
-            self.columnconfigure(1, weight=0)
+            if sided:
+                self.rowconfigure(0, weight=1)
+                self.columnconfigure(0, weight=1)
+                self.columnconfigure(1, weight=0)
+            else:
+                self.rowconfigure(0, weight=1)
+                self.rowconfigure(1, weight=1)
+                self.columnconfigure(0, weight=1)
 
         # Label configuration
         if True:
@@ -152,11 +167,13 @@ class LabelEntry(ttk.Frame):
         if True:
             self.variable = tk.StringVar(value=entry_value)
             self.entry = ttk.Entry(self, textvariable=self.variable, justify='center')
-            self.entry.grid(row=0, column=1, sticky='ew', padx=2)
+            if sided:
+                self.entry.grid(row=0, column=1, sticky='ew', padx=2)
+            else:
+                self.entry.grid(row=1, column=0, sticky='ew', padx=2, pady=(2, 0))
 
             if entry_width:
                 self.entry['width'] = entry_width
-
             if font:
                 self.entry.config(font=font)
 
@@ -285,7 +302,7 @@ class LabelText(ttk.Frame):
                 self.columnconfigure(2, weight=0)
             else:
                 self.rowconfigure(0, weight=0)
-                self.rowconfigure(0, weight=1)
+                self.rowconfigure(1, weight=1)
                 self.columnconfigure(0, weight=1)
                 self.columnconfigure(1, weight=0)
 
@@ -384,6 +401,7 @@ class LabelSpinbox(ttk.Frame):
         spin_end: spinbox end_value
         spin_increment: spinbox increment
         spin_precision: number of decimal places to show for float type spinbox
+        sided: True for label and spinbox side by side, False for spinbox below label
     Methods for the user:
         set(value): sets a value to the spinbox widget
         get(): gets the current value from the spinbox widget
@@ -396,7 +414,7 @@ class LabelSpinbox(ttk.Frame):
                  label_text='label:', label_anchor='e', label_width=None,
                  entry_value=None, entry_width=None, entry_method=None, entry_type='float',
                  spin_start=0, spin_end=10, spin_increment=1, spin_precision=2,
-                 font=None, trace_variable=False):
+                 font=None, trace_variable=False, sided=True):
 
         # Parent class initialization
         super().__init__(parent)
@@ -412,9 +430,14 @@ class LabelSpinbox(ttk.Frame):
 
         # Frame configuration
         if True:
-            self.rowconfigure(0, weight=1)
-            self.columnconfigure(0, weight=1)
-            self.columnconfigure(1, weight=0)
+            if sided:
+                self.rowconfigure(0, weight=1)
+                self.columnconfigure(0, weight=1)
+                self.columnconfigure(1, weight=0)
+            else:
+                self.rowconfigure(0, weight=1)
+                self.rowconfigure(1, weight=1)
+                self.columnconfigure(0, weight=1)
 
         # Label configuration
         if True:
@@ -449,7 +472,10 @@ class LabelSpinbox(ttk.Frame):
 
             self.spin = ttk.Spinbox(self, textvariable=self.variable, justify='center', command=self._spin_selected,
                                     from_=self.start, to=self.end, increment=self.increment)
-            self.spin.grid(row=0, column=1, sticky='ew', padx=2)
+            if sided:
+                self.spin.grid(row=0, column=1, sticky='ew', padx=2)
+            else:
+                self.spin.grid(row=1, column=0, sticky='ew', padx=2, pady=(2, 0))
 
             if entry_width:
                 self.spin['width'] = entry_width
@@ -480,11 +506,11 @@ class LabelSpinbox(ttk.Frame):
         self.spin.event_generate('<Return>')
 
     def _do_on_increment(self, event=None):
-        self._do_upon_clicking_arrows("up")
+        self.after(10, self._do_upon_clicking_arrows("up"))
         return "break"
 
     def _do_on_decrement(self, event=None):
-        self._do_upon_clicking_arrows("down")
+        self.after(10, self._do_upon_clicking_arrows("down"))
         return "break"
 
     def _do_upon_clicking_arrows(self, direction):
@@ -604,6 +630,7 @@ class LabelEntryUnit (ttk.Frame):
         combobox_unit_conversion: boolean, if set to True converts the entry value when the unit is changed
         font: font to be used in the label and for the entry
         precision: number of decimal points to show to the user
+        sided: True for label and other widgets side by side, False for other widgets below label
     Methods for the user:
         disable(): turns the whole widget 'off'
         enable(): turns the whole widget 'on'
@@ -828,7 +855,7 @@ class LabelEntryUnit (ttk.Frame):
                  label_text='Label:', label_anchor='e', label_width=None,
                  entry_value='', entry_width=None, entry_method=None,
                  combobox_unit=None, combobox_unit_width=8, combobox_unit_conversion=False,
-                 font=None, precision=2, trace_variable=False):
+                 font=None, precision=2, trace_variable=False, sided=True):
 
         # Parent class initialization
         super().__init__(parent)
@@ -838,15 +865,24 @@ class LabelEntryUnit (ttk.Frame):
 
         # Frame configuration
         if True:
-            self.rowconfigure(0, weight=1)
-            self.columnconfigure(0, weight=1)
-            self.columnconfigure(1, weight=0)
-            self.columnconfigure(2, weight=0)
+            if sided:
+                self.rowconfigure(0, weight=1)
+                self.columnconfigure(0, weight=1)
+                self.columnconfigure(1, weight=0)
+                self.columnconfigure(2, weight=0)
+            else:
+                self.rowconfigure(0, weight=1)
+                self.rowconfigure(1, weight=1)
+                self.columnconfigure(0, weight=1)
+                self.columnconfigure(1, weight=1)
 
         # Label configuration
         if True:
             self.label = ttk.Label(self, text=label_text, anchor=label_anchor)
-            self.label.grid(row=0, column=0, sticky='ew', padx=2)
+            if sided:
+                self.label.grid(row=0, column=0, sticky='ne', padx=2)
+            else:
+                self.label.grid(row=0, column=0, columnspan=2, sticky='nsew', pady=(0, 2))
 
             if label_width:
                 self.label['width'] = label_width
@@ -859,11 +895,13 @@ class LabelEntryUnit (ttk.Frame):
             self.trace_variable = trace_variable
             self.entry_variable = tk.StringVar(value=entry_value)
             self.entry = ttk.Entry(self, textvariable=self.entry_variable, justify='center')
-            self.entry.grid(row=0, column=1, sticky='ew', padx=2)
+            if sided:
+                self.entry.grid(row=0, column=1, sticky='ew', padx=(0, 2))
+            else:
+                self.entry.grid(row=1, column=0, sticky='ew', padx=(0, 2))
 
             if entry_width:
                 self.entry['width'] = entry_width
-
             if font:
                 self.entry.config(font=font)
 
@@ -885,7 +923,10 @@ class LabelEntryUnit (ttk.Frame):
             self.combobox_unit_conversion = combobox_unit_conversion
             self.combobox_unit_width = combobox_unit_width
             self.unit_combo = local_class(self, self.combobox_unit_width)
-            self.unit_combo.grid(row=0, column=2, sticky='ew', padx=2)
+            if sided:
+                self.unit_combo.grid(row=0, column=2, sticky='ew', padx=2)
+            else:
+                self.unit_combo.grid(row=1, column=2, sticky='ew')
             self.last_unit = self.unit_combo.values[0]
             self.combobox_variable = self.unit_combo.variable
             self.is_locked = False

@@ -61,7 +61,7 @@ def open_image(file_name: str, size_x: int, size_y: int, maximize: bool = False)
         final_scale = max(h / image_final_height, w / image_final_width)
     width_final = int(w / final_scale)
     height_final = int(h / final_scale)
-    final_pil_image = pil_image.resize((width_final, height_final), Image.ANTIALIAS)
+    final_pil_image = pil_image.resize((width_final, height_final), Image.LANCZOS)
     final_pil_image = final_pil_image.convert('RGBA')
     tk_image = ImageTk.PhotoImage(final_pil_image)
     return tk_image
