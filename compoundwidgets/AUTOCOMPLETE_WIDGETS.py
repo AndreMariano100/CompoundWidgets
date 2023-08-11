@@ -29,6 +29,7 @@ class AutocompleteEntryList(ttk.Frame):
         enable(): turns the whole widget 'on'
     
     """
+
     def __init__(self, parent, label_text='label:', label_anchor='w', label_width=None,
                  entry_value='', entry_numeric=False, entry_width=None, entry_max_char=None,
                  list_method=None, list_height=5, list_values=('Value 1', 'Value 2', 'Value 3', 'Value 4')):

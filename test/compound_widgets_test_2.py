@@ -70,13 +70,13 @@ if True:
     frame.columnconfigure(0, weight=1)
 
     unit_options = ('none', 'temperature', 'length', 'area', 'pressure', 'stress',
-                    'force', 'moment', 'energy', 'toughness', 'j-integral', 'thermal expansion')
+                    'force', 'moment', 'energy', 'toughness', 'j-integral', 'thermal expansion', 'time')
 
     all_label_entry_units = []
     for i, item in enumerate(unit_options):
         w = cw.LabelEntryUnit(frame, label_text=f'{str(item).capitalize()}:', label_width=10, entry_value='0',
                               entry_width=8, combobox_unit=item, combobox_unit_width=10, precision=i % 5,
-                              entry_method=lambda e: print('method called'))
+                              entry_method=lambda e: print('method called'), sided=False)
         w.grid(row=i, column=0, sticky='nsew', pady=5, padx=10)
         all_label_entry_units.append(w)
 

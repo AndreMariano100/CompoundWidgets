@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='compoundwidgets',
-    version='0.2.21',
+    version='0.2.23',
     author='Andre Mariano',
     license="MIT",
     url='https://github.com/AndreMariano100/CompoundWidgets.git',

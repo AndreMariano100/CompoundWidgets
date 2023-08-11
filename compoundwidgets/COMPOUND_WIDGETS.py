@@ -631,6 +631,7 @@ class LabelEntryUnit (ttk.Frame):
         font: font to be used in the label and for the entry
         precision: number of decimal points to show to the user
         sided: True for label and other widgets side by side, False for other widgets below label
+        hide_label: True to hide the label
     Methods for the user:
         disable(): turns the whole widget 'off'
         enable(): turns the whole widget 'on'
@@ -695,6 +696,17 @@ class LabelEntryUnit (ttk.Frame):
 
             self.values = ('mm', 'cm', 'm', 'in')
             self.conversion_values = (1, 10, 1000, 25.4)
+
+            self.variable = tk.StringVar(value=self.values[0])
+            self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
+                           state='readonly')
+
+    class TimeCombo(ttk.Combobox):
+        def __init__(self, parent, width):
+            super().__init__(parent)
+
+            self.values = ('s', 'min', 'hour', 'day', 'year')
+            self.conversion_values = (1, 60, 3600, 86400, 3.1536e7)
 
             self.variable = tk.StringVar(value=self.values[0])
             self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
@@ -797,6 +809,7 @@ class LabelEntryUnit (ttk.Frame):
         'none': NoUnitCombo,
         'temperature': TemperatureCombo,
         'length': LengthCombo,
+        'time': TimeCombo,
         'area': AreaCombo,
         'pressure': PressureCombo,
         'stress': StressCombo,
@@ -808,7 +821,10 @@ class LabelEntryUnit (ttk.Frame):
         'thermal expansion': ThermalExpansionCombo
     }
 
-    # List which identifies unit as SI or Custom. Their position in list guides its conversion units.
+    # List which identifies unit as SI or Custom.
+    # Their position in list guides its conversion constants.
+    #       imperial_unit_list[index] * conversion[index] => metric_unit_list[index]
+    # Temperature and time units are excluded from the lists.
     metric_unit_list = \
         ('mm', 'cm',  'm',          # LengthCombo
          'mm²', 'cm²', 'm²',        # AreaCombo
@@ -849,13 +865,11 @@ class LabelEntryUnit (ttk.Frame):
          14.5939,
          0.55556)
 
-    # imperial_unit_list[index] * conversion[index] => metric_unit_list[index]
-
     def __init__(self, parent,
                  label_text='Label:', label_anchor='e', label_width=None,
                  entry_value='', entry_width=None, entry_method=None,
                  combobox_unit=None, combobox_unit_width=8, combobox_unit_conversion=False,
-                 font=None, precision=2, trace_variable=False, sided=True):
+                 font=None, precision=2, trace_variable=False, sided=True, hide_label=False):
 
         # Parent class initialization
         super().__init__(parent)
@@ -865,24 +879,30 @@ class LabelEntryUnit (ttk.Frame):
 
         # Frame configuration
         if True:
-            if sided:
+            if hide_label:
                 self.rowconfigure(0, weight=1)
                 self.columnconfigure(0, weight=1)
                 self.columnconfigure(1, weight=0)
-                self.columnconfigure(2, weight=0)
             else:
-                self.rowconfigure(0, weight=1)
-                self.rowconfigure(1, weight=1)
-                self.columnconfigure(0, weight=1)
-                self.columnconfigure(1, weight=1)
+                if sided:
+                    self.rowconfigure(0, weight=1)
+                    self.columnconfigure(0, weight=1)
+                    self.columnconfigure(1, weight=0)
+                    self.columnconfigure(2, weight=0)
+                else:
+                    self.rowconfigure(0, weight=1)
+                    self.rowconfigure(1, weight=1)
+                    self.columnconfigure(0, weight=1)
+                    self.columnconfigure(1, weight=1)
 
         # Label configuration
         if True:
             self.label = ttk.Label(self, text=label_text, anchor=label_anchor)
-            if sided:
-                self.label.grid(row=0, column=0, sticky='ne', padx=2)
-            else:
-                self.label.grid(row=0, column=0, columnspan=2, sticky='nsew', pady=(0, 2))
+            if not hide_label:
+                if sided:
+                    self.label.grid(row=0, column=0, sticky='ne', padx=2)
+                else:
+                    self.label.grid(row=0, column=0, columnspan=2, sticky='nsew', pady=(0, 2))
 
             if label_width:
                 self.label['width'] = label_width
@@ -1121,10 +1141,14 @@ class LabelEntryUnit (ttk.Frame):
         if not self.get_entry():
             return '', self.unit_combo.values[-1]
         else:
+            if isinstance(self.unit_combo, LabelEntryUnit.TimeCombo):
+                final_index = 0
+            else:
+                final_index = -1
             last_value = self.get_entry()
             intermediary_value = float(last_value) * self.unit_combo.conversion_values[index]
-            new_value = intermediary_value / self.unit_combo.conversion_values[-1]
-            return new_value, self.unit_combo.values[-1]
+            new_value = intermediary_value / self.unit_combo.conversion_values[final_index]
+            return new_value, self.unit_combo.values[final_index]
 
     def convert_to_metric(self):
         """ Convert 'self' to metric """
@@ -1286,6 +1310,9 @@ class LabelEntryUnit (ttk.Frame):
 
                     # Convert from index 1 to new index
                     new_value = intermediary_value / self.unit_combo.conversion_values[new_index]
+
+                    print(f'Index: {old_index}, {new_index}')
+                    print(f'Value: {last_value}, {intermediary_value}, {new_value}')
 
                 self.last_unit = new_unit
                 self.set(new_value, new_unit)
