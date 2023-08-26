@@ -1,5 +1,5 @@
 Change Log
----------------
+------------------------------------------------------------------------------------------------------------------------
 0.1.1 (19/04/2022) - First release
 0.1.2 (19/04/2022) - Bugs corrected
 0.1.3 (19/04/2022) - Bugs corrected
@@ -67,3 +67,8 @@ Change Log
 0.2.21 (30/07/2023) - 'SIDED' feature added to labelentry, labelcombo, labelspinbox and labelentryunit
 0.2.22 (30/07/2023) - 'hide_label' feature added to labelentryunit
 0.2.23 (11/08/2023) - 'Time' unit option in LabelEntryUnit
+0.3.00 (15/08/2023) - General revision of Compoundwidgets. Base LabelCompoundWidget class created. High order values conversion corrected.
+0.3.01 (25/08/2023) - 'Temperature rate' unit option in LabelEntryUnit (temperature unit/time unit)
+0.3.02 (26/08/2023) - Small correction on the LabelSpin widget
+0.3.03 (26/08/2023) - Now it will actually work
+0.3.04 (26/08/2023) - Precision adjusted for LabelEntry

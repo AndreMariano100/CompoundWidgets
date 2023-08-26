@@ -40,15 +40,21 @@ if True:
     frame = ttk.LabelFrame(root, text='Label Combos')
     frame.grid(row=0, column=0, sticky='nsew', padx=10, pady=10)
     frame.columnconfigure(0, weight=1)
-    local_list = ('Label Combo 1', 'Label Combo 2', 'Label Combo 3', 'Label Combo 4')
+    local_list = ('Label Combo 1', 'Label Combo 2', 'Label\nCombo 3', 'Label Combo 4')
     label_combo_list = []
     for i, item in enumerate(local_list):
-        w = cw.LabelCombo(frame, label_text=item, label_width=10, combo_list=local_list)
+        if i:
+            sided=True
+        else:
+            sided=False
+        w = cw.LabelCombo(frame, label_text=item, label_width=10, combo_list=local_list,
+                          sided=sided, label_anchor='w', label_justify='left')
         w.grid(row=i, column=0, sticky='nsew', pady=2)
         label_combo_list.append(w)
         if i == 2:
             w.readonly()
         if i == 3:
+            w.set_label_text('')
             w.disable()
 
     b1 = ttk.Button(frame, text='GET ALL', command=get_all_label_combos)
@@ -104,10 +110,12 @@ if True:
     for i, item in enumerate(local_list):
         if i in range(3):
             w = cw.LabelEntry(frame, label_text=f'Label Entry {i+1}', label_width=10, entry_method=get_all_label_entries,
-                              entry_numeric=True, entry_value=item, entry_max_char=10, trace_variable=True)
+                              entry_numeric=True, entry_value=item, entry_max_char=10, trace_variable=True,
+                              precision=2)
         else:
             w = cw.LabelEntry(frame, label_text=f'Label Entry {i+1}', label_width=10, entry_method=get_all_label_entries,
-                              entry_numeric=False, entry_value=item, entry_max_char=10, trace_variable=True)
+                              entry_numeric=False, entry_value=item, entry_max_char=10, trace_variable=True,
+                              precision=3)
         w.grid(row=i, column=0, sticky='nsew', pady=2)
         label_entry_list.append(w)
         if i == 2:
@@ -235,7 +243,7 @@ if True:
         else:
             w = cw.LabelText(frame, label_text=f'Label Text {i + 1}', label_width=10, label_anchor='w',
                              text_height=5, text_width=60, text_method=get_all_label_text, text_value=item,
-                             sided=False, font=('Verdana', '12'))
+                             sided=False, label_font=('Verdana', '12'))
         w.grid(row=i, column=0, sticky='nsew', pady=2, padx=2)
         label_text_list.append(w)
 

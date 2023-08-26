@@ -69,14 +69,18 @@ if True:
     frame.grid(row=0, column=0, rowspan=2, sticky='nsew', padx=10, pady=10)
     frame.columnconfigure(0, weight=1)
 
-    unit_options = ('none', 'temperature', 'length', 'area', 'pressure', 'stress',
+    unit_options = ('none', 'temperature', 'temperature rate', 'length', 'area', 'pressure', 'stress',
                     'force', 'moment', 'energy', 'toughness', 'j-integral', 'thermal expansion', 'time')
 
     all_label_entry_units = []
     for i, item in enumerate(unit_options):
+        if i > 5:
+            sided = True
+        else:
+            sided = False
         w = cw.LabelEntryUnit(frame, label_text=f'{str(item).capitalize()}:', label_width=10, entry_value='0',
                               entry_width=8, combobox_unit=item, combobox_unit_width=10, precision=i % 5,
-                              entry_method=lambda e: print('method called'), sided=False)
+                              entry_method=lambda e: print('method called'), sided=sided)
         w.grid(row=i, column=0, sticky='nsew', pady=5, padx=10)
         all_label_entry_units.append(w)
 
@@ -147,9 +151,13 @@ if True:
     b_text = ['Enable ALL', 'Disable All', 'Readonly ALL', 'Get ALL', 'Set ALL']
     all_label_entry_button = []
     for i in range(5):
+        if i > 1:
+            sided=True
+        else:
+            sided = False
         w = cw.LabelEntryButton(frame, label_text=f'Label Entry Button {i+1}:', label_width=30, entry_value='0',
                                 entry_width=12, entry_numeric=True, entry_max_char=10, button_text=b_text[i],
-                                button_method=b_method_list[i], button_width=15, precision=1)
+                                button_method=b_method_list[i], button_width=15, precision=1, sided=sided)
         w.grid(row=i, column=0, sticky='nsew', pady=5, padx=10)
         all_label_entry_button.append(w)
 
@@ -185,10 +193,14 @@ if True:
     b_text = ['Enable ALL', 'Disable All', 'Readonly ALL', 'Get ALL', 'Set ALL']
     label_combo_list = []
     for i, item in enumerate(label_text):
+        if i > 1:
+            sided=True
+        else:
+            sided = False
         w = cw.LabelComboButton(frame, label_text=f'{item}:', label_width=12,
                                 combo_method=lambda e: print('Combobox Selected'), combo_value='',
                                 combo_list=label_text, combo_width=15, button_text=b_text[i],
-                                button_width=15, button_method=b_method_list[i])
+                                button_width=15, button_method=b_method_list[i], sided=sided)
         w.grid(row=i, column=0, sticky='nsew', pady=2)
         label_combo_list.append(w)
 
