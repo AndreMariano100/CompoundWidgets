@@ -32,7 +32,7 @@ class BaseTopLevelWidget(tk.Toplevel):
         if True:
             self.label = ttk.Label(self, text=message, justify='left', padding=5)
             self.label.grid(row=0, column=0, columnspan=3, sticky='nsew')
-            if self.label.winfo_reqwidth() > self.minsize()[0]:
+            if self.label.winfo_reqwidth() > self.minsize()[0] - 50:
                 self.minsize(self.label.winfo_reqwidth() + 20, 120)
                 self.update()
 

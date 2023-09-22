@@ -993,6 +993,8 @@ class LabelEntryUnit(LabelCompoundWidget):
         self.label.config(style='TLabel')
         self.entry.config(state='normal')
         self.unit_combo.config(state='readonly', values=self.unit_combo.values)
+        if not self.unit_combo.get():
+            self.unit_combo.set(self.unit_combo.values[0])
 
     def disable(self):
         self.unlock_unit()

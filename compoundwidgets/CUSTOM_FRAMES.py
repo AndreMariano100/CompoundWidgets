@@ -287,7 +287,7 @@ class VCollapsableFrame(ttk.Frame):
         self.collapse_button.configure(bootstyle=self.label_style)
 
 
-class ScrollableFrame(ttk.Frame):
+class ScrollableFrame_old(ttk.Frame):
     """
     Creates a frame with a vertical scrollbar.
     Parameters:
@@ -421,3 +421,89 @@ class ScrollableFrame(ttk.Frame):
         """Callback for when the mouse wheel is scrolled."""
         delta = -int(event.delta / 30)
         self.yview_scroll(delta, 'units')
+
+
+class ScrollableFrame(ttk.Frame):
+    """
+    Creates a frame with a vertical scrollbar.
+    Parameters:
+        parent: container for the frame
+        style: bootstyle (color style)
+    """
+
+    def __init__(self, parent, style='TFrame', **kwargs):
+
+        # Main container
+        self.container = ttk.Frame(parent)
+        self.container.rowconfigure(0, weight=1)
+        self.container.columnconfigure(0, weight=1)
+        self.container.columnconfigure(1, weight=0)
+
+        # canvas
+        self.canvas = tk.Canvas(self.container, borderwidth=0, highlightthickness=0)
+        self.canvas.grid(row=0, column=0, sticky='nsew')
+
+        # vertical scrollbar
+        self.vscroll = ttk.Scrollbar(self.container, command=self.canvas.yview, orient='vertical')
+        self.vscroll.grid(row=0, column=1, sticky='ns')
+
+        # intermediary frame
+        self.bottom_frame = ttk.Frame(self.canvas, style=style)
+        self.bottom_frame.grid(row=0, column=0, sticky='nsew')
+        self.bottom_frame.columnconfigure(0, weight=1)
+        self.bottom_frame.rowconfigure(0, weight=1)
+        self.bottom_frame.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+
+        self.window_id = self.canvas.create_window((0, 0), window=self.bottom_frame, anchor='nw')
+        self.canvas.configure(yscrollcommand=self.vscroll.set)
+
+        # 'self' frame, that will receive all widgets
+        super().__init__(self.bottom_frame, style=style, **kwargs)
+        self.grid(row=0, column=0, sticky='nsew')
+
+        # bindings
+        if True:
+            self.container.bind("<Enter>", self._on_enter, "+")
+            self.canvas.bind("<Enter>", self._on_enter, "+")
+            self.vscroll.bind("<Enter>", self._on_enter, "+")
+            self.bottom_frame.bind("<Enter>", self._on_enter, "+")
+            self.bind("<Enter>", self._on_enter, "+")
+
+            self.container.bind("<Leave>", self._on_leave, "+")
+            self.canvas.bind("<Leave>", self._on_leave, "+")
+            self.vscroll.bind("<Leave>", self._on_leave, "+")
+            self.bottom_frame.bind("<Leave>", self._on_leave, "+")
+            self.bind("<Leave>", self._on_leave, "+")
+
+            self.container.bind("<Map>", self._update, "+")
+            self.bind("<<MapChild>>", self._update, "+")
+            self.container.bind("<Configure>", self._update, '+')
+
+        # delegate content geometry methods to container frame
+        _methods = vars(tk.Grid).keys()
+        for method in _methods:
+            if "grid" in method:
+                # prefix content frame methods with 'content_'
+                setattr(self, f"content_{method}", getattr(self, method))
+                # overwrite content frame methods from container frame
+                setattr(self, method, getattr(self.container, method))
+
+    def _on_enter(self, event):
+        """Callback for when the mouse enters the widget."""
+        self.container.bind_all("<MouseWheel>", self._on_mousewheel, "+")
+
+    def _on_leave(self, event):
+        """Callback for when the mouse leaves the widget."""
+        self.container.unbind_all("<MouseWheel>")
+
+    def _on_mousewheel(self, event):
+        """Callback for when the mouse wheel is scrolled."""
+        delta = -int(event.delta / 30)
+        self.canvas.yview_scroll(delta, 'units')
+
+    def _update(self, event):
+        """ Callback for when new widgets are gridded, of the frame has been configured """
+
+        self.container.update()
+        x_size = self.container.winfo_width()
+        self.canvas.itemconfigure(self.window_id, width=x_size-11)

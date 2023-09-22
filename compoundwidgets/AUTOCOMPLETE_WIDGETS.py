@@ -2,6 +2,7 @@ import tkinter as tk
 import ttkbootstrap as ttk
 import re
 from .SCRIPTS import *
+from .COMPOUND_WIDGETS import LabelCompoundWidget
 
 
 class AutocompleteEntryList(ttk.Frame):
@@ -140,10 +141,11 @@ class AutocompleteEntryList(ttk.Frame):
 
     def _comparison(self):
         """ Responsible for the pattern match from the entry value """
-        pattern = re.compile('.*' + self.entry_var.get().upper() + '.*')
+        pattern_1 = re.compile('.*' + self.entry_var.get().upper() + '.*')
+        pattern_2 = re.compile('.*' + self.entry_var.get().upper().replace(' ', '\u00a0') + '.*')
         index = []
         for i, name in enumerate(self.caps_full_list):
-            if re.match(pattern, name):
+            if re.match(pattern_1, name) or re.match(pattern_2, name):
                 index.append(i)
 
         result = [w for i, w in enumerate(self.full_list) if i in index]
@@ -243,7 +245,6 @@ class AutocompleteCombobox(ttk.Frame):
 
         return result
 
-
     def set_values(self, new_list):
         self.combobox.config(values=new_list)
 
@@ -259,3 +260,92 @@ class AutocompleteCombobox(ttk.Frame):
     def get(self):
         """ Gets the current value from the entry widget """
         return self.entry_var.get()
+
+
+class AutocompleteLabelCombo(LabelCompoundWidget):
+
+    def __init__(self, parent, label_text='Label:', label_anchor='e', label_width=None,
+                 label_justify=None, label_font=None, sided=True, combo_value='',
+                 combo_list=('No values informed',), combo_width=None, combo_method=None, **kwargs):
+
+        # Parent class initialization
+        super().__init__(parent, label_text, label_anchor, label_width, label_justify, label_font, sided, **kwargs)
+
+        # Combobox configuration
+        if True:
+            self.combo_list = combo_list
+            self.variable = tk.StringVar(value=combo_value)
+            self.combobox = ttk.Combobox(self, textvariable=self.variable, justify='center',
+                                         values=combo_list, state='normal')
+            if sided:
+                self.combobox.grid(row=0, column=1, sticky='nsew', padx=2)
+            else:
+                self.combobox.grid(row=1, column=0, sticky='nsew', padx=2, pady=(2, 0))
+
+            if combo_width:
+                self.combobox['width'] = combo_width
+
+        # Bind method to the combobox
+        if combo_method:
+            self.combobox.bind('<<ComboboxSelected>>', combo_method, add='+')
+
+        # Bind method
+        self.variable.trace('w', self._entry_changed)
+
+    def _entry_changed(self, name, index, mode):
+        """ Keeps track of any change in the entry widget and updates the dropdown values """
+
+        print(self.variable.get())
+        if self.variable.get() == '':
+            self.set_combo_values(self.combo_list)
+
+        else:
+            words = self._comparison()
+            if words:
+                self.combobox.config(values=words)
+            else:
+                self.combobox.config(values=['(no match)'])
+
+    def _comparison(self):
+        """ Responsible for the pattern match from the entry value """
+        pattern = re.compile('.*' + self.variable.get().upper() + '.*')
+        index = []
+        caps_values = [item.upper() for item in self.combo_list]
+        for i, name in enumerate(caps_values):
+            if re.match(pattern, name):
+                index.append(i)
+
+        result = [w for i, w in enumerate(self.combo_list) if i in index]
+
+        return result
+
+    def set_combo_values(self, values):
+        self.combo_list = values
+        self.combobox.config(values=values)
+
+    def get_combo_values(self):
+        return self.combo_list
+
+    def get(self):
+        current_value = self.variable.get()
+        if current_value in self.combo_list:
+            return current_value
+        else:
+            return ''
+
+    def set(self, value):
+        if str(self.combobox.cget('state')) == 'disabled':
+            return
+        if value in self.combo_list:
+            self.variable.set(value)
+        else:
+            self.variable.set('')
+
+    def enable(self):
+        self.label.config(style='TLabel')
+        self.combobox.config(state='normal', values=self.combo_list)
+
+    def disable(self):
+        self.variable.set('')
+        self.label.config(style='secondary.TLabel')
+        self.combobox.config(state='disabled')
