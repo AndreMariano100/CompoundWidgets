@@ -75,3 +75,6 @@ Change Log
 0.3.05 (07/09/2023) - Adjusted when enabling LabelEntryUnit - no unit selected
 0.3.06 (16/09/2023) - AutocompleteEntryList adding NBSP as a separator in the search in place of regular space
 0.3.07 (22/09/2023) - AutocompleteLabelCombo created. ScrollableFrame adjusted for 'grid' method.
+0.3.08 (04/10/2023) - Tooltip position improvement and 'move' method implemented.
+0.3.09 (07/10/2023) - Scrollable frame adjust: Horizontal scroll implemented. Scroll 'auto-hide' implemented.
+0.3.10 (07/10/2023) - Collapsable frame adjusted to work with Scrollable frame ('Configure' event generated).

@@ -7,8 +7,7 @@ Intends to help create widgets on the following formats:
 
 . label + combobox
 
-
-. label + comboox + button
+. label + combobox + button
 
 . label + entry
 
@@ -20,8 +19,11 @@ Intends to help create widgets on the following formats:
 
 . label + text
 
+. label + spinbox
+
 Creates a set of buttons with icons for regular methods, such as 'cancel', 'clear', 'help',
 'no', 'yes', 'quit', 'save', and so on.
+
 Also creates new style of buttons ("led" like buttons). The following are available:
 
 . CheckLedButton
@@ -56,3 +58,10 @@ Includes toplevel widgets:
 
 Includes the entry validation required methods for "numbers only" and for maximum number of characters. 
 
+Includes autocomplete widgets, such as:
+
+. Autocomplete Combobox
+
+. Autocomplete EntryList
+
+. Autocomplete LabelCombo

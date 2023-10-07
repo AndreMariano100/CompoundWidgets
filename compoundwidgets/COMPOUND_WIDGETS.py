@@ -916,7 +916,7 @@ class LabelEntryUnit(LabelCompoundWidget):
             self.entry_variable = tk.StringVar()
             if entry_value and isfloat(entry_value):
                 value = float(entry_value)
-                if float(entry_value) < 1 / (10 ** (self.precision - 1)):
+                if 0 < float(entry_value) < 1 / (10 ** (self.precision - 1)):
                     self.entry_variable.set(f'{value:.{self.precision}e}')
                 else:
                     self.entry_variable.set(f'{value:.{self.precision}f}')
@@ -973,13 +973,13 @@ class LabelEntryUnit(LabelCompoundWidget):
             value = float(value)
             if self.trace_variable:
                 self.entry_variable.trace_remove('write', self.cb_name)
-                if value < 1 / (10 ** (self.precision - 1)):
+                if 0 < value < 1 / (10 ** (self.precision - 1)):
                     self.entry_variable.set(f'{value:.{self.precision}e}')
                 else:
                     self.entry_variable.set(f'{value:.{self.precision}f}')
                 self.cb_name = self.entry_variable.trace_add("write", self._update_value)
             else:
-                if value < 1 / (10 ** (self.precision - 1)):
+                if 0 < value < 1 / (10 ** (self.precision - 1)):
                     self.entry_variable.set(f'{value:.{self.precision}e}')
                 else:
                     self.entry_variable.set(f'{value:.{self.precision}f}')
@@ -1078,13 +1078,13 @@ class LabelEntryUnit(LabelCompoundWidget):
             value = float(value)
             if self.trace_variable:
                 self.entry_variable.trace_remove('write', self.cb_name)
-                if value < 1 / (10 ** (self.precision - 1)):
+                if 0 < value < 1 / (10 ** (self.precision - 1)):
                     self.entry_variable.set(f'{value:.{self.precision}e}')
                 else:
                     self.entry_variable.set(f'{value:.{self.precision}f}')
                 self.cb_name = self.entry_variable.trace_add("write", self._update_value)
             else:
-                if value < 1 / (10 ** (self.precision - 1)):
+                if 0 < value < 1 / (10 ** (self.precision - 1)):
                     self.entry_variable.set(f'{value:.{self.precision}e}')
                 else:
                     self.entry_variable.set(f'{value:.{self.precision}f}')

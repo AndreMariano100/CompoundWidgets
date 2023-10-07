@@ -232,7 +232,7 @@ class ProgressBar(tk.Toplevel):
 
 
 class Tooltip:
-    """ It creates a tooltip for a given widget as the mouse goes on it. """
+    """ It creates a tooltip window for a given widget as the mouse goes over it. """
 
     def __init__(self, widget, text='widget info', bg='#FFFF8B', fg='black', wait_time=500, wrap_length=250):
 
@@ -245,6 +245,7 @@ class Tooltip:
 
         self.widget.bind("<Enter>", self._enter)
         self.widget.bind("<Leave>", self._leave)
+        self.widget.bind("<Motion>", self._move_tip)
         self.widget.bind("<ButtonPress>", self._leave)
         self.id = None
         self.top_level = None
@@ -255,6 +256,12 @@ class Tooltip:
     def _leave(self, event=None):
         self.unschedule()
         self.hide()
+
+    def _move_tip(self, event=None):
+        if self.top_level:
+            x = self.widget.winfo_pointerx() + 25
+            y = self.widget.winfo_pointery() + 10
+            self.top_level.geometry(f"+{x}+{y}")
 
     def schedule(self):
         self.unschedule()
@@ -267,36 +274,12 @@ class Tooltip:
 
     def show(self):
 
-        def tip_pos_calculator(base_widget, selected_label):
+        if self.top_level:
+            return
+        x = self.widget.winfo_pointerx() + 25
+        y = self.widget.winfo_pointery() + 10
 
-            # Get the monitor's size
-            total_width, total_height = base_widget.winfo_vrootwidth(), base_widget.winfo_vrootheight()
-
-            # Tip label minimum size (plus offset)
-            width, height = (selected_label.winfo_reqwidth() + 10, selected_label.winfo_reqheight() + 6)
-
-            # Mouse position
-            mouse_x, mouse_y = base_widget.winfo_pointerxy()
-
-            # Top level initial and final positions
-            x1, y1 = mouse_x + 10, mouse_y + 6
-            x2, y2 = x1 + width, y1 + height
-
-            # Checks for horizontal position
-            if x2 > total_width:
-                x1 -= (x2 - total_width)
-            if x1 < 0:
-                x1 = 30
-
-            # Checks for vertical position
-            if y2 > total_height:
-                y1 -= (y2 - total_height)
-            if y1 < 0:
-                y1 = 30
-
-            return x1, y1
-
-        self.top_level = tk.Toplevel(self.widget)
+        self.top_level = ttk.Toplevel(self.widget, position=(x, y))
         self.top_level.wm_overrideredirect(True)
         self.top_level.rowconfigure(0, weight=1)
         self.top_level.columnconfigure(0, weight=1)
@@ -305,10 +288,6 @@ class Tooltip:
         label = ttk.Label(self.top_level, text=self.text, justify="left",
                           wraplength=self.wrap_length, style='custom.TLabel')
         label.grid(row=0, column=0, sticky='nsew', padx=1, pady=1)
-
-        x, y = tip_pos_calculator(self.widget, label)
-
-        self.top_level.geometry(f'+{x}+{y}')
 
     def hide(self):
         if self.top_level:

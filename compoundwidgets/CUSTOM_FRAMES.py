@@ -41,6 +41,7 @@ class CollapsableFrame(ttk.Frame):
 
         # Main container
         if True:
+            self.parent = parent
             self.style = style
             self.container = ttk.Frame(parent, bootstyle=style)
             self.container.columnconfigure(0, weight=1)
@@ -72,7 +73,7 @@ class CollapsableFrame(ttk.Frame):
             self.rowconfigure(0, weight=1)
             self.columnconfigure(0, weight=1)
 
-        # Delegate content geometry methods to container frame
+        # Delegate content geometry methods from container frame
         _methods = vars(tk.Grid).keys()
         for method in _methods:
             if "grid" in method:
@@ -80,9 +81,6 @@ class CollapsableFrame(ttk.Frame):
                 setattr(self, f"content_{method}", getattr(self, method))
                 # overwrite content frame methods from container frame
                 setattr(self, method, getattr(self.container, method))
-
-        # if hasattr(parent, 'yview') and callable(parent.yview):
-        #     self.bind("<Configure>", lambda _: parent.yview())
 
         # Collapsed start adjust
         if not open_start:
@@ -111,12 +109,14 @@ class CollapsableFrame(ttk.Frame):
         self.collapse_button.configure(text='+')
         self.rowconfigure(1, weight=0)
         self.content_grid_remove()
+        self.parent.event_generate("<Configure>")
 
     def expand_frame(self):
         if not self.disabled:
             self.collapse_button.configure(text='-')
             self.rowconfigure(1, weight=1)
             self.content_grid()
+            self.parent.event_generate("<Configure>")
 
     def is_collapsed(self):
         if self.collapse_button.cget('text') == '-':
@@ -287,145 +287,10 @@ class VCollapsableFrame(ttk.Frame):
         self.collapse_button.configure(bootstyle=self.label_style)
 
 
-class ScrollableFrame_old(ttk.Frame):
-    """
-    Creates a frame with a vertical scrollbar.
-    Parameters:
-        parent: container for the frame
-        style: bootstyle (color style)
-    """
-
-    def __init__(self, master=None, style='TFrame', **kwargs):
-
-        # content frame container
-        self.container = ttk.Frame(master, bootstyle=style)
-        self.container.bind("<Configure>", lambda _: self.yview())
-        self.container.rowconfigure(0, weight=1)
-        self.container.columnconfigure(0, weight=1)
-        self.container.columnconfigure(1, weight=0)
-
-        # content frame
-        super().__init__(self.container, bootstyle=style, **kwargs)
-        self.place(rely=0.0, relwidth=1.0)
-
-        # vertical scrollbar
-        self.vscroll = ttk.Scrollbar(self.container, command=self.yview, orient='vertical')
-        self.vscroll.pack(side='right', fill='y')
-
-        # widget event binding
-        self.container.bind("<Enter>", self._on_enter, "+")
-        self.vscroll.bind("<Enter>", self._on_enter, "+")
-        self.bind("<Enter>", self._on_enter, "+")
-
-        self.container.bind("<Leave>", self._on_leave, "+")
-        self.vscroll.bind("<Leave>", self._on_leave, "+")
-        self.bind("<Leave>", self._on_leave, "+")
-
-        self.container.bind("<Map>", self._on_map, "+")
-        self.bind("<<MapChild>>", self._on_map_child, "+")
-
-        # delegate content geometry methods to container frame
-        _methods = vars(tk.Pack).keys() | vars(tk.Grid).keys() | vars(tk.Place).keys()
-        for method in _methods:
-            if any(["pack" in method, "grid" in method, "place" in method]):
-                # prefix content frame methods with 'content_'
-                setattr(self, f"content_{method}", getattr(self, method))
-                # overwrite content frame methods from container frame
-                setattr(self, method, getattr(self.container, method))
-
-    def yview(self, *args):
-        """Update the vertical position of the content frame within the container.
-        Parameters:
-            *args (List[Any, ...]):
-                Optional arguments passed to yview in order to move the
-                content frame within the container frame.
-        """
-        if not args:
-            first, _ = self.vscroll.get()
-            self.yview_moveto(fraction=first)
-        elif args[0] == "moveto":
-            self.yview_moveto(fraction=float(args[1]))
-        elif args[0] == "scroll":
-            self.yview_scroll(number=int(args[1]), what=args[2])
-        else:
-            return
-
-    def yview_moveto(self, fraction: float):
-        """Update the vertical position of the content frame within the container.
-        Parameters:
-            fraction (float):
-                The relative position of the content frame within the container.
-        """
-        base, thumb = self._measures()
-        if fraction < 0:
-            first = 0.0
-        elif (fraction + thumb) > 1:
-            first = 1 - thumb
-        else:
-            first = fraction
-        self.vscroll.set(first, first + thumb)
-        self.content_place(rely=-first * base)
-
-    def yview_scroll(self, number: int, what: str):
-        """Update the vertical position of the content frame within the
-        container.
-
-        Parameters:
-
-            number (int):
-                The amount by which the content frame will be moved
-                within the container frame by 'what' units.
-
-            what (str):
-                The type of units by which the number is to be interpeted.
-                This parameter is currently not used and is assumed to be
-                'units'.
-        """
-        first, _ = self.vscroll.get()
-        fraction = (number / 100) + first
-        self.yview_moveto(fraction)
-
-    def _measures(self):
-        """Measure the base size of the container and the thumb size
-        for use in the yview methods"""
-        outer = self.container.winfo_height()
-        inner = max([self.winfo_height(), outer])
-        base = inner / outer
-        if inner == outer:
-            thumb = 1.0
-        else:
-            thumb = outer / inner
-        return base, thumb
-
-    def _on_map_child(self, event):
-        """Callback for when a widget is mapped to the content frame."""
-        if self.container.winfo_ismapped():
-            self.yview()
-
-    def _on_enter(self, event):
-        """Callback for when the mouse enters the widget."""
-        self.container.bind_all("<MouseWheel>", self._on_mousewheel, "+")
-
-    def _on_leave(self, event):
-        """Callback for when the mouse leaves the widget."""
-        self.container.unbind_all("<MouseWheel>")
-
-    def _on_configure(self, event):
-        """Callback for when the widget is configured"""
-        self.yview()
-
-    def _on_map(self, event):
-        self.yview()
-
-    def _on_mousewheel(self, event):
-        """Callback for when the mouse wheel is scrolled."""
-        delta = -int(event.delta / 30)
-        self.yview_scroll(delta, 'units')
-
-
 class ScrollableFrame(ttk.Frame):
     """
-    Creates a frame with a vertical scrollbar.
+    Creates a frame with a vertical and a horizontal scrollbar.
+    Scrollbars will hide if the content fits the frame dimensions.
     Parameters:
         parent: container for the frame
         style: bootstyle (color style)
@@ -437,49 +302,59 @@ class ScrollableFrame(ttk.Frame):
         self.container = ttk.Frame(parent)
         self.container.rowconfigure(0, weight=1)
         self.container.columnconfigure(0, weight=1)
-        self.container.columnconfigure(1, weight=0)
 
         # canvas
         self.canvas = tk.Canvas(self.container, borderwidth=0, highlightthickness=0)
         self.canvas.grid(row=0, column=0, sticky='nsew')
 
         # vertical scrollbar
-        self.vscroll = ttk.Scrollbar(self.container, command=self.canvas.yview, orient='vertical')
-        self.vscroll.grid(row=0, column=1, sticky='ns')
+        self.v_scroll = ttk.Scrollbar(self.container, command=self.canvas.yview, orient='vertical')
+        self.v_scroll.grid(row=0, column=1, sticky='ns')
 
-        # intermediary frame
-        self.bottom_frame = ttk.Frame(self.canvas, style=style)
-        self.bottom_frame.grid(row=0, column=0, sticky='nsew')
+        # Horizontal scrollbar
+        self.h_scroll = ttk.Scrollbar(self.container, command=self.canvas.xview, orient='horizontal')
+        self.h_scroll.grid(row=1, column=0, sticky='ew')
+
+        # Intermediary frame
+        self.bottom_frame = ttk.Frame(self.canvas)
+        self.bottom_frame.grid()
         self.bottom_frame.columnconfigure(0, weight=1)
         self.bottom_frame.rowconfigure(0, weight=1)
-        self.bottom_frame.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+        self.bottom_frame.bind("<Configure>",
+                               lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
 
+        # Canvas window objet
         self.window_id = self.canvas.create_window((0, 0), window=self.bottom_frame, anchor='nw')
-        self.canvas.configure(yscrollcommand=self.vscroll.set)
+        self.canvas.configure(yscrollcommand=self.v_scroll.set, xscrollcommand=self.h_scroll.set)
 
         # 'self' frame, that will receive all widgets
         super().__init__(self.bottom_frame, style=style, **kwargs)
         self.grid(row=0, column=0, sticky='nsew')
 
-        # bindings
+        # Mouse wheel bindings
         if True:
             self.container.bind("<Enter>", self._on_enter, "+")
             self.canvas.bind("<Enter>", self._on_enter, "+")
-            self.vscroll.bind("<Enter>", self._on_enter, "+")
+            self.v_scroll.bind("<Enter>", self._on_enter, "+")
+            self.h_scroll.bind("<Enter>", self._on_enter, "+")
             self.bottom_frame.bind("<Enter>", self._on_enter, "+")
             self.bind("<Enter>", self._on_enter, "+")
 
             self.container.bind("<Leave>", self._on_leave, "+")
             self.canvas.bind("<Leave>", self._on_leave, "+")
-            self.vscroll.bind("<Leave>", self._on_leave, "+")
+            self.v_scroll.bind("<Leave>", self._on_leave, "+")
+            self.h_scroll.bind("<Leave>", self._on_leave, "+")
             self.bottom_frame.bind("<Leave>", self._on_leave, "+")
             self.bind("<Leave>", self._on_leave, "+")
 
+        # Configure bindings
+        if True:
             self.container.bind("<Map>", self._update, "+")
-            self.bind("<<MapChild>>", self._update, "+")
             self.container.bind("<Configure>", self._update, '+')
+            self.bind("<<MapChild>>", self._update, "+")
+            self.bind("<Configure>", self._update, '+')
 
-        # delegate content geometry methods to container frame
+        # delegate content geometry methods from container frame to 'self'
         _methods = vars(tk.Grid).keys()
         for method in _methods:
             if "grid" in method:
@@ -502,8 +377,53 @@ class ScrollableFrame(ttk.Frame):
         self.canvas.yview_scroll(delta, 'units')
 
     def _update(self, event):
-        """ Callback for when new widgets are gridded, of the frame has been configured """
+        """ Callback for when new widgets are gridded, or the frame has been configured """
 
-        self.container.update()
-        x_size = self.container.winfo_width()
-        self.canvas.itemconfigure(self.window_id, width=x_size-11)
+        # Container size
+        if True:
+            self.container.update()
+            container_x_size = self.container.winfo_width()
+            container_y_size = self.container.winfo_height()
+
+        # Removes the vertical scroll if available height is bigger than required height
+        if True:
+            if self.h_scroll.winfo_ismapped():
+                available_y_size = container_y_size - 11
+            else:
+                available_y_size = container_y_size
+
+            if self.bottom_frame.winfo_reqheight() < available_y_size:
+                expand_y = True
+                self.v_scroll.grid_remove()
+                available_width = container_x_size
+                self.canvas.grid_configure(columnspan=2)
+            else:
+                expand_y = False
+                self.v_scroll.grid()
+                available_width = container_x_size - 11
+                self.canvas.grid_configure(columnspan=1)
+
+        # Removes the horizontal scroll if available width is bigger than required width
+        if True:
+            if self.v_scroll.winfo_ismapped():
+                available_x_size = container_x_size - 11
+            else:
+                available_x_size = container_x_size
+
+            if self.bottom_frame.winfo_reqwidth() < available_x_size:
+                expand_x = True
+                self.h_scroll.grid_remove()
+                available_height = container_y_size
+                self.canvas.grid_configure(rowspan=2)
+            else:
+                expand_x = False
+                self.h_scroll.grid()
+                available_height = container_y_size - 11
+                self.canvas.grid_configure(rowspan=1)
+
+        # Adjust the canvas dimensions
+        final_width = max (available_width, self.bottom_frame.winfo_reqwidth())
+        self.canvas.itemconfigure(self.window_id, width=final_width)
+
+        final_height = max (available_height, self.bottom_frame.winfo_reqheight())
+        self.canvas.itemconfigure(self.window_id, height=final_height)

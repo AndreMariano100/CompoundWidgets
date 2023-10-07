@@ -2,12 +2,14 @@ from setuptools import setup
 
 setup(
     name='compoundwidgets',
-    version='0.3.07',
+    version='0.3.10',
     author='Andre Mariano',
-    license="MIT",
-    url='https://github.com/AndreMariano100/CompoundWidgets.git',
-    description='Compound TTK Widgets with ttkbootstrap',
     author_email='andremariano100@gmail.com',
+    url='https://github.com/AndreMariano100/CompoundWidgets.git',
+    long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
+    license="MIT",
+    description='Compound TTK Widgets with ttkbootstrap',
     packages=['compoundwidgets', 'compoundwidgets.IMAGES'],
     install_requires=['ttkbootstrap', 'Pillow'],
     include_package_data=True,

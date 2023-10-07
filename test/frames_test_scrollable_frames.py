@@ -21,7 +21,8 @@ frame.grid(row=0, column=0, sticky='nsew', padx=10, pady=10)
 frame.columnconfigure(0, weight=1)
 frame.columnconfigure(1, weight=0)
 for i in range(10):
-    label = ttk.Label(frame, text=f'This is label {i}', style='secondary.Inverse.TLabel')
+    label = ttk.Label(frame, text=f'This is label {i+1}', style='secondary.Inverse.TLabel',
+                      width=120)
     label.grid(row=i, column=1, sticky='nsew', pady=5, padx=20)
 
 # the scrollable frame does not behave appropriately if you use two of the on the same container
