@@ -294,9 +294,10 @@ class ScrollableFrame(ttk.Frame):
     Parameters:
         parent: container for the frame
         style: bootstyle (color style)
+        bind_mouse_wheel: select whether to not bind mouse wheel events
     """
 
-    def __init__(self, parent, style='TFrame', **kwargs):
+    def __init__(self, parent, style='TFrame', bind_mouse_wheel=True, **kwargs):
 
         # Main container
         self.container = ttk.Frame(parent)
@@ -332,7 +333,8 @@ class ScrollableFrame(ttk.Frame):
         self.grid(row=0, column=0, sticky='nsew')
 
         # Mouse wheel bindings
-        if True:
+        self.bind_mouse_wheel = bind_mouse_wheel
+        if self.bind_mouse_wheel:
             self.container.bind("<Enter>", self._on_enter, "+")
             self.canvas.bind("<Enter>", self._on_enter, "+")
             self.v_scroll.bind("<Enter>", self._on_enter, "+")
@@ -351,6 +353,7 @@ class ScrollableFrame(ttk.Frame):
         if True:
             self.container.bind("<Map>", self._update, "+")
             self.container.bind("<Configure>", self._update, '+')
+            self.container.bind("<<MapChild>>", self._update, '+')
             self.bind("<<MapChild>>", self._update, "+")
             self.bind("<Configure>", self._update, '+')
 
@@ -381,7 +384,7 @@ class ScrollableFrame(ttk.Frame):
 
         # Container size
         if True:
-            self.container.update()
+            self.container.update_idletasks()
             container_x_size = self.container.winfo_width()
             container_y_size = self.container.winfo_height()
 

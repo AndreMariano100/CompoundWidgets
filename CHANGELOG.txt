@@ -78,3 +78,5 @@ Change Log
 0.3.08 (04/10/2023) - Tooltip position improvement and 'move' method implemented.
 0.3.09 (07/10/2023) - Scrollable frame adjust: Horizontal scroll implemented. Scroll 'auto-hide' implemented.
 0.3.10 (07/10/2023) - Collapsable frame adjusted to work with Scrollable frame ('Configure' event generated).
+0.3.11 (07/10/2023) - Collapsable frame child mapping event added.
+0.3.12 (08/10/2023) - Scrollable frame with option of not binding mouse wheel events.

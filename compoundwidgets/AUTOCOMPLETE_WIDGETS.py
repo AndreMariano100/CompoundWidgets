@@ -33,7 +33,8 @@ class AutocompleteEntryList(ttk.Frame):
 
     def __init__(self, parent, label_text='label:', label_anchor='w', label_width=None,
                  entry_value='', entry_numeric=False, entry_width=None, entry_max_char=None,
-                 list_method=None, list_height=5, list_values=('Value 1', 'Value 2', 'Value 3', 'Value 4')):
+                 entry_change_method=None, list_method=None, list_height=5,
+                 list_values=('Value 1', 'Value 2', 'Value 3', 'Value 4')):
 
         # Parent class initialization
         super().__init__(parent, padding=5)
@@ -59,6 +60,7 @@ class AutocompleteEntryList(ttk.Frame):
 
         # Entry
         if True:
+            self.entry_change_method = entry_change_method
             self.entry_var = tk.StringVar(value=entry_value)
             self.entry = ttk.Entry(self, textvariable=self.entry_var, justify='center')
             self.entry.grid(row=1, column=0, sticky='ew', pady=2)
@@ -108,6 +110,10 @@ class AutocompleteEntryList(ttk.Frame):
 
     def _entry_changed(self, name, index, mode):
         """ Keeps track of any change in the entry widget and updates the listbox values """
+
+        if mode in ('unset', 'write'):
+            if self.entry_change_method:
+                self.entry_change_method()
 
         if self.entry_var.get() == '':
             self.list_var.set(self.full_list)
