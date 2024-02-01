@@ -39,6 +39,8 @@ def alternate_style():
     else:
         widget_2.disable()
 
+def edit_message():
+    print('entry i has been edited')
 
 root = tk.Tk()
 root.style = Style(theme='darkly')
@@ -56,7 +58,8 @@ frame.columnconfigure(0, weight=1)
 
 widget_1 = cw.AutocompleteEntryList(frame, label_text='Auto Complete Test',
                                     label_anchor='w', list_method=method_1,
-                                    list_height=10, list_values=full_list)
+                                    list_height=10, list_values=full_list,
+                                    entry_change_method=edit_message)
 widget_1.grid(row=0, column=0, sticky='nsew', pady=(10, 0), padx=10)
 
 # Second frame, disabled

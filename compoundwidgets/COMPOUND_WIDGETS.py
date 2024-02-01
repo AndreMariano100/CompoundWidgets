@@ -115,16 +115,16 @@ class LabelCombo(LabelCompoundWidget):
 
     def enable(self):
         self.label.config(style='TLabel')
-        self.combobox.config(state='readonly', values=self.combo_list)
+        self.combobox.config(state='readonly', values=self.combo_list, takefocus=1)
 
     def disable(self):
         self.variable.set('')
         self.label.config(style='secondary.TLabel')
-        self.combobox.config(state='disabled')
+        self.combobox.config(state='disabled', takefocus=0)
 
     def readonly(self):
         self.label.config(style='TLabel')
-        self.combobox.config(state='readonly', values=[])
+        self.combobox.config(state='readonly', values=[], takefocus=0)
 
     def get(self):
         return self.variable.get()
@@ -218,34 +218,48 @@ class LabelEntry(LabelCompoundWidget):
                 self.entry.bind("<Return>", self.entry_method, add='+')
 
     def _update_value(self, name, index, mode):
+        """ Variable trace method. Calls the applicable method everytime the value changes """
+
         if self.entry_method:
-            self.entry.event_generate("<Return>")
+            self.entry_method()
 
     def _adjust_value(self, event):
+        """ Precision adjustment method. Called when 'focus' is taken away from the widget. """
+
         value = self.get()
-        if isfloat(value):
-            value = float(value)
+        if self.entry_numeric:
+            if isfloat(value):
+                value = float(value)
+                if self.trace_variable:
+                    self.variable.trace_remove('write', self.cb_name)
+                    self.variable.set(f'{value:.{self.precision}f}')
+                    self.cb_name = self.variable.trace_add("write", self._update_value)
+                else:
+                    self.variable.set(f'{value:.{self.precision}f}')
+
+        else:
             if self.trace_variable:
                 self.variable.trace_remove('write', self.cb_name)
-                self.variable.set(f'{value:.{self.precision}f}')
+                self.variable.set(value)
                 self.cb_name = self.variable.trace_add("write", self._update_value)
             else:
-                self.variable.set(f'{value:.{self.precision}f}')
+                self.variable.set(value)
+
         if self.entry_method:
-            self.entry.event_generate("<Return>")
+            self.entry_method()
 
     def enable(self):
         self.label.config(style='TLabel')
-        self.entry.config(state='normal')
+        self.entry.config(state='normal', takefocus=1)
 
     def disable(self):
         self.set('')
         self.label.config(style='secondary.TLabel')
-        self.entry.config(state='disabled')
+        self.entry.config(state='disabled', takefocus=0)
 
     def readonly(self):
         self.label.config(style='TLabel')
-        self.entry.config(state='readonly')
+        self.entry.config(state='readonly', takefocus=0)
 
     def get(self):
         return self.variable.get()
@@ -351,19 +365,16 @@ class LabelText(LabelCompoundWidget):
 
     def enable(self):
         self.label.config(style='TLabel')
-        self.text.config(state='normal')
-        self.text.config(fg=self.enabled_color)
+        self.text.config(state='normal', fg=self.enabled_color, takefocus=1)
 
     def disable(self):
         self.label.config(style='secondary.TLabel')
         self.set('')
-        self.text.config(state='disabled')
-        self.text.config(fg=self.disabled_color)
+        self.text.config(state='disabled', fg=self.disabled_color, takefocus=0)
 
     def readonly(self):
         self.label.config(style='TLabel')
-        self.text.config(state='disabled')
-        self.text.config(fg=self.enabled_color)
+        self.text.config(state='disabled', fg=self.enabled_color, takefocus=0)
 
     def get(self):
         return str(self.text.get('1.0', tk.END)).rstrip('\n')
@@ -471,7 +482,7 @@ class LabelSpinbox(LabelCompoundWidget):
         current = self.variable.get()
         if isfloat(current):
             if self.entry_method:
-                self.spin.event_generate("<Return>")
+                self.entry_method()
         else:
             self.spin.delete(self.spin.index("insert"), last='end')
 
@@ -560,7 +571,7 @@ class LabelSpinbox(LabelCompoundWidget):
 
     def enable(self):
         self.label.config(style='TLabel')
-        self.spin.config(state='normal')
+        self.spin.config(state='normal', takefocus=1)
 
         if not str(self.get()):
             if self.initial_value is not None:
@@ -572,11 +583,11 @@ class LabelSpinbox(LabelCompoundWidget):
     def disable(self):
         self.set('')
         self.label.config(style='secondary.TLabel')
-        self.spin.config(state='disabled')
+        self.spin.config(state='disabled', takefocus=0)
 
     def readonly(self):
         self.label.config(style='TLabel')
-        self.spin.config(state='readonly')
+        self.spin.config(state='readonly', takefocus=0)
 
     def get(self):
         value = self.variable.get()
@@ -745,7 +756,7 @@ class LabelEntryUnit(LabelCompoundWidget):
             super().__init__(parent)
 
             self.values = ('kPa', 'bar', 'kgf/cm²', 'MPa', 'atmosphere', 'ksi', 'psi')
-            self.conversion_values = (1, 100, 98.0665, 1000, 101.325, 689.4757, 6.894757)
+            self.conversion_values = (1, 100, 98.0665, 1000, 101.325, 6894.757, 6.894757)
 
             self.variable = tk.StringVar(value=self.values[0])
             self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
@@ -911,11 +922,14 @@ class LabelEntryUnit(LabelCompoundWidget):
 
         # Entry configuration
         if True:
+            self.parent = parent
             self.precision = precision
             self.trace_variable = trace_variable
+            self.entry_method = entry_method
             self.entry_variable = tk.StringVar()
             if entry_value and isfloat(entry_value):
                 value = float(entry_value)
+                self.last_value = value
                 if 0 < float(entry_value) < 1 / (10 ** (self.precision - 1)):
                     self.entry_variable.set(f'{value:.{self.precision}e}')
                 else:
@@ -931,6 +945,8 @@ class LabelEntryUnit(LabelCompoundWidget):
             # Restrict numeric values
             if True:
                 self.entry.config(validate='all', validatecommand=(validate_numbers, '%d', '%P', '%S'))
+
+            self.last_value = entry_value
 
         # Unit combobox configuration
         if True:
@@ -953,21 +969,27 @@ class LabelEntryUnit(LabelCompoundWidget):
         if True:
             if self.trace_variable:
                 self.cb_name = self.entry_variable.trace_add("write", self._update_value)
-            self.entry_method = entry_method
-            self.entry.bind("<FocusOut>", self._adjust_value)
+
+            # When leaving the widget adjust the precision
+            self.entry.bind("<FocusOut>", self._adjust_value, add='+')
+
+            # When 'enter' is selected, runs the applicable method
             if self.entry_method:
                 self.entry.bind("<Return>", self.entry_method, add='+')
 
             if not self.combobox_unit_conversion:
-                self.unit_combo.bind("<<ComboboxSelected>>", entry_method, add='+')
+                self.unit_combo.bind("<<ComboboxSelected>>", self.entry_method, add='+')
             else:
                 self.unit_combo.bind("<<ComboboxSelected>>", self._convert_to_selected_unit, add='+')
 
     def _update_value(self, name, index, mode):
+        """ Variable trace method. Calls the applicable method everytime the value changes """
         if self.entry_method:
-            self.entry.event_generate("<Return>")
+            self.entry_method()
 
     def _adjust_value(self, event):
+        """ Precision adjustment method. Called when 'focus' is taken away from the widget. """
+
         value = self.get_entry()
         if isfloat(value):
             value = float(value)
@@ -983,16 +1005,24 @@ class LabelEntryUnit(LabelCompoundWidget):
                     self.entry_variable.set(f'{value:.{self.precision}e}')
                 else:
                     self.entry_variable.set(f'{value:.{self.precision}f}')
+
+        else:
+            if self.trace_variable:
+                self.entry_variable.trace_remove('write', self.cb_name)
+                self.entry_variable.set('')
+                self.cb_name = self.entry_variable.trace_add("write", self._update_value)
+            else:
+                self.entry_variable.set('')
+
         if self.entry_method:
-            self.entry.event_generate("<Return>")
+            self.entry_method()
 
     # Widget state methods ---------------------------------------------------------------------------------------------
     def enable(self):
         self.unlock_unit()
-        self.last_unit = self.combobox_variable.get()
         self.label.config(style='TLabel')
-        self.entry.config(state='normal')
-        self.unit_combo.config(state='readonly', values=self.unit_combo.values)
+        self.entry.config(state='normal', takefocus=1)
+        self.unit_combo.config(state='readonly', values=self.unit_combo.values, takefocus=1)
         if not self.unit_combo.get():
             self.unit_combo.set(self.unit_combo.values[0])
 
@@ -1001,18 +1031,17 @@ class LabelEntryUnit(LabelCompoundWidget):
         self.set_entry('')
         self.combobox_variable.set('')
         self.label.config(style='secondary.TLabel')
-        self.entry.config(state='disabled')
-        self.unit_combo.config(state='disabled')
+        self.entry.config(state='disabled', takefocus=0)
+        self.unit_combo.config(state='disabled', takefocus=0)
 
     def readonly(self):
         self.unlock_unit()
-        self.last_unit = self.combobox_variable.get()
         self.label.config(style='TLabel')
-        self.entry.config(state='readonly')
+        self.entry.config(state='readonly', takefocus=0)
         if not self.combobox_unit_conversion:
-            self.unit_combo.config(state='readonly', values=[])
+            self.unit_combo.config(state='readonly', values=[], takefocus=0)
         else:
-            self.unit_combo.config(state='readonly', values=self.unit_combo.values)
+            self.unit_combo.config(state='readonly', values=self.unit_combo.values, takefocus=1)
 
     def is_disabled(self):
         if str(self.entry.cget('state')) == 'disabled':
@@ -1025,16 +1054,15 @@ class LabelEntryUnit(LabelCompoundWidget):
         self.unit_combo.config(state='readonly', values=[], style='TLabel',
                                width=self.combobox_unit_width+4)
         self.is_locked = True
-        self.last_unit = self.combobox_variable.get()
 
     def unlock_unit(self):
         self.unit_combo.config(state='readonly', values=self.unit_combo.values, style='TCombobox',
                                width=self.combobox_unit_width)
         self.is_locked = False
-        self.last_unit = self.combobox_variable.get()
 
     def activate_self_conversion(self):
         self.unlock_unit()
+        self.last_value = self.get_entry()
         self.last_unit = self.combobox_variable.get()
         self.enable()
         self.entry.config(state='readonly')
@@ -1089,6 +1117,9 @@ class LabelEntryUnit(LabelCompoundWidget):
                 else:
                     self.entry_variable.set(f'{value:.{self.precision}f}')
 
+            if not self.combobox_unit_conversion:
+                self.last_value = value
+
     def get_unit(self):
         return self.combobox_variable.get()
 
@@ -1101,10 +1132,8 @@ class LabelEntryUnit(LabelCompoundWidget):
 
         if unit in list(self.unit_combo.values):
             self.combobox_variable.set(unit)
-            self.last_unit = unit
         else:
             self.combobox_variable.set(self.unit_combo.values[0])
-            self.last_unit = self.unit_combo.values[0]
 
     def get(self):
         return self.get_entry(), self.get_unit()
@@ -1295,35 +1324,36 @@ class LabelEntryUnit(LabelCompoundWidget):
         Method to convert the value everytime a unit is changed.
         """
 
-        last_value = self.get_entry()
-        new_unit = self.get_unit()
+        last_value = self.last_value
         last_unit = self.last_unit
+        new_unit = self.get_unit()
+        print(f'Last value: {self.last_value}')
+        print(f'Last unit: {self.last_unit}')
+        print(f'New unit: {self.get_unit()}')
 
         if isinstance(self.unit_combo, LabelEntryUnit.NoUnitCombo):
             pass
 
         elif isinstance(self.unit_combo, LabelEntryUnit.TemperatureCombo):
-            if last_unit == new_unit:
-                pass
+            if new_unit == last_unit:
+                self.set_entry(last_value)
             else:
                 if new_unit == '°F':
                     if not last_value:
                         new_value = ''
                     else:
                         new_value = 9 * (float(last_value) / 5) + 32
-                    self.last_unit = '°F'
                     self.set(new_value, '°F')
                 else:
                     if not last_value:
                         new_value = ''
                     else:
                         new_value = 5 * (float(last_value) - 32) / 9
-                    self.last_unit = '°C'
                     self.set(new_value, '°C')
 
         else:
-            if last_unit == new_unit:
-                pass
+            if new_unit == last_unit:
+                self.set_entry(last_value)
             else:
                 old_index = self.unit_combo.values.index(last_unit)
                 new_index = self.unit_combo.values.index(new_unit)
@@ -1336,10 +1366,6 @@ class LabelEntryUnit(LabelCompoundWidget):
                     # Convert from index 1 to new index
                     new_value = intermediary_value / self.unit_combo.conversion_values[new_index]
 
-                    # print(f'Index: {old_index}, {new_index}')
-                    # print(f'Value: {last_value}, {intermediary_value}, {new_value}')
-
-                self.last_unit = new_unit
                 self.set(new_value, new_unit)
 
 
@@ -1438,35 +1464,45 @@ class LabelEntryButton(LabelCompoundWidget):
 
     def _update_value(self, name, index, mode):
         if self.entry_method:
-            self.entry.event_generate("<Return>")
+            self.entry_method()
 
     def _adjust_value(self, event):
+
         value = self.get()
-        if isfloat(value):
-            value = float(value)
+        if self.entry_numeric:
+            if isfloat(value):
+                value = float(value)
+                if self.trace_variable:
+                    self.variable.trace_remove('write', self.cb_name)
+                    self.variable.set(f'{value:.{self.precision}f}')
+                    self.cb_name = self.variable.trace_add("write", self._update_value)
+                else:
+                    self.variable.set(f'{value:.{self.precision}f}')
+        else:
             if self.trace_variable:
                 self.variable.trace_remove('write', self.cb_name)
-                self.variable.set(f'{value:.{self.precision}f}')
+                self.variable.set(value)
                 self.cb_name = self.variable.trace_add("write", self._update_value)
             else:
-                self.variable.set(f'{value:.{self.precision}f}')
+                self.variable.set(value)
+
         if self.entry_method:
-            self.entry.event_generate("<Return>")
+            self.entry_method()
 
     def enable(self):
         self.label.config(style='TLabel')
-        self.entry.config(state='normal')
+        self.entry.config(state='normal', takefocus=1)
         self.button.state(["!disabled"])
 
     def disable(self):
         self.set('')
         self.label.config(style='secondary.TLabel')
-        self.entry.config(state='disabled')
+        self.entry.config(state='disabled', takefocus=0)
         self.button.state(["disabled"])
 
     def readonly(self):
         self.label.config(style='TLabel')
-        self.entry.config(state='readonly')
+        self.entry.config(state='readonly', takefocus=0)
         self.button.state(["!disabled"])
 
     def get(self):
@@ -1570,18 +1606,18 @@ class LabelComboButton(LabelCompoundWidget):
 
     def enable(self):
         self.label.config(style='TLabel')
-        self.combobox.config(state='readonly', values=self.combo_list)
+        self.combobox.config(state='readonly', values=self.combo_list, takefocus=1)
         self.button.state(["!disabled"])
 
     def disable(self):
         self.variable.set('')
         self.label.config(style='secondary.TLabel')
-        self.combobox.config(state='disabled')
+        self.combobox.config(state='disabled', takefocus=0)
         self.button.state(["disabled"])
 
     def readonly(self):
         self.label.config(style='TLabel')
-        self.combobox.config(state='readonly', values=[])
+        self.combobox.config(state='readonly', values=[], takefocus=0)
         self.button.state(["!disabled"])
 
     def get(self):

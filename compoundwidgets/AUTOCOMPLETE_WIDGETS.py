@@ -103,6 +103,7 @@ class AutocompleteEntryList(ttk.Frame):
         # Binds and initialization
         if True:
             self.entry_var.trace('w', self._entry_changed)
+            self.entry_var.trace('u', self._entry_changed)
             self.lb.bind("<Right>", self._listbox_selection)
             self.lb.bind('<Return>', self._listbox_selection)
             self.lb.bind("<Double-Button-1>", self._listbox_selection)
@@ -111,7 +112,7 @@ class AutocompleteEntryList(ttk.Frame):
     def _entry_changed(self, name, index, mode):
         """ Keeps track of any change in the entry widget and updates the listbox values """
 
-        if mode in ('unset', 'write'):
+        if str(mode) == 'w':
             if self.entry_change_method:
                 self.entry_change_method()
 
@@ -186,14 +187,14 @@ class AutocompleteEntryList(ttk.Frame):
         """ Style adjust for 'disabled' widgets """
         self.label.config(style='secondary.TLabel')
         self.set_entry('')
-        self.entry.config(state='disabled')
-        self.lb.config(state='disabled')
+        self.entry.config(state='disabled', takefocus=0)
+        self.lb.config(state='disabled', takefocus=0)
 
     def enable(self):
         """ Style adjust for 'normal' widgets """
         self.label.config(style='TLabel')
-        self.entry.config(state='normal')
-        self.lb.config(state='normal')
+        self.entry.config(state='normal', takefocus=1)
+        self.lb.config(state='normal', takefocus=1)
 
 
 class AutocompleteCombobox(ttk.Frame):
@@ -349,9 +350,9 @@ class AutocompleteLabelCombo(LabelCompoundWidget):
 
     def enable(self):
         self.label.config(style='TLabel')
-        self.combobox.config(state='normal', values=self.combo_list)
+        self.combobox.config(state='normal', values=self.combo_list, takefocus=1)
 
     def disable(self):
         self.variable.set('')
         self.label.config(style='secondary.TLabel')
-        self.combobox.config(state='disabled')
+        self.combobox.config(state='disabled', takefocus=0)

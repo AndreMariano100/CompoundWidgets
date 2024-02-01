@@ -78,8 +78,7 @@ if True:
 # Second frame, testing LabelEntry
 if True:
     def get_all_label_entries(event=None):
-        for w in label_entry_list:
-            print(w.get())
+        print('/'.join([w.get() for w in label_entry_list]))
 
     def set_all_label_entries():
         for w in label_entry_list:
@@ -109,11 +108,13 @@ if True:
     label_entry_list = []
     for i, item in enumerate(local_list):
         if i in range(3):
-            w = cw.LabelEntry(frame, label_text=f'Label Entry {i+1}', label_width=10, entry_method=get_all_label_entries,
+            w = cw.LabelEntry(frame, label_text=f'Label Entry {i+1}', label_width=10,
+                              entry_method=get_all_label_entries,
                               entry_numeric=True, entry_value=item, entry_max_char=10, trace_variable=True,
                               precision=2)
         else:
-            w = cw.LabelEntry(frame, label_text=f'Label Entry {i+1}', label_width=10, entry_method=get_all_label_entries,
+            w = cw.LabelEntry(frame, label_text=f'Label Entry {i+1}', label_width=10,
+                              entry_method=get_all_label_entries,
                               entry_numeric=False, entry_value=item, entry_max_char=10, trace_variable=True,
                               precision=3)
         w.grid(row=i, column=0, sticky='nsew', pady=2)

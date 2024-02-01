@@ -80,3 +80,9 @@ Change Log
 0.3.10 (07/10/2023) - Collapsable frame adjusted to work with Scrollable frame ('Configure' event generated).
 0.3.11 (07/10/2023) - Collapsable frame child mapping event added.
 0.3.12 (08/10/2023) - Scrollable frame with option of not binding mouse wheel events.
+0.3.13 (02/11/2023) - AutocompleteEntryList added method when entry is edited
+0.3.14 (02/11/2023) - AutocompleteEntryList added method when entry is edited (corrected)
+0.3.15 (08/12/2023) - Corrected the conversion from psi to ksi in LabelEntryUnit - Pressure
+0.3.16 (19/01/2024) - LabelEntryUnit conversion corrected
+0.3.17 (29/01/2024) - LabelEntryUnit conversion corrected (last value setting)
+0.3.18 (31/01/2024) - Takefocus adjusted for disabled and readonly widgets. FocusOut event adjusted for all entries.

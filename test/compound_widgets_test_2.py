@@ -13,9 +13,8 @@ root.columnconfigure(1, weight=1)
 
 # First frame, testing LabelEntryUnits
 if True:
-    def get_all_label_entry_values():
-        for w in all_label_entry_units:
-            print(w.get())
+    def get_all_label_entry_values(event=None):
+        print('/'.join([str(w.get()) for w in all_label_entry_units]))
 
     def get_all_label_entry_metric():
         for w in all_label_entry_units:
@@ -80,7 +79,7 @@ if True:
             sided = False
         w = cw.LabelEntryUnit(frame, label_text=f'{str(item).capitalize()}:', label_width=10, entry_value='0',
                               entry_width=8, combobox_unit=item, combobox_unit_width=10, precision=i % 5,
-                              entry_method=lambda e: print('method called'), sided=sided)
+                              entry_method=get_all_label_entry_values, sided=sided)
         w.grid(row=i, column=0, sticky='nsew', pady=5, padx=10)
         all_label_entry_units.append(w)
 
