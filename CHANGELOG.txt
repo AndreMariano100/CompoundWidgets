@@ -86,3 +86,8 @@ Change Log
 0.3.16 (19/01/2024) - LabelEntryUnit conversion corrected
 0.3.17 (29/01/2024) - LabelEntryUnit conversion corrected (last value setting)
 0.3.18 (31/01/2024) - Takefocus adjusted for disabled and readonly widgets. FocusOut event adjusted for all entries.
+0.3.19 (06/02/2024) - Borderframe creation.
+0.3.20 (19/02/2024) - Small correction on the get_metric method of LabelEntryUnit widgets.
+0.3.21 (21/02/2024) - Small correction on LabelEntryUnit, set_unit method (updates self.last_unit).
+0.3.22 (21/02/2024) - Small correction on LabelEntryUnit, set_unit method (updates self.last_unit).
+0.3.23 (26/02/2024) - Bug when setting empty values to LabelEntryUnit.

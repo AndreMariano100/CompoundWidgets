@@ -1087,11 +1087,13 @@ class LabelEntryUnit(LabelCompoundWidget):
             value = ''
         return value
 
-    def set_entry(self, value):
+    def set_entry(self, value, update_last_value=True):
         if str(self.entry.cget('state')) == 'disabled':
             return
 
-        if value == '':
+        if value in ('', 'NA'):
+            if update_last_value:
+                self.last_value = 0
             if self.trace_variable:
                 self.entry_variable.trace_remove('write', self.cb_name)
                 self.entry_variable.set(value)
@@ -1099,8 +1101,10 @@ class LabelEntryUnit(LabelCompoundWidget):
             else:
                 self.entry_variable.set(value)
             return
+
         elif not(isfloat(value)):
-            return
+            if update_last_value:
+                self.last_value = 0
 
         else:
             value = float(value)
@@ -1117,13 +1121,13 @@ class LabelEntryUnit(LabelCompoundWidget):
                 else:
                     self.entry_variable.set(f'{value:.{self.precision}f}')
 
-            if not self.combobox_unit_conversion:
+            if update_last_value:
                 self.last_value = value
 
     def get_unit(self):
         return self.combobox_variable.get()
 
-    def set_unit(self, unit):
+    def set_unit(self, unit, update_last_unit=True):
         if str(self.unit_combo.cget('state')) == 'disabled':
             return
 
@@ -1131,8 +1135,12 @@ class LabelEntryUnit(LabelCompoundWidget):
             return
 
         if unit in list(self.unit_combo.values):
+            if update_last_unit:
+                self.last_unit = unit
             self.combobox_variable.set(unit)
         else:
+            if update_last_unit:
+                self.last_unit = self.unit_combo.values[0]
             self.combobox_variable.set(self.unit_combo.values[0])
 
     def get(self):
@@ -1142,6 +1150,8 @@ class LabelEntryUnit(LabelCompoundWidget):
         self.set_entry(value)
         if unit:
             self.set_unit(unit)
+        else:
+            self.set_unit(self.get_unit())
 
     # Widget conversion methods ----------------------------------------------------------------------------------------
     def get_metric_value(self):
@@ -1158,14 +1168,14 @@ class LabelEntryUnit(LabelCompoundWidget):
 
         if isinstance(self.unit_combo, LabelEntryUnit.TemperatureCombo):
             if str(self.get_unit()) == '°F':
-                if not self.get_entry():
+                if not str(self.get_entry()):
                     return '', '°C'
                 else:
                     return 5 * (float(self.get_entry()) - 32) / 9, '°C'
             return self.get_entry(), '°C'
 
         index = self.unit_combo.values.index(self.get_unit())
-        if not self.get_entry():
+        if not str(self.get_entry()):
             return '', self.unit_combo.values[0]
         else:
             return float(self.get_entry()) * self.unit_combo.conversion_values[index], self.unit_combo.values[0]
@@ -1184,14 +1194,14 @@ class LabelEntryUnit(LabelCompoundWidget):
 
         if isinstance(self.unit_combo, LabelEntryUnit.TemperatureCombo):
             if str(self.get_unit()) == '°C':
-                if not self.get_entry():
+                if not str(self.get_entry()):
                     return '', '°F'
                 else:
                     return 9 * float(self.get_entry())/5 + 32, '°F'
             return self.get_entry(), '°F'
 
         index = self.unit_combo.values.index(self.get_unit())
-        if not self.get_entry():
+        if not str(self.get_entry()):
             return '', self.unit_combo.values[-1]
         else:
             if isinstance(self.unit_combo, LabelEntryUnit.TimeCombo):
@@ -1327,9 +1337,6 @@ class LabelEntryUnit(LabelCompoundWidget):
         last_value = self.last_value
         last_unit = self.last_unit
         new_unit = self.get_unit()
-        print(f'Last value: {self.last_value}')
-        print(f'Last unit: {self.last_unit}')
-        print(f'New unit: {self.get_unit()}')
 
         if isinstance(self.unit_combo, LabelEntryUnit.NoUnitCombo):
             pass
@@ -1343,13 +1350,16 @@ class LabelEntryUnit(LabelCompoundWidget):
                         new_value = ''
                     else:
                         new_value = 9 * (float(last_value) / 5) + 32
-                    self.set(new_value, '°F')
+
+                    self.set_unit('°F', update_last_unit=False)
+                    self.set_entry(new_value, update_last_value=False)
                 else:
                     if not last_value:
                         new_value = ''
                     else:
                         new_value = 5 * (float(last_value) - 32) / 9
-                    self.set(new_value, '°C')
+                    self.set_unit('°C', update_last_unit=False)
+                    self.set_entry(new_value, update_last_value=False)
 
         else:
             if new_unit == last_unit:
@@ -1366,7 +1376,8 @@ class LabelEntryUnit(LabelCompoundWidget):
                     # Convert from index 1 to new index
                     new_value = intermediary_value / self.unit_combo.conversion_values[new_index]
 
-                self.set(new_value, new_unit)
+                self.set_unit(new_unit, update_last_unit=False)
+                self.set_entry(new_value, update_last_value=False)
 
 
 class LabelEntryButton(LabelCompoundWidget):

@@ -17,12 +17,10 @@ if True:
         print('/'.join([str(w.get()) for w in all_label_entry_units]))
 
     def get_all_label_entry_metric():
-        for w in all_label_entry_units:
-            print(w.get_metric_value())
+        print('/'.join([str(w.get_metric_value()) for w in all_label_entry_units]))
 
     def get_all_label_entry_imperial():
-        for w in all_label_entry_units:
-            print(w.get_imperial_value())
+        print('/'.join([str(w.get_imperial_value()) for w in all_label_entry_units]))
 
     def disable_all_label_entry():
         for w in all_label_entry_units:
@@ -115,7 +113,6 @@ if True:
 
     b11 = ttk.Button(frame, text='ENABLE/DISABLE CONVERSION', command=enable_self_conversion)
     b11.grid(row=10, column=1, pady=2, sticky='ew', padx=2)
-
 
 # Second frame, testing LabelEntryButton
 if True:

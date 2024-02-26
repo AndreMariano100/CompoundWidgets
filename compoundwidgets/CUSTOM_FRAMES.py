@@ -430,3 +430,36 @@ class ScrollableFrame(ttk.Frame):
 
         final_height = max (available_height, self.bottom_frame.winfo_reqheight())
         self.canvas.itemconfigure(self.window_id, height=final_height)
+
+
+class BorderFrame(ttk.Frame):
+    """
+    Creates a frame with a continuous border all around it.
+    Parameters:
+        parent: container for the frame
+        border_width: width of the border (padding)
+        border_style: color of the border (bootstyle)
+        frame_style: main frame style (bootstyle)
+    """
+
+    def __init__(self, parent, border_width=1, border_style='secondary', frame_style='TFrame', **kwargs):
+
+        # Main container
+        if True:
+            self.container = ttk.Frame(parent, style=border_style, padding=border_width)
+            self.container.rowconfigure(0, weight=1)
+            self.container.columnconfigure(0, weight=1)
+
+        # Self initialization
+        if True:
+            super().__init__(self.container, style=frame_style, **kwargs)
+            self.grid(row=0, column=0, sticky='nsew')
+
+        # Delegate content geometry methods from container frame
+        _methods = vars(tk.Grid).keys()
+        for method in _methods:
+            if "grid" in method:
+                # prefix content frame methods with 'content_'
+                setattr(self, f"content_{method}", getattr(self, method))
+                # overwrite content frame methods from container frame
+                setattr(self, method, getattr(self.container, method))
