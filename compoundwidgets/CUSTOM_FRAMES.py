@@ -1,5 +1,6 @@
 import ttkbootstrap as ttk
 import tkinter as tk
+from .MESSAGE_BOX_WIDGETS import Tooltip
 
 
 class CollapsableFrame(ttk.Frame):
@@ -94,6 +95,15 @@ class CollapsableFrame(ttk.Frame):
         else:
             self.disabled = False
             self.enable()
+
+        self.container.bind("<Map>",  self._update, "+")
+        self.container.bind("<Configure>", self._update, '+')
+        self.container.bind("<<MapChild>>", self._update, '+')
+        self.bind("<<MapChild>>", self._update, "+")
+        self.bind("<Configure>", self._update, '+')
+
+    def _update(self, event=None):
+        self.update_idletasks()
 
     def check_collapse(self, event):
         widget_under_cursor = event.widget.winfo_containing(event.x_root, event.y_root)
@@ -201,6 +211,9 @@ class VCollapsableFrame(ttk.Frame):
             self.collapse_button.grid(row=0, column=0, sticky='nsew')
             self.collapse_button.bind('<ButtonRelease-1>', self.check_collapse)
 
+            Tooltip(self.title_frame, text=title)
+            Tooltip(self.collapse_button, text=title)
+
         # Title for the frame
         if True:
             self.title_label = ttk.Label(self.container, font=title_font, padding=5, text=title,
@@ -241,6 +254,15 @@ class VCollapsableFrame(ttk.Frame):
         else:
             self.disabled = False
             self.enable()
+
+        self.container.bind("<Map>", self._update, "+")
+        self.container.bind("<Configure>", self._update, '+')
+        self.container.bind("<<MapChild>>", self._update, '+')
+        self.bind("<<MapChild>>", self._update, "+")
+        self.bind("<Configure>", self._update, '+')
+
+    def _update(self, event=None):
+        self.update_idletasks()
 
     def check_collapse(self, event):
 
@@ -446,14 +468,22 @@ class BorderFrame(ttk.Frame):
 
         # Main container
         if True:
-            self.container = ttk.Frame(parent, style=border_style, padding=border_width)
+            self.container = ttk.Frame(parent, style=border_style)
             self.container.rowconfigure(0, weight=1)
             self.container.columnconfigure(0, weight=1)
 
         # Self initialization
         if True:
             super().__init__(self.container, style=frame_style, **kwargs)
-            self.grid(row=0, column=0, sticky='nsew')
+
+            if isinstance(border_width, tuple) or isinstance(border_width, list):
+                pad_x = border_width[0:2]
+                pad_y = border_width[2:4]
+            else:
+                pad_x = border_width
+                pad_y = border_width
+
+            self.grid(row=0, column=0, sticky='nsew', padx=pad_x, pady=pad_y)
 
         # Delegate content geometry methods from container frame
         _methods = vars(tk.Grid).keys()

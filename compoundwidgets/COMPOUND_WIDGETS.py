@@ -17,7 +17,7 @@ class LabelCompoundWidget(ttk.Frame):
         sided: whether the label and the widget are positioned on the same line vs. in the same column
     """
 
-    def __init__(self, parent, label_text='Label:', label_anchor='e', label_width=None,
+    def __init__(self, parent, label_text=None, label_anchor='e', label_width=None,
                  label_justify=None, label_font=None, sided=True, **kwargs):
 
         # Parent class initialization
@@ -26,30 +26,30 @@ class LabelCompoundWidget(ttk.Frame):
         # Frame configuration
         if True:
             self.sided = sided
-            if self.sided:
-                self.rowconfigure(0, weight=1)
-                self.columnconfigure(0, weight=1)
-                self.columnconfigure(1, weight=0)
-            else:
-                self.rowconfigure(0, weight=1)
+            self.rowconfigure(0, weight=1)
+            self.columnconfigure(0, weight=1)
+
+            if not self.sided:
                 self.rowconfigure(1, weight=1)
-                self.columnconfigure(0, weight=1)
 
         # Label configuration
         if True:
             self.label = ttk.Label(self, text=label_text, anchor=label_anchor)
-            self.label.grid(row=0, column=0, sticky='nsew', padx=2)
+            if label_text:
+                self.label.grid(row=0, column=0, sticky='nsew', padx=2)
 
-            if label_width:
-                self.label['width'] = label_width
-            if label_font:
-                self.label.config(font=label_font)
-            if label_justify:
-                self.label.config(justify=label_justify)
-
-        # Additional configuration: no label text
-        if not label_text:
-            self.set_label_text(label_text)
+                if label_width:
+                    self.label['width'] = label_width
+                if label_font:
+                    self.label.config(font=label_font)
+                if label_justify:
+                    self.label.config(justify=label_justify)
+            else:
+                if self.sided:
+                    self.columnconfigure(0, weight=0)
+                    self.columnconfigure(1, weight=1)
+                else:
+                    self.rowconfigure(0, weight=0)
 
     def set_label_text(self, label_text):
         """ Sets a new string to the label """
@@ -58,6 +58,7 @@ class LabelCompoundWidget(ttk.Frame):
             self.label.grid_remove()
             if self.sided:
                 self.columnconfigure(0, weight=0)
+                self.columnconfigure(1, weight=1)
             else:
                 self.rowconfigure(0, weight=0)
         else:
@@ -65,6 +66,7 @@ class LabelCompoundWidget(ttk.Frame):
             self.label.config(text=label_text)
             if self.sided:
                 self.columnconfigure(0, weight=1)
+                self.columnconfigure(1, weight=0)
             else:
                 self.rowconfigure(0, weight=1)
 
@@ -88,7 +90,7 @@ class LabelCombo(LabelCompoundWidget):
         set_combo_values(values): sets the combobox values after it has been created
     """
 
-    def __init__(self, parent, label_text='Label:', label_anchor='e', label_width=None,
+    def __init__(self, parent, label_text=None, label_anchor='e', label_width=None,
                  label_justify=None, label_font=None, sided=True,
                  combo_value='', combo_list=('No values informed',), combo_width=None, combo_method=None, **kwargs):
 
@@ -163,7 +165,7 @@ class LabelEntry(LabelCompoundWidget):
         set(value): sets a value to the entry widget
     """
 
-    def __init__(self, parent, label_text='label:', label_anchor='e', label_width=None,
+    def __init__(self, parent, label_text=None, label_anchor='e', label_width=None,
                  label_justify=None, label_font=None, sided=True,
                  entry_value='', entry_numeric=False, entry_width=None, entry_max_char=None,
                  entry_method=None, precision=2, trace_variable=False, **kwargs):
@@ -179,7 +181,10 @@ class LabelEntry(LabelCompoundWidget):
 
         # Entry validation for numbers and max_char
         if True:
-            validate_numbers = self.register(float_only)
+            if self.precision == 0:
+                validate_numbers = self.register(int_only)
+            else:
+                validate_numbers = self.register(float_only)
             validate_chars = self.register(max_chars)
 
         # Entry configuration
@@ -200,7 +205,8 @@ class LabelEntry(LabelCompoundWidget):
             if entry_numeric:
                 if not isfloat(entry_value):
                     self.variable.set('')
-                self.entry.config(validate='all', validatecommand=(validate_numbers, '%d', '%P', '%S', entry_max_char))
+                self.entry.config(validate='all',
+                                  validatecommand=(validate_numbers, '%d', '%P', '%S', entry_max_char))
 
             # Restrict max characters
             if entry_max_char and not entry_numeric:
@@ -278,12 +284,21 @@ class LabelEntry(LabelCompoundWidget):
                     self.variable.set(value)
             elif isfloat(value):
                 value = float(value)
-                if self.trace_variable:
-                    self.variable.trace_remove('write', self.cb_name)
-                    self.variable.set(f'{value:.{self.precision}f}')
-                    self.cb_name = self.variable.trace_add("write", self._update_value)
+                if self.precision == 0:
+                    value = int(value)
+                    if self.trace_variable:
+                        self.variable.trace_remove('write', self.cb_name)
+                        self.variable.set(str(value))
+                        self.cb_name = self.variable.trace_add("write", self._update_value)
+                    else:
+                        self.variable.set(str(value))
                 else:
-                    self.variable.set(f'{value:.{self.precision}f}')
+                    if self.trace_variable:
+                        self.variable.trace_remove('write', self.cb_name)
+                        self.variable.set(f'{value:.{self.precision}f}')
+                        self.cb_name = self.variable.trace_add("write", self._update_value)
+                    else:
+                        self.variable.set(f'{value:.{self.precision}f}')
             else:
                 return
 
@@ -315,7 +330,7 @@ class LabelText(LabelCompoundWidget):
         set(text): sets a text to the text widget
     """
 
-    def __init__(self, parent, label_text='Label:', label_anchor='e', label_width=None,
+    def __init__(self, parent, label_text=None, label_anchor='e', label_width=None,
                  label_justify=None, label_font=None, sided=True,
                  text_value='', text_width=None, text_height=None, text_method=None, **kwargs):
 
@@ -410,7 +425,7 @@ class LabelSpinbox(LabelCompoundWidget):
         set(value): sets a value to the spinbox widget
     """
 
-    def __init__(self, parent, label_text='label:', label_anchor='e', label_width=None,
+    def __init__(self, parent, label_text=None, label_anchor='e', label_width=None,
                  label_justify=None, label_font=None, sided=True,
                  entry_value=None, entry_width=None, entry_method=None, entry_type='float',
                  spin_start=0, spin_end=10, spin_increment=1, spin_precision=2,
@@ -897,7 +912,7 @@ class LabelEntryUnit(LabelCompoundWidget):
          14.5939,
          0.55556)
 
-    def __init__(self, parent, label_text='label:', label_anchor='e', label_width=None,
+    def __init__(self, parent, label_text=None, label_anchor='e', label_width=None,
                  label_justify=None, label_font=None, sided=True,
                  entry_value=None, entry_width=None, entry_method=None,
                  combobox_unit=None, combobox_unit_width=8, combobox_unit_conversion=False,
@@ -907,9 +922,12 @@ class LabelEntryUnit(LabelCompoundWidget):
         super().__init__(parent, label_text, label_anchor, label_width, label_justify, label_font, sided, **kwargs)
 
         # Entry validation for numbers
-        validate_numbers = self.register(float_only)
+        if precision == 0:
+            validate_numbers = self.register(int_only)
+        else:
+            validate_numbers = self.register(float_only)
 
-        # Local frame (text + scroll bar)
+        # Local frame
         if True:
             local_frame = ttk.Frame(self)
             local_frame.rowconfigure(0, weight=1)
@@ -1108,18 +1126,27 @@ class LabelEntryUnit(LabelCompoundWidget):
 
         else:
             value = float(value)
-            if self.trace_variable:
-                self.entry_variable.trace_remove('write', self.cb_name)
-                if 0 < value < 1 / (10 ** (self.precision - 1)):
-                    self.entry_variable.set(f'{value:.{self.precision}e}')
+            if self.precision == 0:
+                value = int(value)
+                if self.trace_variable:
+                    self.entry_variable.trace_remove('write', self.cb_name)
+                    self.entry_variable.set(str(value))
+                    self.cb_name = self.entry_variable.trace_add("write", self._update_value)
                 else:
-                    self.entry_variable.set(f'{value:.{self.precision}f}')
-                self.cb_name = self.entry_variable.trace_add("write", self._update_value)
+                    self.entry_variable.set(str(value))
             else:
-                if 0 < value < 1 / (10 ** (self.precision - 1)):
-                    self.entry_variable.set(f'{value:.{self.precision}e}')
+                if self.trace_variable:
+                    self.entry_variable.trace_remove('write', self.cb_name)
+                    if 0 < value < 1 / (10 ** (self.precision - 1)):
+                        self.entry_variable.set(f'{value:.{self.precision}e}')
+                    else:
+                        self.entry_variable.set(f'{value:.{self.precision}f}')
+                    self.cb_name = self.entry_variable.trace_add("write", self._update_value)
                 else:
-                    self.entry_variable.set(f'{value:.{self.precision}f}')
+                    if 0 < value < 1 / (10 ** (self.precision - 1)):
+                        self.entry_variable.set(f'{value:.{self.precision}e}')
+                    else:
+                        self.entry_variable.set(f'{value:.{self.precision}f}')
 
             if update_last_value:
                 self.last_value = value
@@ -1401,7 +1428,7 @@ class LabelEntryButton(LabelCompoundWidget):
         set(value): sets a value to the entry widget
     """
 
-    def __init__(self, parent, label_text='Label:', label_anchor='e', label_width=None,
+    def __init__(self, parent, label_text=None, label_anchor='e', label_width=None,
                  label_justify=None, label_font=None, sided=True,
                  entry_value='', entry_numeric=False, entry_width=None,
                  entry_max_char=None, entry_method=None,
@@ -1420,7 +1447,10 @@ class LabelEntryButton(LabelCompoundWidget):
 
         # Entry validation for numbers
         if True:
-            validate_numbers = self.register(float_only)
+            if self.precision == 0:
+                validate_numbers = self.register(int_only)
+            else:
+                validate_numbers = self.register(float_only)
             validate_chars = self.register(max_chars)
 
         # Local frame (entry + button)
@@ -1532,12 +1562,22 @@ class LabelEntryButton(LabelCompoundWidget):
                     self.variable.set(value)
             elif isfloat(value):
                 value = float(value)
-                if self.trace_variable:
-                    self.variable.trace_remove('write', self.cb_name)
-                    self.variable.set(f'{value:.{self.precision}f}')
-                    self.cb_name = self.variable.trace_add("write", self._update_value)
+                if self.precision == 0:
+                    value = int(value)
+                    if self.trace_variable:
+                        self.variable.trace_remove('write', self.cb_name)
+                        self.variable.set(str(value))
+                        self.cb_name = self.variable.trace_add("write", self._update_value)
+                    else:
+                        self.variable.set(str(value))
+
                 else:
-                    self.variable.set(f'{value:.{self.precision}f}')
+                    if self.trace_variable:
+                        self.variable.trace_remove('write', self.cb_name)
+                        self.variable.set(f'{value:.{self.precision}f}')
+                        self.cb_name = self.variable.trace_add("write", self._update_value)
+                    else:
+                        self.variable.set(f'{value:.{self.precision}f}')
             else:
                 return
 
@@ -1574,7 +1614,7 @@ class LabelComboButton(LabelCompoundWidget):
         set_combo_values(values): sets the combobox values after it has been created
     """
 
-    def __init__(self, parent, label_text='Label:', label_anchor='e', label_width=None,
+    def __init__(self, parent, label_text=None, label_anchor='e', label_width=None,
                  label_justify=None, label_font=None, sided=True,
                  combo_value='', combo_list=('No values informed',), combo_width=None, combo_method=None,
                  button_text='', button_width=None, button_method=None, **kwargs):

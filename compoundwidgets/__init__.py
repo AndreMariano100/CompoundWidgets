@@ -1,4 +1,4 @@
-__version__ = "0.3.23"
+__version__ = "0.4.00"
 __author__ = 'Andre Mariano'
 __all__ = ['AUTOCOMPLETE_WIDGETS',
            'COMPOUND_WIDGETS',
@@ -46,11 +46,11 @@ from .LED_BUTTONS import LedButton
 from .LED_BUTTONS import RadioLedButton
 
 from .MESSAGE_BOX_WIDGETS import OkCancelBox
+from .MESSAGE_BOX_WIDGETS import YesNoBox
 from .MESSAGE_BOX_WIDGETS import ProgressBar
 from .MESSAGE_BOX_WIDGETS import SuccessBox
 from .MESSAGE_BOX_WIDGETS import TimedBox
 from .MESSAGE_BOX_WIDGETS import Tooltip
 from .MESSAGE_BOX_WIDGETS import WarningBox
-from .MESSAGE_BOX_WIDGETS import YesNoBox
 
 from .SCRIPTS import *

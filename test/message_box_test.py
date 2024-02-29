@@ -18,7 +18,7 @@ def show_ok_cancel_box():
 
 def show_yes_no_box():
     answer = cw.YesNoBox(root, icon_path=icon_path, title='Yes No Box',
-                         message='This is a Yes / No message box.\nTest the answers!',
+                         message='This is a Yes / No message box. This one has a very long text message. Test the answers!',
                          language='en').show()
     if answer:
         print(f'Selected Yes ({answer})')
