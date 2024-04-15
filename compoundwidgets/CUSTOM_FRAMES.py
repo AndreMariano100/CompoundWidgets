@@ -191,10 +191,10 @@ class VCollapsableFrame(ttk.Frame):
         # Main container
         if True:
             self.container = ttk.Frame(parent)
-            self.container.rowconfigure(0, weight=0)
-            self.container.rowconfigure(1, weight=1)
-            self.container.columnconfigure(0, weight=0)
-            self.container.columnconfigure(1, weight=1)
+            self.container.rowconfigure(0, weight=0)  # Internal Title
+            self.container.rowconfigure(1, weight=1)  # Main content
+            self.container.columnconfigure(0, weight=0)  # Left Title
+            self.container.columnconfigure(1, weight=1)  # Main content
 
         # Expansion frame + label
         if True:
@@ -204,6 +204,12 @@ class VCollapsableFrame(ttk.Frame):
             self.title_frame.rowconfigure(0, weight=0)
             self.title_frame.rowconfigure(1, weight=1)
             self.title_frame.bind('<ButtonRelease-1>', self.check_collapse)
+
+            broken_title = '\n'.join(title.upper())
+            style = f'{style}.Inverse.TLabel'
+            self.label = ttk.Label(self.title_frame, text=broken_title, anchor='n', justify='center', style=style)
+            self.label.grid(row=1, column=0, sticky='nsew')
+            self.label.bind('<ButtonRelease-1>', self.check_collapse)
 
             self.collapse_button = ttk.Label(self.title_frame, text='-', style='primary.TButton',
                                              font=title_font, width=3, padding=0, bootstyle=self.label_style,
@@ -302,12 +308,13 @@ class VCollapsableFrame(ttk.Frame):
         local_label_style = self.label_style_dict.get(local_style)
         self.title_frame.configure(bootstyle=local_style)
         self.collapse_button.configure(bootstyle=local_label_style)
+        self.label.configure(style='secondary.Inverse.TLabel')
 
     def enable(self):
         self.disabled = False
         self.title_frame.configure(bootstyle=self.style)
         self.collapse_button.configure(bootstyle=self.label_style)
-
+        self.label.configure(style=f'{self.style}.Inverse.TLabel')
 
 class ScrollableFrame(ttk.Frame):
     """

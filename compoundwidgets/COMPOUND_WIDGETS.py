@@ -842,7 +842,7 @@ class LabelEntryUnit(LabelCompoundWidget):
             super().__init__(parent)
 
             self.values = ('10e-6/°C', '10e-6/°F')
-            self.conversion_values = (1, 0.55556)
+            self.conversion_values = (1, 1.79856)
             self.variable = tk.StringVar(value=self.values[0])
             self.configure(textvariable=self.variable, justify='center', width=width, values=self.values,
                            state='readonly')

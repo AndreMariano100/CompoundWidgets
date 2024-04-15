@@ -239,12 +239,14 @@ class Tooltip:
         self.wait_time = wait_time
         self.wrap_length = wrap_length
 
-        self.widget.bind("<Enter>", self._enter)
-        self.widget.bind("<Leave>", self._leave)
-        self.widget.bind("<Motion>", self._move_tip)
-        self.widget.bind("<ButtonPress>", self._leave)
-        self.id = None
-        self.top_level = None
+        if not self.text:
+            self.remove_message()
+        else:
+            self.widget.bind("<Enter>", self._enter)
+            self.widget.bind("<Leave>", self._leave)
+            self.widget.bind("<Motion>", self._move_tip)
+            self.id = None
+            self.top_level = None
 
     def _enter(self, event=None):
         self.schedule()
@@ -294,7 +296,8 @@ class Tooltip:
         self.widget.unbind("<Enter>")
         self.widget.unbind("<Leave>")
         self.widget.unbind("<Motion>")
-        self.widget.unbind("<ButtonPress>")
+        self.unschedule()
+        self.hide()
 
 
 class TimedBox(tk.Toplevel):

@@ -302,7 +302,6 @@ class AutocompleteLabelCombo(LabelCompoundWidget):
     def _entry_changed(self, name, index, mode):
         """ Keeps track of any change in the entry widget and updates the dropdown values """
 
-        print(self.variable.get())
         if self.variable.get() == '':
             self.set_combo_values(self.combo_list)
 

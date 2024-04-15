@@ -7,7 +7,7 @@ def float_only(action, value, text, max_length=None):
     """ Checks that only float related characters are accepted as input """
 
     permitted = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '-']
-    print('validate float')
+
     if action == '1':
         if str(max_length) != 'None':
             if len(value) > int(max_length):
@@ -32,7 +32,7 @@ def int_only(action, value, text, max_length=None):
     """ Checks that only int related characters are accepted as input """
 
     permitted = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-']
-    print('validate int')
+
     if action == '1':
         if str(max_length) != 'None':
             if len(value) > int(max_length):

@@ -92,3 +92,5 @@ Change Log
 0.3.22 (21/02/2024) - Small correction on LabelEntryUnit, set_unit method (updates self.last_unit).
 0.3.23 (26/02/2024) - Bug when setting empty values to LabelEntryUnit.
 0.4.00 (29/02/2024) - General revision of all widgets and frames.
+0.4.01 (29/02/2024) - General revision of all widgets and frames.
+0.4.02 (15/04/2024) - Revision of thermal expansion LabelEntryUnit.
