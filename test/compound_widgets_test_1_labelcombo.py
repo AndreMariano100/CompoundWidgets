@@ -8,7 +8,7 @@ root.style = Style(theme='darkly')
 root.rowconfigure(0, weight=1)
 root.columnconfigure(0, weight=1)
 
-def get_all_label_combos():
+def get_all_label_combos(event=None):
     for w in label_combo_list:
         print(w.get())
 
@@ -26,6 +26,7 @@ def set_disable_combos():
 
 def set_read_only_combos():
     for w in label_combo_list:
+        w.set(local_list[0])
         w.readonly()
 
 def set_normal_combos():
@@ -43,7 +44,7 @@ for i, item in enumerate(local_list):
     else:
         sided=False
     w = cw.LabelCombo(frame, label_text=item, label_width=10, combo_list=local_list,
-                      sided=sided, label_anchor='w', label_justify='left')
+                      sided=sided, label_anchor='w', label_justify='left', combo_method=get_all_label_combos)
     w.grid(row=i, column=0, sticky='nsew', pady=2)
     label_combo_list.append(w)
     if i == 2:

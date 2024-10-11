@@ -33,7 +33,7 @@ def readonly_all_label_entry():
 def fill_entry_values():
     for w in all_label_entry_units:
         w.set_entry(randint(-100, 400))
-        range_2 = len(w.unit_combo.values) -1
+        range_2 = len(w.unit_combo.values) - 1
         w.set_unit(w.unit_combo.values[randint(0, range_2)])
 
 def lock_entry_units():

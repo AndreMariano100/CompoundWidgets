@@ -1,4 +1,4 @@
-__version__ = "0.4.02"
+__version__ = "0.5.00"
 __author__ = 'Andre Mariano'
 __all__ = ['AUTOCOMPLETE_WIDGETS',
            'COMPOUND_WIDGETS',
@@ -35,14 +35,24 @@ from .CUSTOM_BUTTONS import QuitButton
 from .CUSTOM_BUTTONS import RemoveFromReport
 from .CUSTOM_BUTTONS import SaveButton
 from .CUSTOM_BUTTONS import YesButton
+from .CUSTOM_BUTTONS import ClipBoardButton
+from .CUSTOM_BUTTONS import NextButton
+from .CUSTOM_BUTTONS import PreviousButton
+from .CUSTOM_BUTTONS import UpButton
+from .CUSTOM_BUTTONS import SearchButton
+from .CUSTOM_BUTTONS import DownButton
+from .CUSTOM_BUTTONS import HomeButton
+from .CUSTOM_BUTTONS import MainMenuButton
+from .CUSTOM_BUTTONS import AppsMenuButton
+from .CUSTOM_BUTTONS import ConfigurationButton
 
 from .CUSTOM_FRAMES import CollapsableFrame
 from .CUSTOM_FRAMES import ScrollableFrame
-from .CUSTOM_FRAMES import VCollapsableFrame
+from .CUSTOM_FRAMES import HCollapsableFrame
 from .CUSTOM_FRAMES import BorderFrame
 
+from .LED_BUTTONS import CheckSwitchLedButton
 from .LED_BUTTONS import CheckLedButton
-from .LED_BUTTONS import LedButton
 from .LED_BUTTONS import RadioLedButton
 
 from .MESSAGE_BOX_WIDGETS import OkCancelBox

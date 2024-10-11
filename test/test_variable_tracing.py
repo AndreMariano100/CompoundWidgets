@@ -5,7 +5,7 @@ import compoundwidgets as cw
 
 root = tk.Tk()
 
-def entry_method(event):
+def entry_method():
     print(f'entry method')
     all_values = []
     for w in label_entry_list:

@@ -94,3 +94,6 @@ Change Log
 0.4.00 (29/02/2024) - General revision of all widgets and frames.
 0.4.01 (29/02/2024) - General revision of all widgets and frames.
 0.4.02 (15/04/2024) - Revision of thermal expansion LabelEntryUnit.
+0.4.03 (12/05/2024) - Bug corrected on Tooltip.
+0.4.04 (30/05/2024) - Copy to clipboard button added.
+0.5.00 (09/10/2024) - General revision of several widgets.

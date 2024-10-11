@@ -12,10 +12,11 @@ root.minsize(250, 400)
 all_buttons = (
     cw.YesButton,
     cw.NoButton,
-    cw.ClearButton,
-    cw.SaveButton,
     cw.OKButton,
     cw.CancelButton,
+
+    cw.ClearButton,
+    cw.SaveButton,
     cw.CalculateButton,
 
     cw.HelpButton,
@@ -25,15 +26,28 @@ all_buttons = (
     cw.RemoveFromReport,
     cw.AddNewButton,
     cw.EraseButton,
-    cw.QuitButton
+    cw.QuitButton,
+    cw.ClipBoardButton,
+
+    cw.NextButton,
+    cw.PreviousButton,
+    cw.UpButton,
+    cw.DownButton,
+
+    cw.SearchButton,
+    cw.HomeButton,
+    cw.MainMenuButton,
+    cw.AppsMenuButton,
+    cw.ConfigurationButton,
+
 )
 for i, widget in enumerate(all_buttons):
-    widget(root, width=12).grid(row=i, column=0, padx=10, pady=2)
+    widget(root, width=12).grid(row=i, column=0, padx=10, pady=1)
 
 for i, widget in enumerate(all_buttons):
-    widget(root, language='br').grid(row=i, column=1, padx=10, pady=2)
+    widget(root, language='br').grid(row=i, column=1, padx=10, pady=1)
 
 for i, widget in enumerate(all_buttons):
-    widget(root, language='en', style='primary', padding=1).grid(row=i, column=2, padx=10, pady=2)
+    widget(root, language='en', style='primary', padding=1).grid(row=i, column=2, padx=10, pady=1)
 
 root.mainloop()

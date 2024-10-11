@@ -10,7 +10,8 @@ root.columnconfigure(0, weight=1)
 
 def get_all_label_spin(event=None):
     for w in label_spin_list:
-        print(w.get())
+        print(w.get(), end=' / ')
+    print()
 
 def set_all_label_spin():
     for i, w in enumerate(label_spin_list):
@@ -33,7 +34,7 @@ def set_normal_spin():
         w.enable()
 
 frame = ttk.LabelFrame(root, text='Label Spinbox')
-frame.grid(row=0, column=2, sticky='nsew', padx=10, pady=10)
+frame.grid(row=0, column=0, sticky='nsew', padx=10, pady=10)
 frame.columnconfigure(0, weight=1)
 
 local_spin_list = (
@@ -44,7 +45,7 @@ local_spin_list = (
 )
 label_spin_list = []
 for i, item in enumerate(local_spin_list):
-    w = cw.LabelSpinbox(frame, label_text=item[0], label_width=15,
+    w = cw.LabelSpinbox(frame, label_text=item[0], label_width=20,
                         entry_value=item[1], entry_width=10, entry_method=get_all_label_spin,
                         entry_type=item[2], spin_start=item[3], spin_end=item[4],
                         spin_increment=item[5], spin_precision=item[6], trace_variable=True)

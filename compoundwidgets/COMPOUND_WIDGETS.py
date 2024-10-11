@@ -92,7 +92,8 @@ class LabelCombo(LabelCompoundWidget):
 
     def __init__(self, parent, label_text=None, label_anchor='e', label_width=None,
                  label_justify=None, label_font=None, sided=True,
-                 combo_value='', combo_list=('No values informed',), combo_width=None, combo_method=None, **kwargs):
+                 combo_value='', combo_list=('No values informed',),
+                 combo_width=None, combo_method=None, **kwargs):
 
         # Parent class initialization
         super().__init__(parent, label_text, label_anchor, label_width, label_justify, label_font, sided, **kwargs)
@@ -179,7 +180,7 @@ class LabelEntry(LabelCompoundWidget):
         self.precision = precision
         self.trace_variable = trace_variable
 
-        # Entry validation for numbers and max_char
+        # Entry validation for numbers and max char
         if True:
             if self.precision == 0:
                 validate_numbers = self.register(int_only)
@@ -220,8 +221,7 @@ class LabelEntry(LabelCompoundWidget):
                 self.cb_name = self.variable.trace_add("write", self._update_value)
 
             self.entry.bind("<FocusOut>", self._adjust_value, add='+')
-            if self.entry_method:
-                self.entry.bind("<Return>", self.entry_method, add='+')
+            self.entry.bind("<Return>", self._adjust_value, add='+')
 
     def _update_value(self, name, index, mode):
         """ Variable trace method. Calls the applicable method everytime the value changes """
@@ -230,7 +230,9 @@ class LabelEntry(LabelCompoundWidget):
             self.entry_method()
 
     def _adjust_value(self, event):
-        """ Precision adjustment method. Called when 'focus' is taken away from the widget. """
+        """
+        Precision adjustment method. Called when 'focus' is taken away from the widget or when 'return' is pressed.
+        """
 
         value = self.get()
         if self.entry_numeric:
@@ -330,9 +332,10 @@ class LabelText(LabelCompoundWidget):
         set(text): sets a text to the text widget
     """
 
-    def __init__(self, parent, label_text=None, label_anchor='e', label_width=None,
+    def __init__(self, parent, label_text=None, label_anchor='ne', label_width=None,
                  label_justify=None, label_font=None, sided=True,
-                 text_value='', text_width=None, text_height=None, text_method=None, **kwargs):
+                 text_value='', text_width=None, text_height=None,
+                 text_method=None, **kwargs):
 
         # Parent class initialization
         super().__init__(parent, label_text, label_anchor, label_width, label_justify, label_font, sided, **kwargs)
@@ -502,6 +505,8 @@ class LabelSpinbox(LabelCompoundWidget):
             self.spin.delete(self.spin.index("insert"), last='end')
 
     def _spin_selected(self, event=None):
+        if self.spin.cget("state") == 'readonly':
+            return
         self._check_user_value()
         self.spin.event_generate('<Return>')
 
@@ -510,64 +515,67 @@ class LabelSpinbox(LabelCompoundWidget):
         self._increment_lock = False
 
     def _on_increment(self, event=None):
+        if str(self.spin.cget("state")) == 'readonly':
+            return "break"
+
         if self._increment_lock:
             return "break"
         else:
             self._increment_lock = True
-            self.after(200, self._unlock_increment)
-            self.after(200, self._do_upon_clicking_arrows("up"))
+            self._unlock_increment()
+            self._do_upon_clicking_arrows("up")
         return "break"
 
     def _unlock_decrement(self):
         self._decrement_lock = False
 
     def _on_decrement(self, event=None):
+        if self.spin.cget("state") == 'readonly':
+            return "break"
+
         if self._decrement_lock:
             return "break"
         else:
             self._decrement_lock = True
-            self.after(500, self._unlock_decrement)
-            self.after(500, self._do_upon_clicking_arrows("down"))
+            self._unlock_decrement()
+            self._do_upon_clicking_arrows("down")
         return "break"
 
     # ------------------------------------------------------------------------------------------------------------------
     def _do_upon_clicking_arrows(self, direction):
+        if not str(self.variable.get()):
+            self.set(self.initial_value)
+            return
+
+        if self.spin.cget("state") == 'readonly':
+            return "break"
+
+        try:
+            old_value = float(self.variable.get())
+        except ValueError:
+            return "break"
 
         if direction == 'up':
+            new_value = old_value + self.increment
+            final_value = min(self.end, new_value)
             if self.type == 'float':
-                if float(self.get()) >= self.end:
-                    value = self.end
-                else:
-                    value = min(float(self.end), float(self.get()) + self.increment)
-                self.set(float(value))
-
+                self.set(float(final_value))
             else:
-                if int(self.get()) >= self.end:
-                    value = self.end
-                else:
-                    value = min(self.end, int(self.get()) + self.increment)
-                self.set(int(value))
+                self.set(int(final_value))
 
         else:
+            new_value = old_value - self.increment
+            final_value = max(self.start, new_value)
             if self.type == 'float':
-                if float(self.get()) <= self.start:
-                    value = self.start
-                else:
-                    value = max(float(self.start), float(self.get()) - self.increment)
-                self.set(float(value))
-
+                self.set(float(final_value))
             else:
-                if int(self.get()) <= self.start:
-                    value = self.start
-                else:
-                    value = max(self.start, int(self.get()) - self.increment)
-                self.set(int(value))
+                self.set(int(final_value))
 
     def _check_user_value(self, event=None):
         self.spin.update()
         current = self.variable.get()
         if not current or current in ('.', '-'):
-            return
+            return "break"
 
         try:
             current = float(current)
@@ -990,10 +998,7 @@ class LabelEntryUnit(LabelCompoundWidget):
 
             # When leaving the widget adjust the precision
             self.entry.bind("<FocusOut>", self._adjust_value, add='+')
-
-            # When 'enter' is selected, runs the applicable method
-            if self.entry_method:
-                self.entry.bind("<Return>", self.entry_method, add='+')
+            self.entry.bind("<Return>", self._adjust_value, add='+')
 
             if not self.combobox_unit_conversion:
                 self.unit_combo.bind("<<ComboboxSelected>>", self.entry_method, add='+')
@@ -1430,10 +1435,10 @@ class LabelEntryButton(LabelCompoundWidget):
 
     def __init__(self, parent, label_text=None, label_anchor='e', label_width=None,
                  label_justify=None, label_font=None, sided=True,
-                 entry_value='', entry_numeric=False, entry_width=None,
-                 entry_max_char=None, entry_method=None,
+                 entry_value='', entry_numeric=False, entry_width=None, entry_max_char=None,
+                 entry_method=None, precision=2, trace_variable=False,
                  button_text='', button_width=None, button_method=None,
-                 precision=2, trace_variable=False, **kwargs):
+                 **kwargs):
 
         # Parent class initialization
         super().__init__(parent, label_text, label_anchor, label_width, label_justify, label_font, sided, **kwargs)
@@ -1445,7 +1450,7 @@ class LabelEntryButton(LabelCompoundWidget):
         self.trace_variable = trace_variable
         self.button_method = button_method
 
-        # Entry validation for numbers
+        # Entry validation for numbers and max char
         if True:
             if self.precision == 0:
                 validate_numbers = self.register(int_only)
@@ -1500,15 +1505,18 @@ class LabelEntryButton(LabelCompoundWidget):
             if self.trace_variable:
                 self.cb_name = self.variable.trace_add("write", self._update_value)
             self.entry.bind("<FocusOut>", self._adjust_value, add='+')
-            if entry_method:
-                self.entry.bind("<Return>", self.entry_method, add='+')
+            self.entry.bind("<Return>", self._adjust_value, add='+')
 
     def _update_value(self, name, index, mode):
+        """ Variable trace method. Calls the applicable method everytime the value changes """
+
         if self.entry_method:
             self.entry_method()
 
     def _adjust_value(self, event):
-
+        """
+        Precision adjustment method. Called when 'focus' is taken away from the widget or when 'return' is pressed.
+        """
         value = self.get()
         if self.entry_numeric:
             if isfloat(value):

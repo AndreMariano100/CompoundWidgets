@@ -44,7 +44,7 @@ label = ttk.Label(frame_4, text='This is the 4th collapsable frame', padding=50,
 label.grid(row=0, column=0, sticky='nsew')
 
 frame_1 = cw.CollapsableFrame(base_frame, title='No style disabled', disabled=True)
-frame_1.grid(row=1, column=0, sticky='nsew', padx=5, pady=10)
+frame_1.grid(row=1, column=0, sticky='nsew', padx=5, pady=(0, 10))
 
 frame_2 = cw.CollapsableFrame(base_frame, title='Danger disabled', style='danger', disabled=True)
 frame_2.grid(row=3, column=0, sticky='nsew', padx=5, pady=(0, 10))

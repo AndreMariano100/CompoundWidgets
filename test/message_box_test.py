@@ -9,7 +9,7 @@ import time
 # Methods for testing the message boxes
 def show_ok_cancel_box():
     answer = cw.OkCancelBox(root, icon_path=icon_path, title='OK Cancel Box',
-                            message='This is a OK / Cancel message box.\nTest the answers!').show()
+                            message='This is a OK / Cancel message box. Test the answers!').show()
     if answer:
         print(f'Selected OK ({answer})')
     else:
@@ -43,26 +43,42 @@ def show_success_box():
     cw.SuccessBox(root, icon_path=icon_path, title='Success Box',
                   message='This is a Success box!').show()
 
+
 # Methods for testing the message boxes
 def show_timed_danger_box():
     cw.TimedBox(root, message='This is a timed box: 1 seconds', time=1, style='danger').show()
 
+
 def show_timed_warning_box():
     cw.TimedBox(root, message='This is a timed box: 0.5 seconds', time=0.5, style='warning').show()
+
 
 def show_timed_info_box():
     cw.TimedBox(root, message='This is a timed box: 0.2 seconds', time=0.2, style='info').show()
 
+
 def show_timed_generic_box():
     cw.TimedBox(root, message='This is a generic timed box with a kind of a long text to see if it fits').show()
+
+
+def toggle_tool_tip():
+    current_text = tool_tip_button.cget("text")
+    if '- on' in current_text.lower():
+        tool_tip_button.configure(text='Tool Tip - off')
+        cw.Tooltip(tool_tip_button, text='')
+    else:
+        tool_tip_button.configure(text='Tool Tip - on')
+        tool_tip_text = "This is a sample help text, that will be shown on a pop up window in the form of a tool tip"
+        cw.Tooltip(tool_tip_button, text=tool_tip_text, wrap_length=200)
+
 
 # Root
 root = tk.Tk()
 root.title('Message Box Testing')
-image_path = os.getcwd().replace('test', 'compoundwidgets\IMAGES')
+image_path = os.getcwd().replace('test', r'compoundwidgets\IMAGES')
 icon_path = os.path.join(image_path, 'engineering.ico')
 root.iconbitmap(icon_path)
-root.style = Style(theme='darkly')
+root.style = Style(theme='flatly')
 root.geometry(f'400x600+200+50')
 root.columnconfigure(0, weight=1)
 for i in range(10):
@@ -83,10 +99,10 @@ button.grid(row=3, column=0, sticky='nsew', padx=10, pady=10)
 button = ttk.Button(root, text='Success Box', command=show_success_box)
 button.grid(row=4, column=0, sticky='nsew', padx=10, pady=10)
 
-button = ttk.Button(root, text='Tool Tip')
-button.grid(row=5, column=0, sticky='nsew', padx=10, pady=10)
+tool_tip_button = ttk.Button(root, text='Tool Tip - on', command=toggle_tool_tip)
+tool_tip_button.grid(row=5, column=0, sticky='nsew', padx=10, pady=10)
 tool_tip_text = "This is a sample help text, that will be shown on a pop up window in the form of a tool tip"
-cw.Tooltip(button, text=tool_tip_text, wrap_length=200)
+cw.Tooltip(tool_tip_button, text=tool_tip_text, wrap_length=200)
 
 button = ttk.Button(root, text='Danger Timed Box', command=show_timed_danger_box)
 button.grid(row=6, column=0, sticky='nsew', padx=10, pady=10)

@@ -208,3 +208,152 @@ class QuitButton(ttk.Button):
 
         self.configure(text=text, bootstyle=style, width=width, image=tk_image, compound='right')
         self.image = tk_image
+
+
+class ClipBoardButton(ttk.Button):
+    def __init__(self, *args, language='en', style='primary', width=20, **kwargs):
+        super().__init__(*args, **kwargs)
+        image_path = os.path.join(ROOT_DIR, 'copy_to_clipboard.png')
+        tk_image = open_image(file_name=image_path, size_x=30, size_y=20)
+
+        if language == 'br':
+            text = 'Copiar para àrea de transferência\t'
+        else:
+            text = 'Copy to Clipboard\t'
+        self.configure(text=text, bootstyle=style, image=tk_image, padding=2, compound='right', width=width)
+        self.image = tk_image
+
+
+class NextButton(ttk.Button):
+    def __init__(self, *args, language='en', style='primary', width=15, **kwargs):
+        super().__init__(*args, **kwargs)
+        image_path = os.path.join(ROOT_DIR, 'right_arrow.png')
+        tk_image = open_image(file_name=image_path, size_x=30, size_y=20)
+
+        if language == 'br':
+            text = 'Próximo\t\t'
+        else:
+            text = 'NEXT\t\t'
+
+        self.configure(text=text, bootstyle=style, width=width, image=tk_image, compound='right')
+        self.image = tk_image
+
+
+class PreviousButton(ttk.Button):
+    def __init__(self, *args, language='en', style='primary', width=15, **kwargs):
+        super().__init__(*args, **kwargs)
+        image_path = os.path.join(ROOT_DIR, 'left_arrow.png')
+        tk_image = open_image(file_name=image_path, size_x=30, size_y=20)
+
+        if language == 'br':
+            text = 'Anterior\t\t'
+        else:
+            text = 'PREVIOUS\t\t'
+
+        self.configure(text=text, bootstyle=style, width=width, image=tk_image, compound='right')
+        self.image = tk_image
+
+
+class UpButton(ttk.Button):
+    def __init__(self, *args, language='en', style='primary', width=15, **kwargs):
+        super().__init__(*args, **kwargs)
+        image_path = os.path.join(ROOT_DIR, 'up_arrow.png')
+        tk_image = open_image(file_name=image_path, size_x=30, size_y=20)
+
+        if language == 'br':
+            text = 'Acima\t\t'
+        else:
+            text = 'ABOVE\t\t'
+
+        self.configure(text=text, bootstyle=style, width=width, image=tk_image, compound='right')
+        self.image = tk_image
+
+
+class DownButton(ttk.Button):
+    def __init__(self, *args, language='en', style='primary', width=15, **kwargs):
+        super().__init__(*args, **kwargs)
+        image_path = os.path.join(ROOT_DIR, 'down_arrow.png')
+        tk_image = open_image(file_name=image_path, size_x=30, size_y=20)
+
+        if language == 'br':
+            text = 'Abaixo\t\t'
+        else:
+            text = 'BELOW\t\t'
+
+        self.configure(text=text, bootstyle=style, width=width, image=tk_image, compound='right')
+        self.image = tk_image
+
+
+class SearchButton(ttk.Button):
+    def __init__(self, *args, language='en', style='primary', width=15, **kwargs):
+        super().__init__(*args, **kwargs)
+        image_path = os.path.join(ROOT_DIR, 'search.png')
+        tk_image = open_image(file_name=image_path, size_x=30, size_y=20)
+
+        if language == 'br':
+            text = 'Procurar\t\t'
+        else:
+            text = 'SEARCH\t\t'
+
+        self.configure(text=text, bootstyle=style, width=width, image=tk_image, compound='right')
+        self.image = tk_image
+
+
+class HomeButton(ttk.Button):
+    def __init__(self, *args, language='en', style='primary', width=15, **kwargs):
+        super().__init__(*args, **kwargs)
+        image_path = os.path.join(ROOT_DIR, 'home.png')
+        tk_image = open_image(file_name=image_path, size_x=30, size_y=20)
+
+        if language == 'br':
+            text = 'Início\t\t'
+        else:
+            text = 'HOME\t\t'
+
+        self.configure(text=text, bootstyle=style, width=width, image=tk_image, compound='right')
+        self.image = tk_image
+
+
+class MainMenuButton(ttk.Button):
+    def __init__(self, *args, language='en', style='primary', width=15, **kwargs):
+        super().__init__(*args, **kwargs)
+        image_path = os.path.join(ROOT_DIR, 'burguer_menu.png')
+        tk_image = open_image(file_name=image_path, size_x=30, size_y=20)
+
+        if language == 'br':
+            text = 'Menu\t\t'
+        else:
+            text = 'MENU\t\t'
+
+        self.configure(text=text, bootstyle=style, width=width, image=tk_image, compound='right')
+        self.image = tk_image
+
+
+class AppsMenuButton(ttk.Button):
+    def __init__(self, *args, language='en', style='primary', width=15, **kwargs):
+        super().__init__(*args, **kwargs)
+        image_path = os.path.join(ROOT_DIR, 'apps_menu.png')
+        tk_image = open_image(file_name=image_path, size_x=30, size_y=20)
+
+        if language == 'br':
+            text = 'Menu\t\t'
+        else:
+            text = 'MENU\t\t'
+
+        self.configure(text=text, bootstyle=style, width=width, image=tk_image, compound='right')
+        self.image = tk_image
+
+
+class ConfigurationButton(ttk.Button):
+    def __init__(self, *args, language='en', style='primary', width=20, **kwargs):
+        super().__init__(*args, **kwargs)
+        image_path = os.path.join(ROOT_DIR, 'configuration.png')
+        tk_image = open_image(file_name=image_path, size_x=30, size_y=20)
+
+        if language == 'br':
+            text = 'Configurações\t\t'
+        else:
+            text = 'CONFIGURATION\t\t'
+
+        self.configure(text=text, bootstyle=style, width=width, image=tk_image, compound='right')
+        self.image = tk_image

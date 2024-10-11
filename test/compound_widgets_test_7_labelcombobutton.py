@@ -2,34 +2,39 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from ttkbootstrap import Style
 import compoundwidgets as cw
-from random import randint
 
 root = tk.Tk()
 root.style = Style(theme='darkly')
 root.rowconfigure(0, weight=1)
 root.columnconfigure(0, weight=1)
 
+
 def b_6_method():
     for w in label_combo_list:
         w.enable()
+
 
 def b_7_method():
     for i, w in enumerate(label_combo_list):
         if i:
             w.disable()
 
+
 def b_8_method():
     for w in label_combo_list:
         w.readonly()
+
 
 def b_9_method():
     for w in label_combo_list:
         print(w.get(), end='/')
     print()
 
+
 def b_10_method():
-    for w in label_combo_list:
-        w.set(100)
+    for i, w in enumerate(label_combo_list):
+        w.set(label_text[i])
+
 
 frame = ttk.LabelFrame(root, text='Label Combo Button')
 frame.grid(row=1, column=1, sticky='nsew', padx=10, pady=10)

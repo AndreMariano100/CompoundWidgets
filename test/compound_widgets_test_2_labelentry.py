@@ -13,8 +13,8 @@ def get_all_label_entries(event=None):
     print('/'.join([w.get() for w in label_entry_list]))
 
 def set_all_label_entries():
-    for w in label_entry_list:
-        w.set('none')
+    for i, w in enumerate(label_entry_list):
+        w.set(local_list[i])
 
 def set_disable_entries():
     for w in label_entry_list:
@@ -33,17 +33,22 @@ def set_empty_entries():
         w.set('')
 
 frame = ttk.LabelFrame(root, text='Label Entries')
-frame.grid(row=0, column=1, sticky='nsew', padx=10, pady=10)
+frame.grid(row=0, column=0, sticky='nsew', padx=10, pady=10)
 frame.columnconfigure(0, weight=1)
 
 local_list = ('1000', '2000.00', 'Label Entry', 'Label Entry', 'Very Long Label Entry')
 label_entry_list = []
 for i, item in enumerate(local_list):
-    if i in range(3):
+    if i in range(2):
         w = cw.LabelEntry(frame, label_text=f'Label Entry {i+1}', label_width=10,
                           entry_method=get_all_label_entries,
                           entry_numeric=True, entry_value=item, entry_max_char=10, trace_variable=True,
-                          precision=0)
+                          precision=2)
+    elif i == 4:
+        w = cw.LabelEntry(frame, label_text='', label_width=10,
+                          entry_method=get_all_label_entries,
+                          entry_numeric=False, entry_value=item, entry_max_char=10, trace_variable=True,
+                          precision=3)
     else:
         w = cw.LabelEntry(frame, label_text=f'Label Entry {i+1}', label_width=10,
                           entry_method=get_all_label_entries,
@@ -51,10 +56,6 @@ for i, item in enumerate(local_list):
                           precision=3)
     w.grid(row=i, column=0, sticky='nsew', pady=2)
     label_entry_list.append(w)
-    if i == 2:
-        w.readonly()
-    if i == 3:
-        w.disable()
 
 b1 = ttk.Button(frame, text='GET ALL', command=get_all_label_entries)
 b1.grid(row=5, column=0, pady=2, sticky='ew', padx=2)

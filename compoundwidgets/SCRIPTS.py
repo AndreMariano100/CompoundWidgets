@@ -2,7 +2,7 @@ from PIL import Image, ImageTk, ImageFilter
 import json
 
 
-# Validation methods ---------------------------------------------------------------------------------------------------
+# Entry validation methods ---------------------------------------------------------------------------------------------
 def float_only(action, value, text, max_length=None):
     """ Checks that only float related characters are accepted as input """
 
@@ -103,7 +103,7 @@ def read_json_file(file_path):
     try:
         with open(file_path, 'r') as file_object:
             data = json.load(file_object)
-    except IOError or FileNotFoundError:
+    except (IOError, FileNotFoundError):
         raise Exception(f'Error reading JSON file {file_path}')
     except PermissionError:
         raise Exception(f'Permission error reading JSON file {file_path}')

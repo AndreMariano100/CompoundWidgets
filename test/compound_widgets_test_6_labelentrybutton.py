@@ -14,9 +14,10 @@ def b_1_method():
         w.enable()
 
 def b_2_method():
-    for i, w in enumerate(all_label_entry_button):
-        if i:
-            w.disable()
+    for w in all_label_entry_button:
+        w.disable()
+    root.update_idletasks()
+    root.after(1000, all_label_entry_button[0].enable())
 
 def b_3_method():
     for w in all_label_entry_button:
@@ -45,7 +46,8 @@ for i in range(5):
         sided = False
     w = cw.LabelEntryButton(frame, label_text=f'Label Entry Button {i+1}:', label_width=30, entry_value='0',
                             entry_width=12, entry_numeric=True, entry_max_char=10, button_text=b_text[i],
-                            button_method=b_method_list[i], button_width=15, precision=0, sided=sided)
+                            button_method=b_method_list[i], button_width=15, precision=0, sided=sided,
+                            entry_method=b_4_method)
     w.grid(row=i, column=0, sticky='nsew', pady=5, padx=10)
     all_label_entry_button.append(w)
 

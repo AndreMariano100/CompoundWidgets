@@ -7,19 +7,23 @@ class BaseTopLevelWidget(tk.Toplevel):
     """
     Basic TopLevel Widget for Message Boxes
     Input:
-        parent: widget over which the progress bar will be positioned
+        parent: widget over which the widget will be positioned
         icon_path: path to the icon for the widget
         title: title message for the widget
         message = text to be shown as an alert to the user
     """
 
-    def __init__(self, parent, icon_path, title, message):
+    def __init__(self, parent, icon_path=None, title=None, message=None):
 
         # Configuration
         super().__init__(parent)
-        self.iconbitmap(icon_path)
-        self.title(title)
-        self.minsize(250, 120)
+
+        if icon_path:
+            self.iconbitmap(icon_path)
+        if title:
+            self.title(title)
+
+        self.minsize(300, 150)
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)  # Label with the message
         self.rowconfigure(1, weight=0)  # Separator
@@ -27,23 +31,18 @@ class BaseTopLevelWidget(tk.Toplevel):
         self.lift()
 
         # Label
-        self.label = ttk.Label(self, text=message, justify='left', padding=5)
+        self.label = ttk.Label(self, text=message, justify='left', padding=5, wraplength=280)
         self.label.grid(row=0, column=0, sticky='nsew')
 
         # Separator
         separator = ttk.Separator(self, orient='horizontal', style='secondary.Horizontal.TSeparator')
-        separator.grid(row=1, column=0,sticky='nsew')
+        separator.grid(row=1, column=0, sticky='nsew')
 
         # Frame for the buttons
         self.buttons_frame = ttk.Frame(self, padding=5)
-        self.buttons_frame.grid(row=2, column=0,sticky='nsew')
+        self.buttons_frame.grid(row=2, column=0, sticky='nsew')
         self.buttons_frame.rowconfigure(0, weight=1)
         self.buttons_frame.columnconfigure(0, weight=1)
-
-        # Checks for label width minsize
-        if self.label.winfo_reqwidth() > self.minsize()[0] - 50:
-            self.minsize(self.label.winfo_reqwidth() + 20, 120)
-            self.update_idletasks()
 
         # Determine relative position
         self.geometry(screen_position(self, parent))
@@ -87,11 +86,11 @@ class OkCancelBox(BaseTopLevelWidget):
             cancel_text, ok_text = 'CANCEL', 'OK'
 
         cancel_button = ttk.Button(self.buttons_frame, text=cancel_text, command=lambda: self.adjust_var(0), width=8,
-                                   style='secondary.TButton')
+                                   style='danger.TButton')
         cancel_button.grid(row=0, column=1, sticky='nsew', padx=5)
 
         ok_button = ttk.Button(self.buttons_frame, text=ok_text, command=lambda: self.adjust_var(1), width=8,
-                               style='primary.TButton')
+                               style='success.TButton')
         ok_button.grid(row=0, column=2, sticky='nsew')
 
 
@@ -116,11 +115,11 @@ class YesNoBox(BaseTopLevelWidget):
             no_text, yes_text = 'NO', 'YES'
 
         no_button = ttk.Button(self.buttons_frame, text=no_text, command=lambda: self.adjust_var(0), width=8,
-                               style='secondary.TButton')
+                               style='danger.TButton')
         no_button.grid(row=0, column=1, sticky='nsew', padx=5)
 
         yes_button = ttk.Button(self.buttons_frame, text=yes_text, command=lambda: self.adjust_var(1), width=8,
-                                style='primary.TButton')
+                                style='success.TButton')
         yes_button.grid(row=0, column=2, sticky='nsew')
 
 
@@ -160,8 +159,9 @@ class SuccessBox(BaseTopLevelWidget):
 
         super().__init__(parent, icon_path, title, message)
 
+        self.label.config(style='success.TLabel')
         ok_button = ttk.Button(self.buttons_frame, text="OK", command=lambda: self.destroy(), width=8,
-                               style='primary.TButton')
+                               style='success.TButton')
         ok_button.grid(row=0, column=2, sticky='nsew')
 
 
@@ -239,14 +239,18 @@ class Tooltip:
         self.wait_time = wait_time
         self.wrap_length = wrap_length
 
+        self.id = None
+        self.top_level = None
+
         if not self.text:
+            self.widget.unbind("<Enter>")
+            self.widget.unbind("<Leave>")
+            self.widget.unbind("<Motion>")
             self.remove_message()
         else:
             self.widget.bind("<Enter>", self._enter)
             self.widget.bind("<Leave>", self._leave)
             self.widget.bind("<Motion>", self._move_tip)
-            self.id = None
-            self.top_level = None
 
     def _enter(self, event=None):
         self.schedule()
@@ -293,9 +297,6 @@ class Tooltip:
         self.top_level = None
 
     def remove_message(self):
-        self.widget.unbind("<Enter>")
-        self.widget.unbind("<Leave>")
-        self.widget.unbind("<Motion>")
         self.unschedule()
         self.hide()
 
@@ -324,26 +325,26 @@ class TimedBox(tk.Toplevel):
             self.rowconfigure(1, weight=0)
             self.rowconfigure(2, weight=0)
             self.lift()
-            style_dict = {
-                'danger': ('danger.TLabel','danger.TButton', 'danger.Horizontal.TProgressbar'),
-                'warning': ('warning.TLabel', 'warning.TButton', 'warning.Horizontal.TProgressbar'),
-                'info': ('info.TLabel', 'info.TButton', 'info.Horizontal.TProgressbar'),
-            }
+
+            style_list = ('danger', 'warning', 'info', 'success',
+                          'secondary', 'primary', 'light', 'dark')
+            if style not in style_list:
+                self.style = 'primary'
+            else:
+                self.style = style
 
         # Widgets
         if True:
-            label_style, button_style, progress_bar_style = \
-                style_dict.get(style, ('TLabel', 'TButton', 'TProgressbar'))
-            label = ttk.Label(self, text=message, justify='left', style=label_style)
+            label = ttk.Label(self, text=message, justify='left', bootstyle=self.style)
             label.grid(row=0, column=0, columnspan=2, sticky='nsew', padx=10, pady=10)
 
             self.progressbar_var = tk.DoubleVar(value=0)
             self.progressbar = ttk.Progressbar(self, maximum=self.total_time_ms, orient='horizontal',
-                                               mode='determinate', style=progress_bar_style,
+                                               mode='determinate', bootstyle=self.style,
                                                variable=self.progressbar_var)
             self.progressbar.grid(row=1, column=0, columnspan=2, sticky='nsew', padx=10)
 
-            button = ttk.Button(self, text='CLOSE', style=button_style, command= lambda: self.destroy())
+            button = ttk.Button(self, text='CLOSE', bootstyle=self.style, command= lambda: self.destroy())
             button.grid(row=2, column=1, sticky='nsew', pady=10, padx=10)
 
             if label.winfo_reqwidth() > self.minsize()[0]:

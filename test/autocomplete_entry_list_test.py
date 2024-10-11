@@ -39,8 +39,10 @@ def alternate_style():
     else:
         widget_2.disable()
 
+
 def edit_message():
     print('entry i has been edited')
+
 
 root = tk.Tk()
 root.style = Style(theme='darkly')
@@ -49,14 +51,14 @@ root.rowconfigure(0, weight=1)
 root.columnconfigure(0, weight=1)
 root.columnconfigure(1, weight=1)
 
-full_list = ['John', 'Paul', 'Ringo', 'Jonathan', 'Neo', 'Robert']
+full_list = ['John A', 'John B', 'John P', 'Orwel', 'Paul', 'Ringo', 'Jonathan', 'Neo', 'Robert']
 
 # First frame, enabled
 frame = ttk.LabelFrame(root, text='Autocomplete Entry and List 1')
 frame.grid(row=0, column=0, sticky='nsew', padx=10, pady=10)
 frame.columnconfigure(0, weight=1)
 
-widget_1 = cw.AutocompleteEntryList(frame, label_text='Auto Complete Test',
+widget_1 = cw.AutocompleteEntryList(frame, label_text='Auto Complete Test - Not case Sensitive',
                                     label_anchor='w', list_method=method_1,
                                     list_height=10, list_values=full_list,
                                     entry_change_method=edit_message)
@@ -67,9 +69,10 @@ frame = ttk.LabelFrame(root, text='Autocomplete Entry and List 2')
 frame.grid(row=0, column=1, sticky='nsew', padx=10, pady=10)
 frame.columnconfigure(0, weight=1)
 
-widget_2 = cw.AutocompleteEntryList(frame, label_text='Auto Complete Test',
+widget_2 = cw.AutocompleteEntryList(frame, label_text='Auto Complete Test - Case Sensitive',
                                     label_anchor='w', list_method=method_2,
-                                    list_height=10, list_values=full_list)
+                                    list_height=10, list_values=full_list,
+                                    case_sensitive=True)
 widget_2.grid(row=0, column=0, sticky='nsew', pady=(10, 0), padx=10)
 widget_2.disable()
 

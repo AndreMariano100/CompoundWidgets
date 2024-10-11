@@ -21,6 +21,7 @@ class AutocompleteEntryList(ttk.Frame):
         list_method: method to be called when an item is selected
         list_height: number of lines on the listbox
         list_values: values to be shown on the listbox
+        case_sensitive: whether char case shall be respected
     Methods for the user:
         set_list(new_list): sets a new list of values to the listbox widget
         set_entry(value): sets a value to the entry widget
@@ -33,7 +34,7 @@ class AutocompleteEntryList(ttk.Frame):
 
     def __init__(self, parent, label_text='label:', label_anchor='w', label_width=None,
                  entry_value='', entry_numeric=False, entry_width=None, entry_max_char=None,
-                 entry_change_method=None, list_method=None, list_height=5,
+                 entry_change_method=None, list_method=None, list_height=5, case_sensitive=False,
                  list_values=('Value 1', 'Value 2', 'Value 3', 'Value 4')):
 
         # Parent class initialization
@@ -42,6 +43,8 @@ class AutocompleteEntryList(ttk.Frame):
         # Entry validation for numbers
         validate_numbers = self.register(float_only)
         validate_chars = self.register(max_chars)
+
+        self.case_sensitive = case_sensitive
 
         # Frame configuration
         if True:
@@ -148,12 +151,21 @@ class AutocompleteEntryList(ttk.Frame):
 
     def _comparison(self):
         """ Responsible for the pattern match from the entry value """
-        pattern_1 = re.compile('.*' + self.entry_var.get().upper() + '.*')
-        pattern_2 = re.compile('.*' + self.entry_var.get().upper().replace(' ', '\u00a0') + '.*')
-        index = []
-        for i, name in enumerate(self.caps_full_list):
-            if re.match(pattern_1, name) or re.match(pattern_2, name):
-                index.append(i)
+
+        if not self.case_sensitive:
+            pattern_1 = re.compile('.*' + self.entry_var.get().upper() + '.*')
+            pattern_2 = re.compile('.*' + self.entry_var.get().upper().replace(' ', '\u00a0') + '.*')
+            index = []
+            for i, name in enumerate(self.caps_full_list):
+                if re.match(pattern_1, name) or re.match(pattern_2, name):
+                    index.append(i)
+        else:
+            pattern_1 = re.compile('.*' + self.entry_var.get() + '.*')
+            pattern_2 = re.compile('.*' + self.entry_var.get().replace(' ', '\u00a0') + '.*')
+            index = []
+            for i, name in enumerate(self.full_list):
+                if re.match(pattern_1, name) or re.match(pattern_2, name):
+                    index.append(i)
 
         result = [w for i, w in enumerate(self.full_list) if i in index]
 
@@ -198,8 +210,23 @@ class AutocompleteEntryList(ttk.Frame):
 
 
 class AutocompleteCombobox(ttk.Frame):
+    """
+    Autocomplete Combobox Widget
+    Filling the entry field filters the content from the combobox.
+    Parameters:
+        case_sensitive: whether the search shall be case sensitive
+        all other parameters are the same as for a regular Combobox
+    Methods for the user:
+        set_list(new_list): sets a new list of values to the listbox widget
+        set_entry(value): sets a value to the entry widget
+        set(value): sets a value to the entry widget
+        get(): gets the current value from the entry widget
+        disable(): turns the whole widget 'off'
+        enable(): turns the whole widget 'on'
 
-    def __init__(self, parent, **kwargs):
+    """
+
+    def __init__(self, parent, case_sensitive=False, **kwargs):
 
         # Frame configuration
         super().__init__(parent)
@@ -213,67 +240,107 @@ class AutocompleteCombobox(ttk.Frame):
             pass
 
         # Values
-        self.values = kwargs.get('values', [])
+        self.combo_list = kwargs.get('values', [])
         kwargs.pop('values')
 
         # Variable
-        self.entry_var = tk.StringVar(value='')
+        self.variable = tk.StringVar(value='')
 
         # Combobox
-        self.combobox = ttk.Combobox(self, values=self.values, state='normal', textvariable=self.entry_var, **kwargs)
+        self.combobox = ttk.Combobox(self, values=self.combo_list, state='normal', textvariable=self.variable, **kwargs)
         self.combobox.grid(row=0, column=0, sticky='nsew')
 
         # Bind method
-        self.entry_var.trace('w', self._entry_changed)
+        self.variable.trace('w', self._entry_changed)
+
+        self.case_sensitive = case_sensitive
 
     def _entry_changed(self, name, index, mode):
         """ Keeps track of any change in the entry widget and updates the dropdown values """
 
-        if self.entry_var.get() == '':
-            self.set_values(self.values)
+        if self.variable.get() == '':
+            self._set_filtered_values(values=self.combo_list)
 
         else:
             words = self._comparison()
             if words:
-                self.set_values(words)
+                self._set_filtered_values(values=words)
             else:
-                self.set_values(['(no match)'])
+                self._set_filtered_values(values=['(no match)'])
 
     def _comparison(self):
         """ Responsible for the pattern match from the entry value """
-        pattern = re.compile('.*' + self.entry_var.get().upper() + '.*')
-        index = []
-        caps_values = [item.upper() for item in self.values]
-        for i, name in enumerate(caps_values):
-            if re.match(pattern, name):
-                index.append(i)
 
-        result = [w for i, w in enumerate(self.values) if i in index]
+        if not self.case_sensitive:
+            pattern = re.compile('.*' + self.variable.get().upper() + '.*')
+            index = []
+            caps_values = [item.upper() for item in self.combo_list]
+            for i, name in enumerate(caps_values):
+                if re.match(pattern, name):
+                    index.append(i)
+        else:
+            pattern = re.compile('.*' + self.variable.get() + '.*')
+            index = []
+            for i, name in enumerate(self.combo_list):
+                if re.match(pattern, name):
+                    index.append(i)
+
+        result = [w for i, w in enumerate(self.combo_list) if i in index]
 
         return result
 
-    def set_values(self, new_list):
-        self.combobox.config(values=new_list)
+    def _set_filtered_values(self, values):
+        self.combobox.config(values=values)
 
-    def get_values(self):
-        return self.values
+    def set_combo_values(self, values):
+        self.combo_list = values
+        self.combobox.config(values=values)
+
+    def get_combo_values(self):
+        return self.combo_list
 
     def set(self, new_value):
         """ Sets a value to the entry widget """
         if str(self.cget('state')) == 'disabled':
             return
-        self.entry_var.set(new_value)
+        if new_value in self.combo_list:
+            self.variable.set(new_value)
+        else:
+            self.variable.set('')
 
     def get(self):
         """ Gets the current value from the entry widget """
-        return self.entry_var.get()
+        return self.variable.get()
+
+    def enable(self):
+        self.combobox.config(state='normal', values=self.combo_list, takefocus=1)
+
+    def disable(self):
+        self.variable.set('')
+        self.combobox.config(state='disabled', takefocus=0)
 
 
 class AutocompleteLabelCombo(LabelCompoundWidget):
+    """
+    Autocomplete compound widget which combines an Label Widget and a Autocomplete Combobox
+    Filling the entry field filters the content from the combobox.
+    Parameters:
+        case_sensitive: whether the search shall be case sensitive
+        all other parameters are the same as for a regular Combobox
+    Methods for the user:
+        set_list(new_list): sets a new list of values to the listbox widget
+        set_entry(value): sets a value to the entry widget
+        set(value): sets a value to the entry widget
+        get(): gets the current value from the entry widget
+        disable(): turns the whole widget 'off'
+        enable(): turns the whole widget 'on'
+
+    """
 
     def __init__(self, parent, label_text='Label:', label_anchor='e', label_width=None,
                  label_justify=None, label_font=None, sided=True, combo_value='',
-                 combo_list=('No values informed',), combo_width=None, combo_method=None, **kwargs):
+                 combo_list=('No values informed',), combo_width=None, combo_method=None,
+                 case_sensitive=False, **kwargs):
 
         # Parent class initialization
         super().__init__(parent, label_text, label_anchor, label_width, label_justify, label_font, sided, **kwargs)
@@ -281,6 +348,7 @@ class AutocompleteLabelCombo(LabelCompoundWidget):
         # Combobox configuration
         if True:
             self.combo_list = combo_list
+            self.case_sensitive = case_sensitive
             self.variable = tk.StringVar(value=combo_value)
             self.combobox = ttk.Combobox(self, textvariable=self.variable, justify='center',
                                          values=combo_list, state='normal')
@@ -303,27 +371,37 @@ class AutocompleteLabelCombo(LabelCompoundWidget):
         """ Keeps track of any change in the entry widget and updates the dropdown values """
 
         if self.variable.get() == '':
-            self.set_combo_values(self.combo_list)
+            self._set_filtered_values(values=self.combo_list)
 
         else:
             words = self._comparison()
             if words:
-                self.combobox.config(values=words)
+                self._set_filtered_values(values=words)
             else:
-                self.combobox.config(values=['(no match)'])
+                self._set_filtered_values(values=['(no match)'])
 
     def _comparison(self):
         """ Responsible for the pattern match from the entry value """
-        pattern = re.compile('.*' + self.variable.get().upper() + '.*')
-        index = []
-        caps_values = [item.upper() for item in self.combo_list]
-        for i, name in enumerate(caps_values):
-            if re.match(pattern, name):
-                index.append(i)
+        if not self.case_sensitive:
+            pattern = re.compile('.*' + self.variable.get().upper() + '.*')
+            index = []
+            caps_values = [item.upper() for item in self.combo_list]
+            for i, name in enumerate(caps_values):
+                if re.match(pattern, name):
+                    index.append(i)
+        else:
+            pattern = re.compile('.*' + self.variable.get() + '.*')
+            index = []
+            for i, name in enumerate(self.combo_list):
+                if re.match(pattern, name):
+                    index.append(i)
 
         result = [w for i, w in enumerate(self.combo_list) if i in index]
 
         return result
+
+    def _set_filtered_values(self, values):
+        self.combobox.config(values=values)
 
     def set_combo_values(self, values):
         self.combo_list = values
