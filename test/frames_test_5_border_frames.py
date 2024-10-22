@@ -2,6 +2,19 @@ import tkinter as tk
 import ttkbootstrap as ttk
 from ttkbootstrap import Style
 import compoundwidgets as cw
+import random
+
+
+def change_style():
+    new_styles = random.sample(label_style_list, len(label_style_list))
+    for i, frame in enumerate(frames_list):
+        frame.set_border_style(new_styles[i])
+
+    new_styles = random.sample(label_style_list, len(label_style_list))
+    for i, frame in enumerate(frames_list):
+        frame.set_frame_style(new_styles[i])
+
+
 
 root = tk.Tk()
 root.columnconfigure(0, weight=1)
@@ -29,5 +42,12 @@ frame_4 = cw.BorderFrame(root, border_width=(1, 5, 1, 5), border_style='primary'
 frame_4.grid(row=3, column=0, sticky='nsew', padx=10, pady=10)
 label = ttk.Label(frame_4, text='Border 4')
 label.grid(row=0, column=0, sticky='nsew', padx=10, pady=10)
+
+frames_list = [frame_1, frame_2, frame_3, frame_4]
+label_style_list = ('danger', 'warning', 'info', 'success',
+                    'secondary', 'primary', 'light', 'dark', 'no style')
+
+b = ttk.Button(root, text='Change Styles', command=change_style)
+b.grid(row=4, column=0, sticky='nsew', pady=5, columnspan=len(frames_list))
 
 root.mainloop()

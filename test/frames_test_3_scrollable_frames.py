@@ -2,6 +2,15 @@ import tkinter as tk
 import ttkbootstrap as ttk
 from ttkbootstrap import Style
 import compoundwidgets as cw
+import random
+
+
+def change_style():
+    label_style_list = ('danger', 'warning', 'info', 'success',
+                        'secondary', 'primary', 'light', 'dark', 'no style')
+    new_style = random.choice(label_style_list)
+    frame.set_style(new_style)
+
 
 root = tk.Tk()
 root.columnconfigure(0, weight=1)
@@ -26,4 +35,6 @@ for i in range(10):
 
 # the scrollable frame does not behave appropriately if you use two of them on the same container
 
+b = ttk.Button(root, text='Change Styles', command=change_style)
+b.grid(row=15, column=0, sticky='nsew', pady=5)
 root.mainloop()

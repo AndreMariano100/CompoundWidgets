@@ -20,21 +20,17 @@ class CollapsableFrame(ttk.Frame):
 
         # Style definition
         if True:
-            self.label_style_dict = {
-                'danger': 'inverse-danger',
-                'warning': 'inverse-warning',
-                'info': 'inverse-info',
-                'success': 'inverse-success',
-                'secondary': 'inverse-secondary',
-                'primary': 'inverse-primary',
-                'light': 'inverse-light',
-                'dark': 'inverse-dark',
-            }
-            if style not in list(self.label_style_dict.keys()):
-                self.style = 'primary'
+            self.label_style_list = (
+                'danger', 'warning', 'info', 'success',
+                'secondary', 'primary', 'light', 'dark'
+            )
+            if style:
+                if style not in self.label_style_list:
+                    self.style = 'primary'
+                else:
+                    self.style = style
             else:
-                self.style = style
-            self.label_style = self.label_style_dict.get(self.style)
+                self.style = 'primary'
 
         # Main container
         if True:
@@ -53,12 +49,12 @@ class CollapsableFrame(ttk.Frame):
             self.title_frame.columnconfigure(1, weight=0)
 
             self.title_label = ttk.Label(self.title_frame, font=title_font, padding=5, text=title,
-                                         bootstyle=self.label_style)
+                                         style=f'{self.style}.Inverse.TLabel')
             self.title_label.grid(row=0, column=0, sticky='nsew')
             self.title_label.bind('<ButtonRelease-1>', self._check_collapse)
 
             self.collapse_button = ttk.Label(self.title_frame, text='\u25B2', font=title_font, width=2,
-                                             padding=0, bootstyle=self.label_style)
+                                             padding=0, style=f'{self.style}.Inverse.TLabel')
             self.collapse_button.grid(row=0, column=1, sticky='nsew')
             self.collapse_button.bind('<ButtonRelease-1>', self._check_collapse)
 
@@ -137,22 +133,33 @@ class CollapsableFrame(ttk.Frame):
         return True
 
     def disable(self):
+        """ Style adjust for 'disabled' widgets """
+
         self.collapse_frame()
         self.disabled = True
-        local_style = 'secondary'
-        local_label_style = self.label_style_dict.get(local_style)
-
-        self.container.configure(bootstyle=local_style)
-        self.title_frame.configure(bootstyle=local_style)
-        self.title_label.configure(bootstyle=local_label_style)
-        self.collapse_button.configure(bootstyle=local_label_style)
+        self.container.configure(bootstyle='secondary')
+        self.title_frame.configure(style=f'secondary.Inverse.TLabel')
+        self.title_label.configure(style=f'secondary.Inverse.TLabel')
+        self.collapse_button.configure(style=f'secondary.Inverse.TLabel')
 
     def enable(self):
+        """ Style adjust for 'normal' widgets """
+
         self.disabled = False
         self.container.configure(bootstyle=self.style)
-        self.title_frame.configure(bootstyle=self.style)
-        self.title_label.configure(bootstyle=self.label_style)
-        self.collapse_button.configure(bootstyle=self.label_style)
+        self.title_frame.configure(style=f'{self.style}.Inverse.TLabel')
+        self.title_label.configure(style=f'{self.style}.Inverse.TLabel')
+        self.collapse_button.configure(style=f'{self.style}.Inverse.TLabel')
+
+    def set_style(self, bootstyle):
+        """ Sets a new style to the widgets """
+
+        if bootstyle not in self.label_style_list:
+            return
+        self.style = bootstyle
+        if self.disabled:
+            return
+        self.enable()
 
 
 class HCollapsableFrame(ttk.Frame):
@@ -173,22 +180,17 @@ class HCollapsableFrame(ttk.Frame):
 
         # Style definition
         if True:
-            self.label_style_dict = {
-                'danger': 'inverse-danger',
-                'warning': 'inverse-warning',
-                'info': 'inverse-info',
-                'success': 'inverse-success',
-                'secondary': 'inverse-secondary',
-                'primary': 'inverse-primary',
-                'light': 'inverse-light',
-                'dark': 'inverse-dark',
-            }
-            if style not in list(self.label_style_dict.keys()):
-                self.style = 'primary'
+            self.label_style_list = (
+                'danger', 'warning', 'info', 'success',
+                'secondary', 'primary', 'light', 'dark'
+            )
+            if style:
+                if style not in self.label_style_list:
+                    self.style = 'primary'
+                else:
+                    self.style = style
             else:
-                self.style = style
-
-            self.label_style = self.label_style_dict.get(self.style)
+                self.style = 'primary'
 
         # Main container
         if True:
@@ -209,12 +211,12 @@ class HCollapsableFrame(ttk.Frame):
             broken_title = '\n'.join(title.upper())
             self.title_label = ttk.Label(self.title_frame, font=title_font, padding=5,
                                          text=broken_title, anchor='n',
-                                         justify='center', style=self.label_style)
+                                         justify='center', style=f'{self.style}.Inverse.TLabel')
             self.title_label.grid(row=1, column=0, sticky='nsew')
             self.title_label.bind('<ButtonRelease-1>', self._check_collapse)
 
             self.collapse_button = ttk.Label(self.title_frame, text='\u25C0', font=title_font, width=3,
-                                             padding=0, bootstyle=self.label_style,
+                                             padding=0, style=f'{self.style}.Inverse.TLabel',
                                              anchor='center', justify='center',)
             self.collapse_button.grid(row=0, column=0, sticky='nsew')
             self.collapse_button.bind('<ButtonRelease-1>', self._check_collapse)
@@ -296,20 +298,27 @@ class HCollapsableFrame(ttk.Frame):
     def disable(self):
         self.collapse_frame()
         self.disabled = True
-        local_style = 'secondary'
-        local_label_style = self.label_style_dict.get(local_style)
-
-        self.container.configure(bootstyle=local_style)
-        self.title_frame.configure(bootstyle=local_style)
-        self.title_label.configure(bootstyle=local_label_style)
-        self.collapse_button.configure(bootstyle=local_label_style)
+        self.container.configure(bootstyle='secondary')
+        self.title_frame.configure(style=f'secondary.Inverse.TLabel')
+        self.title_label.configure(style=f'secondary.Inverse.TLabel')
+        self.collapse_button.configure(style=f'secondary.Inverse.TLabel')
 
     def enable(self):
         self.disabled = False
         self.container.configure(bootstyle=self.style)
-        self.title_frame.configure(bootstyle=self.style)
-        self.title_label.configure(bootstyle=self.label_style)
-        self.collapse_button.configure(bootstyle=self.label_style)
+        self.title_frame.configure(style=f'{self.style}.Inverse.TLabel')
+        self.title_label.configure(style=f'{self.style}.Inverse.TLabel')
+        self.collapse_button.configure(style=f'{self.style}.Inverse.TLabel')
+
+    def set_style(self, bootstyle):
+        """ Sets a new style to the widgets """
+
+        if bootstyle not in self.label_style_list:
+            return
+        self.style = bootstyle
+        if self.disabled:
+            return
+        self.enable()
 
 
 class ScrollableFrame(ttk.Frame):
@@ -326,12 +335,17 @@ class ScrollableFrame(ttk.Frame):
 
         # Style definition
         if True:
-            label_style_list = ('danger', 'warning', 'info', 'success',
-                                'secondary', 'primary', 'light', 'dark')
-            if style not in label_style_list:
-                self.style = 'TFrame'
+            self.label_style_list = (
+                'danger', 'warning', 'info', 'success',
+                'secondary', 'primary', 'light', 'dark'
+            )
+            if style:
+                if style not in self.label_style_list:
+                    self.style = 'primary'
+                else:
+                    self.style = style
             else:
-                self.style = style
+                self.style = 'primary'
 
         # Main container
         self.container = ttk.Frame(parent)
@@ -343,11 +357,13 @@ class ScrollableFrame(ttk.Frame):
         self.canvas.grid(row=0, column=0, sticky='nsew')
 
         # Vertical scrollbar
-        self.v_scroll = ttk.Scrollbar(self.container, command=self.canvas.yview, orient='vertical')
+        self.v_scroll = ttk.Scrollbar(self.container, command=self.canvas.yview, orient='vertical',
+                                      bootstyle=self.style)
         self.v_scroll.grid(row=0, column=1, sticky='ns')
 
         # Horizontal scrollbar
-        self.h_scroll = ttk.Scrollbar(self.container, command=self.canvas.xview, orient='horizontal')
+        self.h_scroll = ttk.Scrollbar(self.container, command=self.canvas.xview, orient='horizontal',
+                                      bootstyle=self.style)
         self.h_scroll.grid(row=1, column=0, sticky='ew')
 
         # Intermediary frame, will respond to the canvas scroll
@@ -466,6 +482,16 @@ class ScrollableFrame(ttk.Frame):
         final_height = max (available_height, self.bottom_frame.winfo_reqheight())
         self.canvas.itemconfigure(self.window_id, height=final_height)
 
+    def set_style(self, bootstyle):
+        """ Sets a new style to the widgets """
+
+        if bootstyle not in self.label_style_list:
+            return
+        self.style = bootstyle
+        self.configure(bootstyle=self.style)
+        self.v_scroll.configure(bootstyle=self.style)
+        self.h_scroll.configure(bootstyle=self.style)
+
 
 class BorderFrame(ttk.Frame):
     """
@@ -481,14 +507,14 @@ class BorderFrame(ttk.Frame):
 
         # Style definition
         if True:
-            label_style_list = ('danger', 'warning', 'info', 'success',
-                                'secondary', 'primary', 'light', 'dark')
-            if border_style not in label_style_list:
+            self.label_style_list = ('danger', 'warning', 'info', 'success',
+                                     'secondary', 'primary', 'light', 'dark')
+            if border_style not in self.label_style_list:
                 self.border_style = 'secondary'
             else:
                 self.border_style = border_style
 
-            if frame_style not in label_style_list:
+            if frame_style not in self.label_style_list:
                 self.frame_style = 'TFrame'
             else:
                 self.frame_style = frame_style
@@ -524,3 +550,19 @@ class BorderFrame(ttk.Frame):
                 setattr(self, f"content_{method}", getattr(self, method))
                 # overwrite content frame methods from container frame
                 setattr(self, method, getattr(self.container, method))
+
+    def set_border_style(self, bootstyle):
+        """ Sets a new style to the widgets """
+
+        if bootstyle not in self.label_style_list:
+            return
+        self.border_style = bootstyle
+        self.container.configure(bootstyle=self.border_style)
+
+    def set_frame_style(self, bootstyle):
+        """ Sets a new style to the widgets """
+
+        if bootstyle not in self.label_style_list:
+            return
+        self.frame_style = bootstyle
+        self.configure(bootstyle=self.frame_style)

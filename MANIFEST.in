@@ -2,14 +2,25 @@ global-include *.py *.png
 recursive-include CompoundWidgets/compoundwidgets/images *
 global-include IMAGES/add_new.png
 global-include IMAGES/add_to_form.png
+global-include IMAGES/apps_menu.png
 global-include IMAGES/back.png
+global-include IMAGES/burguer_menu.png
 global-include IMAGES/calculate.png
 global-include IMAGES/clear.png
+global-include IMAGES/configuration.png
+global-include IMAGES/copy_to_clipboard.png
+global-include IMAGES/down_arrow.png
 global-include IMAGES/edit_form.png
+global-include IMAGES/engineering.png
 global-include IMAGES/help.png
+global-include IMAGES/home.png
+global-include IMAGES/left_arrow.png
 global-include IMAGES/no.png
 global-include IMAGES/quit.png
 global-include IMAGES/remove_from_form.png
+global-include IMAGES/right_arrow.png
 global-include IMAGES/save.png
+global-include IMAGES/search.png
 global-include IMAGES/trash_can.png
+global-include IMAGES/up_arrow.png
 global-include IMAGES/yes.png

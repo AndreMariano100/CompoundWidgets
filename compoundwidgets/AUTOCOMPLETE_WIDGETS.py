@@ -29,7 +29,6 @@ class AutocompleteEntryList(ttk.Frame):
         get(): gets the current value from the entry widget
         disable(): turns the whole widget 'off'
         enable(): turns the whole widget 'on'
-    
     """
 
     def __init__(self, parent, label_text='label:', label_anchor='w', label_width=None,
@@ -258,7 +257,6 @@ class AutocompleteCombobox(ttk.Frame):
         get(): gets the current value from the entry widget
         disable(): turns the whole widget 'off'
         enable(): turns the whole widget 'on'
-
     """
 
     def __init__(self, parent, case_sensitive=False, style=None, **kwargs):
@@ -399,7 +397,6 @@ class AutocompleteLabelCombo(LabelCompoundWidget):
         get(): gets the current value from the entry widget
         disable(): turns the whole widget 'off'
         enable(): turns the whole widget 'on'
-
     """
 
     def __init__(self, parent, label_text='Label:', label_anchor='e', label_width=None,
