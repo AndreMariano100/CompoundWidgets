@@ -35,7 +35,7 @@ class AutocompleteEntryList(ttk.Frame):
     def __init__(self, parent, label_text='label:', label_anchor='w', label_width=None,
                  entry_value='', entry_numeric=False, entry_width=None, entry_max_char=None,
                  entry_change_method=None, list_method=None, list_height=5, case_sensitive=False,
-                 list_values=('Value 1', 'Value 2', 'Value 3', 'Value 4')):
+                 list_values=('Value 1', 'Value 2', 'Value 3', 'Value 4'), style=None):
 
         # Parent class initialization
         super().__init__(parent, padding=5)
@@ -45,6 +45,19 @@ class AutocompleteEntryList(ttk.Frame):
         validate_chars = self.register(max_chars)
 
         self.case_sensitive = case_sensitive
+
+        # Style definition
+        self.label_style_list = (
+            'danger', 'warning', 'info', 'success',
+            'secondary', 'primary', 'light', 'dark'
+        )
+        if style:
+            if style not in self.label_style_list:
+                self.style = 'primary'
+            else:
+                self.style = style
+        else:
+            self.style = 'primary'
 
         # Frame configuration
         if True:
@@ -81,7 +94,7 @@ class AutocompleteEntryList(ttk.Frame):
 
         # List box and scroll bar
         if True:
-            self.container = ttk.Frame(self)
+            self.container = ttk.Frame(self, padding=1)
             self.container.grid(row=2, column=0, sticky='nsew')
 
             self.container.rowconfigure(0, weight=1)
@@ -111,6 +124,9 @@ class AutocompleteEntryList(ttk.Frame):
             self.lb.bind('<Return>', self._listbox_selection)
             self.lb.bind("<Double-Button-1>", self._listbox_selection)
             self.lb.bind("<<ListboxSelected>>", self._listbox_selection)
+
+        self.is_disabled = False
+        self.set_style(self.style)
 
     def _entry_changed(self, name, index, mode):
         """ Keeps track of any change in the entry widget and updates the listbox values """
@@ -197,16 +213,35 @@ class AutocompleteEntryList(ttk.Frame):
 
     def disable(self):
         """ Style adjust for 'disabled' widgets """
-        self.label.config(style='secondary.TLabel')
+        self.is_disabled = True
+        self.label.configure(bootstyle='secondary')
         self.set_entry('')
-        self.entry.config(state='disabled', takefocus=0)
+        self.entry.configure(state='disabled', bootstyle='secondary', takefocus=0)
+        self.container.configure(bootstyle='secondary')
+        self.vscroll.configure(bootstyle='secondary')
         self.lb.config(state='disabled', takefocus=0)
 
     def enable(self):
         """ Style adjust for 'normal' widgets """
-        self.label.config(style='TLabel')
-        self.entry.config(state='normal', takefocus=1)
+        self.is_disabled = False
+        self.label.configure(bootstyle=self.style)
+        self.entry.configure(bootstyle=self.style, takefocus=1)
+        self.container.configure(bootstyle=self.style)
+        self.vscroll.configure(bootstyle=self.style)
         self.lb.config(state='normal', takefocus=1)
+
+    def set_style(self, bootstyle):
+        """ Sets a new style to the widgets """
+
+        if bootstyle not in self.label_style_list:
+            return
+        self.style = bootstyle
+        if self.is_disabled:
+            return
+        self.label.configure(bootstyle=self.style)
+        self.entry.configure(bootstyle=self.style)
+        self.container.configure(bootstyle=self.style)
+        self.vscroll.configure(bootstyle=self.style)
 
 
 class AutocompleteCombobox(ttk.Frame):
@@ -226,12 +261,27 @@ class AutocompleteCombobox(ttk.Frame):
 
     """
 
-    def __init__(self, parent, case_sensitive=False, **kwargs):
+    def __init__(self, parent, case_sensitive=False, style=None, **kwargs):
+
+        # Parent class initialization
+        super().__init__(parent)
 
         # Frame configuration
-        super().__init__(parent)
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
+
+        # Style definition
+        self.label_style_list = (
+            'danger', 'warning', 'info', 'success',
+            'secondary', 'primary', 'light', 'dark'
+        )
+        if style:
+            if style not in self.label_style_list:
+                self.style = 'primary'
+            else:
+                self.style = style
+        else:
+            self.style = 'primary'
 
         # Does not accept other variable to control the widget
         try:
@@ -247,6 +297,7 @@ class AutocompleteCombobox(ttk.Frame):
         self.variable = tk.StringVar(value='')
 
         # Combobox
+        print(self.style)
         self.combobox = ttk.Combobox(self, values=self.combo_list, state='normal', textvariable=self.variable, **kwargs)
         self.combobox.grid(row=0, column=0, sticky='nsew')
 
@@ -254,6 +305,8 @@ class AutocompleteCombobox(ttk.Frame):
         self.variable.trace('w', self._entry_changed)
 
         self.case_sensitive = case_sensitive
+        self.is_disabled = False
+        self.set_style(self.style)
 
     def _entry_changed(self, name, index, mode):
         """ Keeps track of any change in the entry widget and updates the dropdown values """
@@ -313,11 +366,23 @@ class AutocompleteCombobox(ttk.Frame):
         return self.variable.get()
 
     def enable(self):
-        self.combobox.config(state='normal', values=self.combo_list, takefocus=1)
+        self.is_disabled = False
+        self.combobox.config(state='normal', values=self.combo_list, takefocus=1, bootstyle=self.style)
 
     def disable(self):
         self.variable.set('')
-        self.combobox.config(state='disabled', takefocus=0)
+        self.is_disabled = True
+        self.combobox.config(state='disabled', takefocus=0, bootstyle='secondary')
+
+    def set_style(self, bootstyle):
+        """ Sets a new style to the widgets """
+
+        if bootstyle not in self.label_style_list:
+            return
+        self.style = bootstyle
+        if self.is_disabled:
+            return
+        self.combobox.configure(bootstyle=self.style)
 
 
 class AutocompleteLabelCombo(LabelCompoundWidget):
@@ -340,10 +405,23 @@ class AutocompleteLabelCombo(LabelCompoundWidget):
     def __init__(self, parent, label_text='Label:', label_anchor='e', label_width=None,
                  label_justify=None, label_font=None, sided=True, combo_value='',
                  combo_list=('No values informed',), combo_width=None, combo_method=None,
-                 case_sensitive=False, **kwargs):
+                 case_sensitive=False, style=None, **kwargs):
 
         # Parent class initialization
         super().__init__(parent, label_text, label_anchor, label_width, label_justify, label_font, sided, **kwargs)
+
+        # Style definition
+        self.label_style_list = (
+            'danger', 'warning', 'info', 'success',
+            'secondary', 'primary', 'light', 'dark'
+        )
+        if style:
+            if style not in self.label_style_list:
+                self.style = 'primary'
+            else:
+                self.style = style
+        else:
+            self.style = 'primary'
 
         # Combobox configuration
         if True:
@@ -366,6 +444,9 @@ class AutocompleteLabelCombo(LabelCompoundWidget):
 
         # Bind method
         self.variable.trace('w', self._entry_changed)
+
+        self.is_disabled = False
+        self.set_style(self.style)
 
     def _entry_changed(self, name, index, mode):
         """ Keeps track of any change in the entry widget and updates the dropdown values """
@@ -426,10 +507,23 @@ class AutocompleteLabelCombo(LabelCompoundWidget):
             self.variable.set('')
 
     def enable(self):
-        self.label.config(style='TLabel')
-        self.combobox.config(state='normal', values=self.combo_list, takefocus=1)
+        self.is_disabled = False
+        self.label.config(bootstyle=self.style)
+        self.combobox.config(state='normal', values=self.combo_list, takefocus=1, bootstyle=self.style)
 
     def disable(self):
+        self.is_disabled = True
         self.variable.set('')
-        self.label.config(style='secondary.TLabel')
-        self.combobox.config(state='disabled', takefocus=0)
+        self.label.configure(boostyle='secondary')
+        self.combobox.configure(state='disabled', takefocus=0, boostyle='secondary')
+
+    def set_style(self, bootstyle):
+        """ Sets a new style to the widgets """
+
+        if bootstyle not in self.label_style_list:
+            return
+        self.style = bootstyle
+        if self.is_disabled:
+            return
+        self.combobox.configure(bootstyle=self.style)
+        self.label.configure(bootstyle=self.style)

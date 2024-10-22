@@ -44,6 +44,12 @@ def edit_message():
     print('entry i has been edited')
 
 
+def change_style(event):
+    style = style_combobox.get()
+    widget_1.set_style(style)
+    widget_2.set_style(style)
+
+
 root = tk.Tk()
 root.style = Style(theme='darkly')
 root.minsize(300, 200)
@@ -93,5 +99,8 @@ button_3.grid(row=0, column=2, padx=(5, 0))
 button_4 = ttk.Button(frame, text='Alternate Enable/Disable', command=alternate_style)
 button_4.grid(row=0, column=3, padx=(5, 0))
 
-
+style_combobox = ttk.Combobox(frame, values=['danger', 'warning', 'info', 'success', 'secondary',
+                                             'primary', 'light', 'dark'])
+style_combobox.grid(row=0, column=4, padx=(5, 0))
+style_combobox.bind('<<ComboboxSelected>>', change_style)
 root.mainloop()
