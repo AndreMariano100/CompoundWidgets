@@ -2,39 +2,47 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from ttkbootstrap import Style
 import compoundwidgets as cw
-from random import randint
+import random
 
 root = tk.Tk()
 root.style = Style(theme='darkly')
 root.rowconfigure(0, weight=1)
 root.columnconfigure(0, weight=1)
 
+
 def get_all_label_entry_values(event=None):
     print('/'.join([str(w.get()) for w in all_label_entry_units]))
+
 
 def get_all_label_entry_metric():
     print('/'.join([str(w.get_metric_value()) for w in all_label_entry_units]))
 
+
 def get_all_label_entry_imperial():
     print('/'.join([str(w.get_imperial_value()) for w in all_label_entry_units]))
+
 
 def disable_all_label_entry():
     for w in all_label_entry_units:
         w.disable()
 
+
 def enable_all_label_entry():
     for w in all_label_entry_units:
         w.enable()
+
 
 def readonly_all_label_entry():
     for w in all_label_entry_units:
         w.readonly()
 
+
 def fill_entry_values():
     for w in all_label_entry_units:
-        w.set_entry(randint(-100, 400))
+        w.set_entry(random.randint(-100, 400))
         range_2 = len(w.unit_combo.values) - 1
-        w.set_unit(w.unit_combo.values[randint(0, range_2)])
+        w.set_unit(w.unit_combo.values[random.randint(0, range_2)])
+
 
 def lock_entry_units():
     for w in all_label_entry_units:
@@ -43,13 +51,16 @@ def lock_entry_units():
         else:
             w.lock_unit()
 
+
 def convert_entry_to_metric():
     for w in all_label_entry_units:
         w.convert_to_metric()
 
+
 def convert_entry_to_imperial():
     for w in all_label_entry_units:
         w.convert_to_imperial()
+
 
 def enable_self_conversion():
     for w in all_label_entry_units:
@@ -57,6 +68,17 @@ def enable_self_conversion():
             w.activate_self_conversion()
         else:
             w.deactivate_self_conversion()
+
+
+def set_style():
+    label_style_list = ('danger', 'warning', 'info', 'success',
+                        'secondary', 'primary', 'light', 'dark', 'no style',
+                        'danger', 'warning', 'info', 'success',
+                        'secondary', 'primary', 'light', 'dark', 'no style')
+    new_styles = random.sample(label_style_list, len(all_label_entry_units))
+    for i, w in enumerate(all_label_entry_units):
+        w.set_style(new_styles[i])
+
 
 frame = ttk.LabelFrame(root, text='Label Entry Units')
 frame.grid(row=0, column=0, rowspan=2, sticky='nsew', padx=10, pady=10)
@@ -109,5 +131,8 @@ b10.grid(row=9, column=1, pady=2, sticky='ew', padx=2)
 
 b11 = ttk.Button(frame, text='ENABLE/DISABLE CONVERSION', command=enable_self_conversion)
 b11.grid(row=10, column=1, pady=2, sticky='ew', padx=2)
+
+b12 = ttk.Button(frame, text='SET STYLES', command=set_style)
+b12.grid(row=11, column=1, pady=2, sticky='ew', padx=2)
 
 root.mainloop()

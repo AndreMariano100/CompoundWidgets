@@ -2,16 +2,18 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from ttkbootstrap import Style
 import compoundwidgets as cw
-from random import randint
+import random
 
 root = tk.Tk()
 root.style = Style(theme='darkly')
 root.rowconfigure(0, weight=1)
 root.columnconfigure(0, weight=1)
 
+
 def b_1_method():
     for w in all_label_entry_button:
         w.enable()
+
 
 def b_2_method():
     for w in all_label_entry_button:
@@ -19,18 +21,38 @@ def b_2_method():
     root.update_idletasks()
     root.after(1000, all_label_entry_button[0].enable())
 
+
 def b_3_method():
     for w in all_label_entry_button:
         w.readonly()
+    root.update_idletasks()
+    root.after(1000, all_label_entry_button[0].enable())
 
 def b_4_method():
     for w in all_label_entry_button:
         print(w.get(), end='/')
     print()
 
+
 def b_5_method():
     for w in all_label_entry_button:
         w.set(100)
+
+
+def set_style():
+    label_style_list = ('danger', 'warning', 'info', 'success',
+                        'secondary', 'primary', 'light', 'dark', 'no style')
+    new_styles = random.sample(label_style_list, len(all_label_entry_button))
+    for i, w in enumerate(all_label_entry_button):
+        w.set_style(new_styles[i])
+
+def set_button_style():
+    label_style_list = ('danger', 'warning', 'info', 'success',
+                        'secondary', 'primary', 'light', 'dark', 'no style')
+    new_styles = random.sample(label_style_list, len(all_label_entry_button))
+    for i, w in enumerate(all_label_entry_button):
+        w.set_button_style(new_styles[i])
+
 
 frame = ttk.LabelFrame(root, text='Label Entry Button')
 frame.grid(row=0, column=1, sticky='nsew', padx=10, pady=10)
@@ -50,5 +72,11 @@ for i in range(5):
                             entry_method=b_4_method)
     w.grid(row=i, column=0, sticky='nsew', pady=5, padx=10)
     all_label_entry_button.append(w)
+
+b = ttk.Button(frame, text='STYLE', command=set_style)
+b.grid(row=6, column=0, pady=2, sticky='ew', padx=2)
+
+b2 = ttk.Button(frame, text='STYLE BUTTON STYLE', command=set_button_style)
+b2.grid(row=7, column=0, pady=2, sticky='ew', padx=2)
 
 root.mainloop()

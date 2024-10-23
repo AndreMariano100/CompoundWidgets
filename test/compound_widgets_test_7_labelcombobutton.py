@@ -2,6 +2,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from ttkbootstrap import Style
 import compoundwidgets as cw
+import random
 
 root = tk.Tk()
 root.style = Style(theme='darkly')
@@ -16,13 +17,16 @@ def b_6_method():
 
 def b_7_method():
     for i, w in enumerate(label_combo_list):
-        if i:
-            w.disable()
+        w.disable()
+    root.update_idletasks()
+    root.after(1000, label_combo_list[0].enable())
 
 
 def b_8_method():
     for w in label_combo_list:
         w.readonly()
+    root.update_idletasks()
+    root.after(1000, label_combo_list[0].enable())
 
 
 def b_9_method():
@@ -34,6 +38,22 @@ def b_9_method():
 def b_10_method():
     for i, w in enumerate(label_combo_list):
         w.set(label_text[i])
+
+
+def set_style():
+    label_style_list = ('danger', 'warning', 'info', 'success',
+                        'secondary', 'primary', 'light', 'dark', 'no style')
+    new_styles = random.sample(label_style_list, len(label_combo_list))
+    for i, w in enumerate(label_combo_list):
+        w.set_style(new_styles[i])
+
+
+def set_button_style():
+    label_style_list = ('danger', 'warning', 'info', 'success',
+                        'secondary', 'primary', 'light', 'dark', 'no style')
+    new_styles = random.sample(label_style_list, len(label_combo_list))
+    for i, w in enumerate(label_combo_list):
+        w.set_button_style(new_styles[i])
 
 
 frame = ttk.LabelFrame(root, text='Label Combo Button')
@@ -54,5 +74,12 @@ for i, item in enumerate(label_text):
                             button_width=15, button_method=b_method_list[i], sided=sided)
     w.grid(row=i, column=0, sticky='nsew', pady=2)
     label_combo_list.append(w)
+
+
+b = ttk.Button(frame, text='STYLE', command=set_style)
+b.grid(row=6, column=0, pady=2, sticky='ew', padx=2)
+
+b2 = ttk.Button(frame, text='STYLE BUTTON STYLE', command=set_button_style)
+b2.grid(row=7, column=0, pady=2, sticky='ew', padx=2)
 
 root.mainloop()

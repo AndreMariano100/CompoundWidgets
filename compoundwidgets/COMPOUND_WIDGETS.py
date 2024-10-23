@@ -22,6 +22,9 @@ class LabelCompoundWidget(ttk.Frame):
 
         # Parent class initialization
         super().__init__(parent, **kwargs)
+        self.parent = parent
+        self.style = 'default'
+        self.disabled = False
 
         # Frame configuration
         if True:
@@ -70,6 +73,37 @@ class LabelCompoundWidget(ttk.Frame):
             else:
                 self.rowconfigure(0, weight=1)
 
+    def set_style(self, style):
+        if self.disabled:
+            return
+
+        label_style_list = (
+            'danger', 'warning', 'info', 'success',
+            'secondary', 'primary', 'light', 'dark',
+            'default'
+        )
+        if style not in label_style_list:
+            return
+        self.style = style
+
+        for widget in self.winfo_children():
+            if isinstance(widget, ttk.Button):
+                continue
+            if isinstance(widget, tk.Text):
+                color = self.parent.winfo_main.style.colors.get(self.style)
+                widget.configure(fg=color)
+            if isinstance(widget, ttk.Frame):
+                for widget_2 in widget.winfo_children():
+                    if isinstance(widget_2, ttk.Button):
+                        continue
+                    if isinstance(widget_2, tk.Text):
+                        color = self.parent.winfo_toplevel().style.colors.get(self.style)
+                        widget_2.configure(fg=color)
+                    else:
+                        widget_2.configure(bootstyle=self.style)
+            else:
+                widget.configure(bootstyle=self.style)
+
 
 class LabelCombo(LabelCompoundWidget):
     """
@@ -117,23 +151,26 @@ class LabelCombo(LabelCompoundWidget):
             self.combobox.bind('<<ComboboxSelected>>', combo_method, add='+')
 
     def enable(self):
-        self.label.config(style='TLabel')
-        self.combobox.config(state='readonly', values=self.combo_list, takefocus=1)
+        self.disabled = False
+        self.label.config(bootstyle=self.style)
+        self.combobox.config(state='readonly', values=self.combo_list, takefocus=1, bootstyle=self.style)
 
     def disable(self):
-        self.variable.set('')
-        self.label.config(style='secondary.TLabel')
-        self.combobox.config(state='disabled', takefocus=0)
+        self.set('')
+        self.disabled = True
+        self.label.config(bootstyle='secondary')
+        self.combobox.config(state='disabled', takefocus=0, bootstyle='secondary')
 
     def readonly(self):
-        self.label.config(style='TLabel')
-        self.combobox.config(state='readonly', values=[], takefocus=0)
+        self.disabled = False
+        self.label.config(bootstyle=self.style)
+        self.combobox.config(state='readonly', values=[], takefocus=0, bootstyle=self.style)
 
     def get(self):
         return self.variable.get()
 
     def set(self, value):
-        if str(self.combobox.cget('state')) == 'disabled':
+        if self.disabled:
             return
         if value in self.combo_list:
             self.variable.set(value)
@@ -257,23 +294,26 @@ class LabelEntry(LabelCompoundWidget):
             self.entry_method()
 
     def enable(self):
-        self.label.config(style='TLabel')
-        self.entry.config(state='normal', takefocus=1)
+        self.disabled = False
+        self.label.config(bootstyle=self.style)
+        self.entry.config(state='normal', takefocus=1, bootstyle=self.style)
 
     def disable(self):
         self.set('')
-        self.label.config(style='secondary.TLabel')
-        self.entry.config(state='disabled', takefocus=0)
+        self.disabled = True
+        self.label.config(bootstyle='secondary')
+        self.entry.config(state='disabled', takefocus=0, bootstyle='secondary')
 
     def readonly(self):
-        self.label.config(style='TLabel')
-        self.entry.config(state='readonly', takefocus=0)
+        self.disabled = False
+        self.label.config(bootstyle=self.style)
+        self.entry.config(state='readonly', takefocus=0, bootstyle=self.style)
 
     def get(self):
         return self.variable.get()
 
     def set(self, value):
-        if str(self.entry.cget('state')) == 'disabled':
+        if self.disabled:
             return
 
         if self.entry_numeric:
@@ -355,7 +395,6 @@ class LabelText(LabelCompoundWidget):
         if True:
             self.text = tk.Text(local_frame, wrap=tk.WORD, spacing1=2, padx=2, pady=2)
             self.text.grid(row=0, column=0, sticky='nsew')
-            self.enabled_color = self.text.cget('fg')
             self.disabled_color = parent.winfo_toplevel().style.colors.secondary
 
             self.set(text_value)
@@ -382,23 +421,28 @@ class LabelText(LabelCompoundWidget):
         self.text.yview_scroll(int(-1 * event.delta / 120), 'units')
 
     def enable(self):
-        self.label.config(style='TLabel')
-        self.text.config(state='normal', fg=self.enabled_color, takefocus=1)
+        self.disabled = False
+        self.label.config(bootstyle=self.style)
+        enabled_color = self.parent.winfo_toplevel().style.colors.get(self.style)
+        self.text.config(state='normal', fg=enabled_color, takefocus=1)
 
     def disable(self):
-        self.label.config(style='secondary.TLabel')
         self.set('')
+        self.disabled = True
+        self.label.config(bootstyle='secondary')
         self.text.config(state='disabled', fg=self.disabled_color, takefocus=0)
 
     def readonly(self):
-        self.label.config(style='TLabel')
-        self.text.config(state='disabled', fg=self.enabled_color, takefocus=0)
+        self.disabled = False
+        self.label.config(bootstyle=self.style)
+        enabled_color = self.parent.winfo_toplevel().style.colors.get(self.style)
+        self.text.config(state='disabled', fg=enabled_color, takefocus=0)
 
     def get(self):
         return str(self.text.get('1.0', tk.END)).rstrip('\n')
 
     def set(self, value):
-        if self.text.cget('fg') == self.disabled_color:
+        if self.disabled:
             return
         original_state = self.text.cget('state')
         self.text.config(state='normal')
@@ -593,8 +637,9 @@ class LabelSpinbox(LabelCompoundWidget):
             self.set(str(current))
 
     def enable(self):
-        self.label.config(style='TLabel')
-        self.spin.config(state='normal', takefocus=1)
+        self.disabled = False
+        self.label.config(bootstyle=self.style)
+        self.spin.config(state='normal', takefocus=1, bootstyle=self.style)
 
         if not str(self.get()):
             if self.initial_value is not None:
@@ -605,12 +650,14 @@ class LabelSpinbox(LabelCompoundWidget):
 
     def disable(self):
         self.set('')
-        self.label.config(style='secondary.TLabel')
-        self.spin.config(state='disabled', takefocus=0)
+        self.disabled = True
+        self.label.config(bootstyle='secondary')
+        self.spin.config(state='disabled', takefocus=0, bootstyle='secondary')
 
     def readonly(self):
-        self.label.config(style='TLabel')
-        self.spin.config(state='readonly', takefocus=0)
+        self.disabled = False
+        self.label.config(bootstyle=self.style)
+        self.spin.config(state='readonly', takefocus=0, bootstyle=self.style)
 
     def get(self):
         value = self.variable.get()
@@ -624,6 +671,9 @@ class LabelSpinbox(LabelCompoundWidget):
                 return int(value)
 
     def set(self, value):
+        if self.disabled:
+            return
+
         if value in (None, ''):
             if self.trace_variable:
                 self.variable.trace_remove('write', self.cb_name)
@@ -1042,10 +1092,11 @@ class LabelEntryUnit(LabelCompoundWidget):
 
     # Widget state methods ---------------------------------------------------------------------------------------------
     def enable(self):
+        self.disabled = False
         self.unlock_unit()
-        self.label.config(style='TLabel')
-        self.entry.config(state='normal', takefocus=1)
-        self.unit_combo.config(state='readonly', values=self.unit_combo.values, takefocus=1)
+        self.label.config(bootstyle=self.style)
+        self.entry.config(state='normal', takefocus=1, bootstyle=self.style)
+        self.unit_combo.config(state='readonly', values=self.unit_combo.values, takefocus=1, bootstyle=self.style)
         if not self.unit_combo.get():
             self.unit_combo.set(self.unit_combo.values[0])
 
@@ -1053,34 +1104,32 @@ class LabelEntryUnit(LabelCompoundWidget):
         self.unlock_unit()
         self.set_entry('')
         self.combobox_variable.set('')
-        self.label.config(style='secondary.TLabel')
-        self.entry.config(state='disabled', takefocus=0)
-        self.unit_combo.config(state='disabled', takefocus=0)
+        self.disabled = True
+        self.label.config(bootstyle='secondary')
+        self.entry.config(state='disabled', takefocus=0, bootstyle='secondary')
+        self.unit_combo.config(state='disabled', takefocus=0, bootstyle='secondary')
 
     def readonly(self):
+        self.disabled = False
         self.unlock_unit()
-        self.label.config(style='TLabel')
-        self.entry.config(state='readonly', takefocus=0)
+        self.label.config(bootstyle=self.style)
+        self.entry.config(state='readonly', takefocus=0, bootstyle=self.style)
         if not self.combobox_unit_conversion:
-            self.unit_combo.config(state='readonly', values=[], takefocus=0)
+            self.unit_combo.config(state='readonly', values=[], takefocus=0, bootstyle=self.style)
         else:
-            self.unit_combo.config(state='readonly', values=self.unit_combo.values, takefocus=1)
+            self.unit_combo.config(state='readonly', values=self.unit_combo.values, takefocus=1, bootstyle=self.style)
 
     def is_disabled(self):
-        if str(self.entry.cget('state')) == 'disabled':
-            return True
-        return False
+        return self.disabled
 
     def lock_unit(self):
         if not self.get_unit():
             return
-        self.unit_combo.config(state='readonly', values=[], style='TLabel',
-                               width=self.combobox_unit_width+4)
+        self.unit_combo.config(state='readonly', values=[], bootstyle=self.style)
         self.is_locked = True
 
     def unlock_unit(self):
-        self.unit_combo.config(state='readonly', values=self.unit_combo.values, style='TCombobox',
-                               width=self.combobox_unit_width)
+        self.unit_combo.config(state='readonly', values=self.unit_combo.values, bootstyle=self.style)
         self.is_locked = False
 
     def activate_self_conversion(self):
@@ -1425,12 +1474,14 @@ class LabelEntryButton(LabelCompoundWidget):
         button_text: string to be shown on the button
         button_width: width of the button in characters
         button_method: method to bind to the button
+        button_style: specific style for the button
     Methods for the user:
         enable(): turns the whole widget 'on'
         disable(): turns the whole widget 'off'
         readonly(): turn the whole widget 'readonly' (non-editable)
         get(): returns the current value from the entry widget
         set(value): sets a value to the entry widget
+        set_button_style: sets a new style for the button
     """
 
     def __init__(self, parent, label_text=None, label_anchor='e', label_width=None,
@@ -1438,7 +1489,7 @@ class LabelEntryButton(LabelCompoundWidget):
                  entry_value='', entry_numeric=False, entry_width=None, entry_max_char=None,
                  entry_method=None, precision=2, trace_variable=False,
                  button_text='', button_width=None, button_method=None,
-                 **kwargs):
+                 button_style=None, **kwargs):
 
         # Parent class initialization
         super().__init__(parent, label_text, label_anchor, label_width, label_justify, label_font, sided, **kwargs)
@@ -1449,6 +1500,18 @@ class LabelEntryButton(LabelCompoundWidget):
         self.precision = precision
         self.trace_variable = trace_variable
         self.button_method = button_method
+        if not button_style:
+            self.button_style = 'default'
+        else:
+            label_style_list = (
+                'danger', 'warning', 'info', 'success',
+                'secondary', 'primary', 'light', 'dark',
+                'default'
+            )
+            if button_style not in label_style_list:
+                self.button_style = 'default'
+            else:
+                self.button_style = button_style
 
         # Entry validation for numbers and max char
         if True:
@@ -1495,7 +1558,7 @@ class LabelEntryButton(LabelCompoundWidget):
 
         # Button configuration
         if True:
-            self.button = ttk.Button(local_frame, text=button_text, width=button_width)
+            self.button = ttk.Button(local_frame, text=button_text, width=button_width, style=self.button_style)
             self.button.grid(row=0, column=1, sticky='nsew', padx=(2, 0))
 
         # Bind methods
@@ -1539,20 +1602,23 @@ class LabelEntryButton(LabelCompoundWidget):
             self.entry_method()
 
     def enable(self):
-        self.label.config(style='TLabel')
-        self.entry.config(state='normal', takefocus=1)
-        self.button.state(["!disabled"])
+        self.disabled = False
+        self.label.config(bootstyle=self.style)
+        self.entry.config(state='normal', takefocus=1, bootstyle=self.style)
+        self.button.config(state='normal', bootstyle=self.button_style)
 
     def disable(self):
         self.set('')
-        self.label.config(style='secondary.TLabel')
-        self.entry.config(state='disabled', takefocus=0)
-        self.button.state(["disabled"])
+        self.disabled = True
+        self.label.config(bootstyle='secondary')
+        self.entry.config(state='disabled', takefocus=0, bootstyle='secondary')
+        self.button.config(state='disabled', bootstyle='secondary')
 
     def readonly(self):
-        self.label.config(style='TLabel')
-        self.entry.config(state='readonly', takefocus=0)
-        self.button.state(["!disabled"])
+        self.disabled = False
+        self.label.config(bootstyle=self.style)
+        self.entry.config(state='readonly', takefocus=0, bootstyle=self.style)
+        self.button.config(state='disabled', bootstyle=self.button_style)
 
     def get(self):
         return self.variable.get()
@@ -1599,6 +1665,18 @@ class LabelEntryButton(LabelCompoundWidget):
             else:
                 self.variable.set(value)
 
+    def set_button_style(self, button_style):
+        print(button_style)
+        style_list = (
+            'danger', 'warning', 'info', 'success',
+            'secondary', 'primary', 'light', 'dark',
+            'default'
+        )
+        if button_style not in style_list:
+            return
+        self.button_style = button_style
+        self.button.configure(bootstyle=self.button_style)
+
 
 class LabelComboButton(LabelCompoundWidget):
     """
@@ -1612,6 +1690,7 @@ class LabelComboButton(LabelCompoundWidget):
         button_text: string to be shown on the button
         button_width: width of the button in characters
         button_method: method to bind to the button
+        button_style: specific style for the button
     Methods for the user:
         enable(): turns the whole widget 'on'
         disable(): turns the whole widget 'off'
@@ -1620,15 +1699,29 @@ class LabelComboButton(LabelCompoundWidget):
         set(value): sets a value to the entry widget
         get_combo_values: return the current available values form the combobox
         set_combo_values(values): sets the combobox values after it has been created
+        set_button_style: sets a new style for the button
     """
 
     def __init__(self, parent, label_text=None, label_anchor='e', label_width=None,
                  label_justify=None, label_font=None, sided=True,
                  combo_value='', combo_list=('No values informed',), combo_width=None, combo_method=None,
-                 button_text='', button_width=None, button_method=None, **kwargs):
+                 button_text='', button_width=None, button_method=None, button_style=None, **kwargs):
 
         # Parent class initialization
         super().__init__(parent, label_text, label_anchor, label_width, label_justify, label_font, sided, **kwargs)
+
+        if not button_style:
+            self.button_style = 'default'
+        else:
+            label_style_list = (
+                'danger', 'warning', 'info', 'success',
+                'secondary', 'primary', 'light', 'dark',
+                'default'
+            )
+            if button_style not in label_style_list:
+                self.button_style = 'default'
+            else:
+                self.button_style = button_style
 
         # Local frame (combo + button)
         if True:
@@ -1654,7 +1747,7 @@ class LabelComboButton(LabelCompoundWidget):
 
         # Button configuration
         if True:
-            self.button = ttk.Button(local_frame, text=button_text, width=button_width)
+            self.button = ttk.Button(local_frame, text=button_text, width=button_width, style=self.button_style)
             self.button.grid(row=0, column=1, sticky='nsew', padx=(2, 0))
 
         # Bind methods
@@ -1664,20 +1757,23 @@ class LabelComboButton(LabelCompoundWidget):
             self.button.configure(command=button_method)
 
     def enable(self):
-        self.label.config(style='TLabel')
-        self.combobox.config(state='readonly', values=self.combo_list, takefocus=1)
-        self.button.state(["!disabled"])
+        self.disabled = False
+        self.label.config(bootstyle=self.style)
+        self.combobox.config(state='readonly', values=self.combo_list, takefocus=1, bootstyle=self.style)
+        self.button.config(state='normal', bootstyle=self.button_style)
 
     def disable(self):
         self.variable.set('')
-        self.label.config(style='secondary.TLabel')
-        self.combobox.config(state='disabled', takefocus=0)
-        self.button.state(["disabled"])
+        self.disabled = True
+        self.label.config(bootstyle='secondary')
+        self.combobox.config(state='disabled', takefocus=0, bootstyle='secondary')
+        self.button.config(state='disabled', bootstyle='secondary')
 
     def readonly(self):
-        self.label.config(style='TLabel')
-        self.combobox.config(state='readonly', values=[], takefocus=0)
-        self.button.state(["!disabled"])
+        self.disabled = False
+        self.label.config(bootstyle=self.style)
+        self.combobox.config(state='readonly', values=[], takefocus=0, bootstyle=self.style)
+        self.button.config(state='disabled', bootstyle=self.button_style)
 
     def get(self):
         return self.variable.get()
@@ -1696,3 +1792,17 @@ class LabelComboButton(LabelCompoundWidget):
     def set_combo_values(self, values):
         self.combo_list = values
         self.combobox.config(values=values)
+
+    def set_button_style(self, button_style):
+
+        style_list = (
+            'danger', 'warning', 'info', 'success',
+            'secondary', 'primary', 'light', 'dark',
+            'default'
+        )
+        if button_style not in style_list:
+            return
+        self.button_style = button_style
+        if self.disabled:
+            return
+        self.button.configure(bootstyle=self.button_style)

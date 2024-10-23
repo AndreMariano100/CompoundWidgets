@@ -2,36 +2,51 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from ttkbootstrap import Style
 import compoundwidgets as cw
+import random
 
 root = tk.Tk()
 root.style = Style(theme='darkly')
 root.rowconfigure(0, weight=1)
 root.columnconfigure(0, weight=1)
 
+
 def get_all_label_combos(event=None):
     for w in label_combo_list:
         print(w.get())
+
 
 def set_all_label_combos():
     for w in label_combo_list:
         w.set('none')
 
+
 def set_all_label_combos_2():
     for w in label_combo_list:
         w.set('Label Combo 2')
+
 
 def set_disable_combos():
     for w in label_combo_list:
         w.disable()
 
+
 def set_read_only_combos():
     for w in label_combo_list:
-        w.set(local_list[0])
         w.readonly()
+
 
 def set_normal_combos():
     for w in label_combo_list:
         w.enable()
+
+
+def set_style():
+    label_style_list = ('danger', 'warning', 'info', 'success',
+                        'secondary', 'primary', 'light', 'dark', 'no style')
+    new_styles = random.sample(label_style_list, len(label_combo_list))
+    for i, w in enumerate(label_combo_list):
+        w.set_style(new_styles[i])
+
 
 frame = ttk.LabelFrame(root, text='Label Combos')
 frame.grid(row=0, column=0, sticky='nsew', padx=10, pady=10)
@@ -70,5 +85,8 @@ b5.grid(row=8, column=0, pady=2, sticky='ew', padx=2)
 
 b6 = ttk.Button(frame, text='NORMAL', command=set_normal_combos)
 b6.grid(row=9, column=0, pady=2, sticky='ew', padx=2)
+
+b7 = ttk.Button(frame, text='STYLE', command=set_style)
+b7.grid(row=10, column=0, pady=2, sticky='ew', padx=2)
 
 root.mainloop()
