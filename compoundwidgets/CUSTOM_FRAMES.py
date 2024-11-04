@@ -21,16 +21,15 @@ class CollapsableFrame(ttk.Frame):
         # Style definition
         if True:
             self.label_style_list = (
-                'danger', 'warning', 'info', 'success',
-                'secondary', 'primary', 'light', 'dark'
+                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
             )
             if style:
                 if style not in self.label_style_list:
-                    self.style = 'primary'
+                    self.style = 'default'
                 else:
                     self.style = style
             else:
-                self.style = 'primary'
+                self.style = 'default'
 
         # Main container
         if True:
@@ -181,16 +180,15 @@ class HCollapsableFrame(ttk.Frame):
         # Style definition
         if True:
             self.label_style_list = (
-                'danger', 'warning', 'info', 'success',
-                'secondary', 'primary', 'light', 'dark'
+                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
             )
             if style:
                 if style not in self.label_style_list:
-                    self.style = 'primary'
+                    self.style = 'default'
                 else:
                     self.style = style
             else:
-                self.style = 'primary'
+                self.style = 'default'
 
         # Main container
         if True:
@@ -336,16 +334,15 @@ class ScrollableFrame(ttk.Frame):
         # Style definition
         if True:
             self.label_style_list = (
-                'danger', 'warning', 'info', 'success',
-                'secondary', 'primary', 'light', 'dark'
+                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
             )
             if style:
                 if style not in self.label_style_list:
-                    self.style = 'primary'
+                    self.style = 'default'
                 else:
                     self.style = style
             else:
-                self.style = 'primary'
+                self.style = 'default'
 
         # Main container
         self.container = ttk.Frame(parent)
@@ -507,8 +504,9 @@ class BorderFrame(ttk.Frame):
 
         # Style definition
         if True:
-            self.label_style_list = ('danger', 'warning', 'info', 'success',
-                                     'secondary', 'primary', 'light', 'dark')
+            self.label_style_list = (
+                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
+            )
             if border_style not in self.label_style_list:
                 self.border_style = 'secondary'
             else:

@@ -28,7 +28,7 @@ def b_3_method():
     root.update_idletasks()
     root.after(1000, all_label_entry_button[0].enable())
 
-def b_4_method():
+def b_4_method(event=None):
     for w in all_label_entry_button:
         print(w.get(), end='/')
     print()
@@ -69,7 +69,7 @@ for i in range(5):
     w = cw.LabelEntryButton(frame, label_text=f'Label Entry Button {i+1}:', label_width=30, entry_value='0',
                             entry_width=12, entry_numeric=True, entry_max_char=10, button_text=b_text[i],
                             button_method=b_method_list[i], button_width=15, precision=0, sided=sided,
-                            entry_method=b_4_method)
+                            entry_method=b_4_method, trace_variable=True)
     w.grid(row=i, column=0, sticky='nsew', pady=5, padx=10)
     all_label_entry_button.append(w)
 

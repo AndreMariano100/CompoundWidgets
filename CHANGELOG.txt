@@ -97,3 +97,7 @@ Change Log
 0.4.03 (12/05/2024) - Bug corrected on Tooltip.
 0.4.04 (30/05/2024) - Copy to clipboard button added.
 0.5.00 (09/10/2024) - General revision of several widgets.
+0.5.1 (23/10/2024) - Option to set the style after the widget has been created. Option to disable/enable cw.Buttons.
+0.5.2 (29/10/2024) - Bub correction: events not being forwarded to selected method on some widgets.
+0.5.3 (01/11/2024) - "Default" style correction.
+0.5.4 (01/11/2024) - CompoundWidgets unit conversion correction (empty value vs. zero value).

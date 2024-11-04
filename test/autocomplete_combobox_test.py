@@ -19,6 +19,12 @@ def disable_widgets():
         widget_2.disable()
 
 
+def show_combobox_values(event):
+    print(event.widget)
+    print(widget_1.get())
+    print(widget_2.get())
+
+
 root = tk.Tk()
 root.style = Style(theme='darkly')
 root.minsize(200, 100)
@@ -28,11 +34,12 @@ root.columnconfigure(0, weight=1)
 full_list = ['John A', 'John B', 'John C', 'Paul A', 'Paul B', 'Paul C']
 
 ttk.Label(root, text='Not case sensitive').grid(row=0, column=0, padx=10, pady=10)
-widget_1 = cw.AutocompleteCombobox(root, values=full_list, width=30)
+widget_1 = cw.AutocompleteCombobox(root, values=full_list, width=30, combobox_method=show_combobox_values)
 widget_1.grid(row=1, column=0, padx=10, pady=10)
 
 ttk.Label(root, text='Case sensitive').grid(row=2, column=0, padx=10, pady=10)
-widget_2 = cw.AutocompleteCombobox(root, values=full_list, width=30, case_sensitive=True)
+widget_2 = cw.AutocompleteCombobox(root, values=full_list, width=30, case_sensitive=True,
+                                   combobox_method=show_combobox_values)
 widget_2.grid(row=3, column=0, padx=10, pady=10)
 
 disable_button = ttk.Button(root, text='Disable/Enable', command=disable_widgets)

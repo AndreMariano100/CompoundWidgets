@@ -20,7 +20,7 @@ class CheckLedButton(ttk.Frame):
     """
 
     def __init__(self, parent, label_text='Label', label_width=10, label_method=None,
-                 style='primary', font=None):
+                 style='default', font=None):
 
         # Parent class initialization
         super().__init__(parent)
@@ -42,11 +42,10 @@ class CheckLedButton(ttk.Frame):
                 self.disabled_led_color = all_colors.light
 
             label_style_list = (
-                'danger', 'warning', 'info', 'success',
-                'secondary', 'primary', 'light', 'dark',
+                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
             )
             if style not in label_style_list:
-                self.style = 'primary'
+                self.style = 'default'
             else:
                 self.style = style
 
@@ -72,7 +71,10 @@ class CheckLedButton(ttk.Frame):
                 self.label.config(font=font)
 
         # Bind method
-        self.label_method = label_method
+        if label_method and callable(label_method):
+            self.label_method = label_method
+        else:
+            self.label_method = None
         self.color_canvas.bind('<ButtonRelease-1>', self._check_hover)
         self.label.bind('<ButtonRelease-1>', self._check_hover)
 
@@ -149,7 +151,7 @@ class CheckSwitchLedButton(ttk.Frame):
     """
 
     def __init__(self, parent, label_text='Label', label_width=10, label_method=None,
-                 style='primary', font=None):
+                 style='default', font=None):
 
         # Parent class initialization
         super().__init__(parent)
@@ -171,11 +173,10 @@ class CheckSwitchLedButton(ttk.Frame):
                 self.disabled_led_color = all_colors.light
 
             label_style_list = (
-                'danger', 'warning', 'info', 'success',
-                'secondary', 'primary', 'light', 'dark',
+                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
             )
             if style not in label_style_list:
-                self.style = 'primary'
+                self.style = 'default'
             else:
                 self.style = style
 
@@ -207,7 +208,10 @@ class CheckSwitchLedButton(ttk.Frame):
                 self.label.config(font=font)
 
         # Bind method
-        self.label_method = label_method
+        if label_method and callable(label_method):
+            self.label_method = label_method
+        else:
+            self.label_method = None
         self.color_canvas_1.bind('<ButtonRelease-1>', self._check_hover)
         self.color_canvas_2.bind('<ButtonRelease-1>', self._check_hover)
         self.label.bind('<ButtonRelease-1>', self._check_hover)
@@ -293,7 +297,7 @@ class RadioLedButton(ttk.Frame):
     control_variable_dict = {}
 
     def __init__(self, parent, label_text='Label', label_width=10, label_method=None,
-                 style='primary', control_variable=None, font=None, switch_type=False):
+                 style='default', control_variable=None, font=None, switch_type=False):
 
         # Parent class initialization
         super().__init__(parent)
@@ -321,11 +325,10 @@ class RadioLedButton(ttk.Frame):
                 self.disabled_led_color = all_colors.light
 
             label_style_list = (
-                'danger', 'warning', 'info', 'success',
-                'secondary', 'primary', 'light', 'dark',
+                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
             )
             if style not in label_style_list:
-                self.style = 'primary'
+                self.style = 'default'
             else:
                 self.style = style
 
@@ -344,7 +347,11 @@ class RadioLedButton(ttk.Frame):
                                     label_method=self._check_hover, style=self.style, font=font)
         self.b.grid(row=0, column=0, sticky='nsew')
 
-        self.label_method = label_method
+        # Bind methods
+        if label_method and callable(label_method):
+            self.label_method = label_method
+        else:
+            self.label_method = None
         self.b.bind('<ButtonRelease-1>', self._check_hover, add='+')
 
     def _check_hover(self, event):
@@ -357,7 +364,7 @@ class RadioLedButton(ttk.Frame):
             if str(widget) == str(self):
                 widget.select()
                 if self.label_method:
-                    self.label_method()
+                    self.label_method(event)
             else:
                 widget.deselect()
 

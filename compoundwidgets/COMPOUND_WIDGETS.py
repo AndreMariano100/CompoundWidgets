@@ -78,9 +78,7 @@ class LabelCompoundWidget(ttk.Frame):
             return
 
         label_style_list = (
-            'danger', 'warning', 'info', 'success',
-            'secondary', 'primary', 'light', 'dark',
-            'default'
+            'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
         )
         if style not in label_style_list:
             return
@@ -213,7 +211,10 @@ class LabelEntry(LabelCompoundWidget):
 
         self.entry_numeric = entry_numeric
         self.entry_max_chars = entry_max_char
-        self.entry_method = entry_method
+        if entry_method and callable(entry_method):
+            self.entry_method = entry_method
+        else:
+            self.entry_method = None
         self.precision = precision
         self.trace_variable = trace_variable
 
@@ -264,7 +265,8 @@ class LabelEntry(LabelCompoundWidget):
         """ Variable trace method. Calls the applicable method everytime the value changes """
 
         if self.entry_method:
-            self.entry_method()
+            self.entry.event_generate("<Return>")
+            # To call the self.entry_method()
 
     def _adjust_value(self, event):
         """
@@ -291,7 +293,7 @@ class LabelEntry(LabelCompoundWidget):
                 self.variable.set(value)
 
         if self.entry_method:
-            self.entry_method()
+            self.entry_method(event)
 
     def enable(self):
         self.disabled = False
@@ -525,7 +527,10 @@ class LabelSpinbox(LabelCompoundWidget):
 
         # Bind method
         if True:
-            self.entry_method = entry_method
+            if entry_method and callable(entry_method):
+                self.entry_method = entry_method
+            else:
+                self.entry_method = None
             if trace_variable:
                 self.cb_name = self.variable.trace_add("write", self._update_value)
             if self.entry_method:
@@ -544,7 +549,8 @@ class LabelSpinbox(LabelCompoundWidget):
         current = self.variable.get()
         if isfloat(current):
             if self.entry_method:
-                self.entry_method()
+                self.spin.event_generate("<Return>")
+                # To call the self.entry_method()
         else:
             self.spin.delete(self.spin.index("insert"), last='end')
 
@@ -1001,7 +1007,10 @@ class LabelEntryUnit(LabelCompoundWidget):
             self.parent = parent
             self.precision = precision
             self.trace_variable = trace_variable
-            self.entry_method = entry_method
+            if entry_method and callable(entry_method):
+                self.entry_method = entry_method
+            else:
+                self.entry_method = None
             self.entry_variable = tk.StringVar()
             if entry_value and isfloat(entry_value):
                 value = float(entry_value)
@@ -1058,7 +1067,8 @@ class LabelEntryUnit(LabelCompoundWidget):
     def _update_value(self, name, index, mode):
         """ Variable trace method. Calls the applicable method everytime the value changes """
         if self.entry_method:
-            self.entry_method()
+            self.unit_combo.event_generate("<<ComboboxSelected>>")
+            # to call the self.entry_method()
 
     def _adjust_value(self, event):
         """ Precision adjustment method. Called when 'focus' is taken away from the widget. """
@@ -1088,7 +1098,7 @@ class LabelEntryUnit(LabelCompoundWidget):
                 self.entry_variable.set('')
 
         if self.entry_method:
-            self.entry_method()
+            self.entry_method(event)
 
     # Widget state methods ---------------------------------------------------------------------------------------------
     def enable(self):
@@ -1097,7 +1107,7 @@ class LabelEntryUnit(LabelCompoundWidget):
         self.label.config(bootstyle=self.style)
         self.entry.config(state='normal', takefocus=1, bootstyle=self.style)
         self.unit_combo.config(state='readonly', values=self.unit_combo.values, takefocus=1, bootstyle=self.style)
-        if not self.unit_combo.get():
+        if not str(self.unit_combo.get()):
             self.unit_combo.set(self.unit_combo.values[0])
 
     def disable(self):
@@ -1320,7 +1330,7 @@ class LabelEntryUnit(LabelCompoundWidget):
             return None, None
 
         elif unit == '°F':
-            if not value:
+            if not str(value):
                 new_value = ''
             else:
                 new_value = 5 * (float(value) - 32) / 9
@@ -1329,7 +1339,7 @@ class LabelEntryUnit(LabelCompoundWidget):
         else:
             if unit not in LabelEntryUnit.metric_unit_list:
                 index = LabelEntryUnit.imperial_unit_list.index(unit)
-                if not value:
+                if not str(value):
                     new_value = ''
                 else:
                     new_value = float(value)*LabelEntryUnit.conversion[index]
@@ -1346,7 +1356,7 @@ class LabelEntryUnit(LabelCompoundWidget):
             return None, None
 
         elif unit == '°C':
-            if not value:
+            if not str(value):
                 new_value = ''
             else:
                 new_value = 9 * (float(value) / 5) + 32
@@ -1355,7 +1365,7 @@ class LabelEntryUnit(LabelCompoundWidget):
         else:
             if unit not in LabelEntryUnit.imperial_unit_list:
                 index = LabelEntryUnit.metric_unit_list.index(unit)
-                if not value:
+                if not str(value):
                     new_value = ''
                 else:
                     new_value = float(value) / LabelEntryUnit.conversion[index]
@@ -1380,13 +1390,13 @@ class LabelEntryUnit(LabelCompoundWidget):
 
             else:
                 if new_unit == '°F':
-                    if not last_value:
+                    if not str(last_value):
                         new_value = ''
                     else:
                         new_value = 9 * (float(last_value) / 5) + 32
                     return new_value, '°F'
                 else:
-                    if not last_value:
+                    if not str(last_value):
                         new_value = ''
                     else:
                         new_value = 5 * (float(last_value) - 32) / 9
@@ -1399,7 +1409,7 @@ class LabelEntryUnit(LabelCompoundWidget):
             else:
                 old_index = self.unit_combo.values.index(last_unit)
                 new_index = self.unit_combo.values.index(new_unit)
-                if not last_value:
+                if not str(last_value):
                     new_value = ''
                 else:
                     # Convert from old index to index 1
@@ -1427,7 +1437,7 @@ class LabelEntryUnit(LabelCompoundWidget):
                 self.set_entry(last_value)
             else:
                 if new_unit == '°F':
-                    if not last_value:
+                    if not str(last_value):
                         new_value = ''
                     else:
                         new_value = 9 * (float(last_value) / 5) + 32
@@ -1435,7 +1445,7 @@ class LabelEntryUnit(LabelCompoundWidget):
                     self.set_unit('°F', update_last_unit=False)
                     self.set_entry(new_value, update_last_value=False)
                 else:
-                    if not last_value:
+                    if not str(last_value):
                         new_value = ''
                     else:
                         new_value = 5 * (float(last_value) - 32) / 9
@@ -1448,7 +1458,7 @@ class LabelEntryUnit(LabelCompoundWidget):
             else:
                 old_index = self.unit_combo.values.index(last_unit)
                 new_index = self.unit_combo.values.index(new_unit)
-                if not last_value:
+                if not str(last_value):
                     new_value = ''
                 else:
                     # Convert from old index to index 1
@@ -1496,17 +1506,19 @@ class LabelEntryButton(LabelCompoundWidget):
 
         self.entry_numeric = entry_numeric
         self.entry_max_chars = entry_max_char
-        self.entry_method = entry_method
+        if entry_method and callable(entry_method):
+            self.entry_method = entry_method
+        else:
+            self.entry_method = None
         self.precision = precision
         self.trace_variable = trace_variable
-        self.button_method = button_method
+        if button_method and callable(button_method):
+            self.button_method = button_method
         if not button_style:
             self.button_style = 'default'
         else:
             label_style_list = (
-                'danger', 'warning', 'info', 'success',
-                'secondary', 'primary', 'light', 'dark',
-                'default'
+                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
             )
             if button_style not in label_style_list:
                 self.button_style = 'default'
@@ -1574,7 +1586,8 @@ class LabelEntryButton(LabelCompoundWidget):
         """ Variable trace method. Calls the applicable method everytime the value changes """
 
         if self.entry_method:
-            self.entry_method()
+            self.entry.event_generate("<Return>")
+            # to call the self.entry_method()
 
     def _adjust_value(self, event):
         """
@@ -1599,7 +1612,7 @@ class LabelEntryButton(LabelCompoundWidget):
                 self.variable.set(value)
 
         if self.entry_method:
-            self.entry_method()
+            self.entry_method(event)
 
     def enable(self):
         self.disabled = False
@@ -1668,9 +1681,7 @@ class LabelEntryButton(LabelCompoundWidget):
     def set_button_style(self, button_style):
         print(button_style)
         style_list = (
-            'danger', 'warning', 'info', 'success',
-            'secondary', 'primary', 'light', 'dark',
-            'default'
+            'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
         )
         if button_style not in style_list:
             return
@@ -1714,9 +1725,7 @@ class LabelComboButton(LabelCompoundWidget):
             self.button_style = 'default'
         else:
             label_style_list = (
-                'danger', 'warning', 'info', 'success',
-                'secondary', 'primary', 'light', 'dark',
-                'default'
+                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
             )
             if button_style not in label_style_list:
                 self.button_style = 'default'
@@ -1751,9 +1760,9 @@ class LabelComboButton(LabelCompoundWidget):
             self.button.grid(row=0, column=1, sticky='nsew', padx=(2, 0))
 
         # Bind methods
-        if combo_method:
+        if combo_method and callable(combo_method):
             self.combobox.bind('<<ComboboxSelected>>', combo_method, add='+')
-        if button_method:
+        if button_method and callable(button_method):
             self.button.configure(command=button_method)
 
     def enable(self):
@@ -1796,9 +1805,7 @@ class LabelComboButton(LabelCompoundWidget):
     def set_button_style(self, button_style):
 
         style_list = (
-            'danger', 'warning', 'info', 'success',
-            'secondary', 'primary', 'light', 'dark',
-            'default'
+            'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
         )
         if button_style not in style_list:
             return

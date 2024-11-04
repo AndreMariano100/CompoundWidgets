@@ -14,16 +14,15 @@ class CompoundButton(ttk.Button):
         # Style definition
         if True:
             self.style_list = (
-                'danger', 'warning', 'info', 'success',
-                'secondary', 'primary', 'light', 'dark'
+                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
             )
             if style:
                 if style not in self.style_list:
-                    self.style = 'primary'
+                    self.style = 'default'
                 else:
                     self.style = style
             else:
-                self.style = 'primary'
+                self.style = 'default'
 
         self.language = language
         self.width = width

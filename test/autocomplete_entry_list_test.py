@@ -40,7 +40,7 @@ def alternate_style():
         widget_2.disable()
 
 
-def edit_message():
+def edit_message(event=None):
     print('entry i has been edited')
 
 

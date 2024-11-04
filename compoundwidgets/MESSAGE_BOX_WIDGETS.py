@@ -1,6 +1,7 @@
 import tkinter as tk
 import ttkbootstrap as ttk
 from .SCRIPTS import screen_position
+from .CUSTOM_FRAMES import BorderFrame
 
 
 class BaseTopLevelWidget(tk.Toplevel):
@@ -319,32 +320,37 @@ class TimedBox(tk.Toplevel):
             self.overrideredirect(True)
             self.total_time_ms = 1000 * time
             self.minsize(250, 120)
-            self.columnconfigure(0, weight=1)
-            self.columnconfigure(1, weight=0)
-            self.rowconfigure(0, weight=1)
-            self.rowconfigure(1, weight=0)
-            self.rowconfigure(2, weight=0)
-            self.lift()
 
-            style_list = ('danger', 'warning', 'info', 'success',
-                          'secondary', 'primary', 'light', 'dark')
+            self.columnconfigure(0, weight=1)
+            self.rowconfigure(0, weight=1)
+
+            style_list = ('danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default')
             if style not in style_list:
-                self.style = 'primary'
+                self.style = 'default'
             else:
                 self.style = style
 
+            container = BorderFrame(self, border_style=style)
+            container.grid(row=0, column=0, sticky='nsew')
+
+            container.columnconfigure(0, weight=1)
+            container.columnconfigure(1, weight=0)
+            container.rowconfigure(0, weight=1)
+            container.rowconfigure(1, weight=0)
+            container.rowconfigure(2, weight=0)
+
         # Widgets
         if True:
-            label = ttk.Label(self, text=message, justify='left', bootstyle=self.style)
+            label = ttk.Label(container, text=message, justify='left', bootstyle=self.style)
             label.grid(row=0, column=0, columnspan=2, sticky='nsew', padx=10, pady=10)
 
             self.progressbar_var = tk.DoubleVar(value=0)
-            self.progressbar = ttk.Progressbar(self, maximum=self.total_time_ms, orient='horizontal',
+            self.progressbar = ttk.Progressbar(container, maximum=self.total_time_ms, orient='horizontal',
                                                mode='determinate', bootstyle=self.style,
                                                variable=self.progressbar_var)
             self.progressbar.grid(row=1, column=0, columnspan=2, sticky='nsew', padx=10)
 
-            button = ttk.Button(self, text='CLOSE', bootstyle=self.style, command= lambda: self.destroy())
+            button = ttk.Button(container, text='CLOSE', bootstyle=self.style, command= lambda: self.destroy())
             button.grid(row=2, column=1, sticky='nsew', pady=10, padx=10)
 
             if label.winfo_reqwidth() > self.minsize()[0]:
@@ -355,6 +361,8 @@ class TimedBox(tk.Toplevel):
         self.geometry(screen_position(self, parent))
 
         # Grabs the focus
+        self.lift()
+        self.focus_set()
         self.grab_set()
 
     def update_progress_bar(self):
