@@ -21,7 +21,9 @@ class CollapsableFrame(ttk.Frame):
         # Style definition
         if True:
             self.label_style_list = (
-                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
+                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default',
+                'inverse-danger', 'inverse-warning', 'inverse-info', 'inverse-success', 'inverse-secondary',
+                'inverse-primary', 'inverse-light', 'inverse-dark', 'inverse-default', 'no style'
             )
             if style:
                 if style not in self.label_style_list:
@@ -180,7 +182,9 @@ class HCollapsableFrame(ttk.Frame):
         # Style definition
         if True:
             self.label_style_list = (
-                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
+                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default',
+                'inverse-danger', 'inverse-warning', 'inverse-info', 'inverse-success', 'inverse-secondary',
+                'inverse-primary', 'inverse-light', 'inverse-dark', 'inverse-default', 'no style'
             )
             if style:
                 if style not in self.label_style_list:
@@ -334,7 +338,9 @@ class ScrollableFrame(ttk.Frame):
         # Style definition
         if True:
             self.label_style_list = (
-                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
+                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default',
+                'inverse-danger', 'inverse-warning', 'inverse-info', 'inverse-success', 'inverse-secondary',
+                'inverse-primary', 'inverse-light', 'inverse-dark', 'inverse-default', 'no style'
             )
             if style:
                 if style not in self.label_style_list:
@@ -505,7 +511,9 @@ class BorderFrame(ttk.Frame):
         # Style definition
         if True:
             self.label_style_list = (
-                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
+                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default',
+                'inverse-danger', 'inverse-warning', 'inverse-info', 'inverse-success', 'inverse-secondary',
+                'inverse-primary', 'inverse-light', 'inverse-dark', 'inverse-default', 'no style'
             )
             if border_style not in self.label_style_list:
                 self.border_style = 'secondary'

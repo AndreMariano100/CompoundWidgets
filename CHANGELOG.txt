@@ -101,3 +101,7 @@ Change Log
 0.5.2 (29/10/2024) - Bub correction: events not being forwarded to selected method on some widgets.
 0.5.3 (01/11/2024) - "Default" style correction.
 0.5.4 (01/11/2024) - CompoundWidgets unit conversion correction (empty value vs. zero value).
+0.5.5 (02/12/2024) - Idle time event for LabelText widgets.
+0.5.6 (03/12/2024) - 'Inverse' style added to the widgets.
+0.5.7 (18/04/2025) - Duplicate event generation corrected for AutocompleteEntryList. Life time added to Tooltip.
+0.5.8 (23/04/2025) - Life time added to Tooltip does not run while the mouse is over the widget.

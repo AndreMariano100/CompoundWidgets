@@ -278,3 +278,60 @@ def retrieve_description(_dict, tab=0, list_break=False):
             final_text += '\n'
 
     return final_text
+
+
+# Conversion methods ---------------------------------------------------------------------------------------------------
+def convert_temperature(f_temperature=None, c_temperature=None):
+    """ Temperature conversion: °F <-> °C"""
+
+    if f_temperature is not None:
+        if isinstance(f_temperature, tuple):
+            f_temperature = f_temperature[0]
+        return round(5 * (f_temperature - 32) / 9, 3), '°C'
+
+    if c_temperature is not None:
+        if isinstance(c_temperature, tuple):
+            c_temperature = c_temperature[0]
+        return round(9 * c_temperature / 5 + 32, 3), '°F'
+
+
+def convert_stress(ksi_stress=None, mpa_stress=None):
+    """ Stress conversion:  ksi <-> MPa """
+
+    if ksi_stress is not None:
+        if isinstance(ksi_stress, tuple):
+            ksi_stress = ksi_stress[0]
+        return round(ksi_stress * 6.894757, 3), 'MPa'
+
+    if mpa_stress is not None:
+        if isinstance(mpa_stress, tuple):
+            mpa_stress = mpa_stress[0]
+        return round(mpa_stress / 6.894757, 3), 'ksi'
+
+
+def convert_pressure(psi_pressure=None, kpa_pressure=None):
+    """ Stress conversion: psi <-> kPa"""
+
+    if psi_pressure is not None:
+        if isinstance(psi_pressure, tuple):
+            psi_pressure = psi_pressure[0]
+        return round(psi_pressure * 6.894757, 3), 'kPa'
+
+    if kpa_pressure is not None:
+        if isinstance(kpa_pressure, tuple):
+            kpa_pressure = kpa_pressure[0]
+        return round(kpa_pressure / 6.894757, 3), 'psi'
+
+
+def convert_length(in_length=None, mm_length=None):
+    """ Length conversion: in <-> mm """
+
+    if in_length is not None:
+        if isinstance(in_length, tuple):
+            in_length = in_length[0]
+        return round(in_length * 25.4, 3), 'mm'
+
+    if mm_length is not None:
+        if isinstance(mm_length, tuple):
+            mm_length = mm_length[0]
+        return round(mm_length / 25.4, 3), 'in'

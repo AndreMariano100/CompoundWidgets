@@ -14,7 +14,9 @@ class CompoundButton(ttk.Button):
         # Style definition
         if True:
             self.style_list = (
-                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
+                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default',
+                'inverse-danger', 'inverse-warning', 'inverse-info', 'inverse-success', 'inverse-secondary',
+                'inverse-primary', 'inverse-light', 'inverse-dark', 'inverse-default', 'no style'
             )
             if style:
                 if style not in self.style_list:

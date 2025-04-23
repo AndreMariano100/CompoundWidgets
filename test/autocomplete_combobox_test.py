@@ -30,6 +30,7 @@ root.style = Style(theme='darkly')
 root.minsize(200, 100)
 root.rowconfigure(0, weight=1)
 root.columnconfigure(0, weight=1)
+root.columnconfigure(1, weight=1)
 
 full_list = ['John A', 'John B', 'John C', 'Paul A', 'Paul B', 'Paul C']
 
@@ -46,7 +47,7 @@ disable_button = ttk.Button(root, text='Disable/Enable', command=disable_widgets
 disable_button.grid(row=4, column=0, padx=10, pady=10)
 
 style_combobox = ttk.Combobox(root, values=['danger', 'warning', 'info', 'success', 'secondary',
-                                            'primary', 'light', 'dark'])
+                                            'primary', 'light', 'dark', 'default'])
 style_combobox.grid(row=5, column=0, padx=10, pady=10)
 style_combobox.bind('<<ComboboxSelected>>', change_style)
 

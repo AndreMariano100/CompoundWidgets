@@ -18,13 +18,26 @@ class LabelCompoundWidget(ttk.Frame):
     """
 
     def __init__(self, parent, label_text=None, label_anchor='e', label_width=None,
-                 label_justify=None, label_font=None, sided=True, **kwargs):
+                 label_justify=None, label_font=None, sided=True, style=None, **kwargs):
 
         # Parent class initialization
         super().__init__(parent, **kwargs)
         self.parent = parent
-        self.style = 'default'
         self.disabled = False
+
+        # Style definition
+        self.label_style_list = (
+            'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default',
+            'inverse-danger', 'inverse-warning', 'inverse-info', 'inverse-success', 'inverse-secondary',
+            'inverse-primary', 'inverse-light', 'inverse-dark', 'inverse-default'
+        )
+        if style:
+            if style not in self.label_style_list:
+                self.style = 'default'
+            else:
+                self.style = style
+        else:
+            self.style = 'default'
 
         # Frame configuration
         if True:
@@ -37,7 +50,7 @@ class LabelCompoundWidget(ttk.Frame):
 
         # Label configuration
         if True:
-            self.label = ttk.Label(self, text=label_text, anchor=label_anchor)
+            self.label = ttk.Label(self, text=label_text, anchor=label_anchor, style=self.style)
             if label_text:
                 self.label.grid(row=0, column=0, sticky='nsew', padx=2)
 
@@ -73,34 +86,24 @@ class LabelCompoundWidget(ttk.Frame):
             else:
                 self.rowconfigure(0, weight=1)
 
-    def set_style(self, style):
+    def set_style(self, style=None):
+
+        if style:
+            if style not in self.label_style_list:
+                self.style = 'default'
+            else:
+                self.style = style
         if self.disabled:
             return
 
-        label_style_list = (
-            'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
-        )
-        if style not in label_style_list:
-            return
-        self.style = style
-
         for widget in self.winfo_children():
-            if isinstance(widget, ttk.Button):
-                continue
-            if isinstance(widget, tk.Text):
-                color = self.parent.winfo_main.style.colors.get(self.style)
-                widget.configure(fg=color)
-            if isinstance(widget, ttk.Frame):
-                for widget_2 in widget.winfo_children():
-                    if isinstance(widget_2, ttk.Button):
-                        continue
-                    if isinstance(widget_2, tk.Text):
-                        color = self.parent.winfo_toplevel().style.colors.get(self.style)
-                        widget_2.configure(fg=color)
-                    else:
-                        widget_2.configure(bootstyle=self.style)
-            else:
-                widget.configure(bootstyle=self.style)
+            try:
+                widget.configure(bootstyle=style)
+            except:
+                try:
+                    widget.configure(bootstyle=style.split('-')[1])
+                except:
+                    widget.configure(bootstyle='default')
 
 
 class LabelCombo(LabelCompoundWidget):
@@ -125,10 +128,11 @@ class LabelCombo(LabelCompoundWidget):
     def __init__(self, parent, label_text=None, label_anchor='e', label_width=None,
                  label_justify=None, label_font=None, sided=True,
                  combo_value='', combo_list=('No values informed',),
-                 combo_width=None, combo_method=None, **kwargs):
+                 combo_width=None, combo_method=None, style=None, **kwargs):
 
         # Parent class initialization
-        super().__init__(parent, label_text, label_anchor, label_width, label_justify, label_font, sided, **kwargs)
+        super().__init__(parent, label_text, label_anchor, label_width, label_justify,
+                         label_font, sided, style, **kwargs)
 
         # Combobox configuration
         if True:
@@ -147,6 +151,8 @@ class LabelCombo(LabelCompoundWidget):
         # Bind method to the combobox
         if combo_method:
             self.combobox.bind('<<ComboboxSelected>>', combo_method, add='+')
+
+        self.set_style()
 
     def enable(self):
         self.disabled = False
@@ -204,10 +210,11 @@ class LabelEntry(LabelCompoundWidget):
     def __init__(self, parent, label_text=None, label_anchor='e', label_width=None,
                  label_justify=None, label_font=None, sided=True,
                  entry_value='', entry_numeric=False, entry_width=None, entry_max_char=None,
-                 entry_method=None, precision=2, trace_variable=False, **kwargs):
+                 entry_method=None, precision=2, trace_variable=False, style=None, **kwargs):
 
         # Parent class initialization
-        super().__init__(parent, label_text, label_anchor, label_width, label_justify, label_font, sided, **kwargs)
+        super().__init__(parent, label_text, label_anchor, label_width, label_justify,
+                         label_font, sided, style, **kwargs)
 
         self.entry_numeric = entry_numeric
         self.entry_max_chars = entry_max_char
@@ -260,6 +267,8 @@ class LabelEntry(LabelCompoundWidget):
 
             self.entry.bind("<FocusOut>", self._adjust_value, add='+')
             self.entry.bind("<Return>", self._adjust_value, add='+')
+
+        self.set_style()
 
     def _update_value(self, name, index, mode):
         """ Variable trace method. Calls the applicable method everytime the value changes """
@@ -377,10 +386,11 @@ class LabelText(LabelCompoundWidget):
     def __init__(self, parent, label_text=None, label_anchor='ne', label_width=None,
                  label_justify=None, label_font=None, sided=True,
                  text_value='', text_width=None, text_height=None,
-                 text_method=None, **kwargs):
+                 text_method=None, idle_event=False, idle_time=1000, style=None, **kwargs):
 
         # Parent class initialization
-        super().__init__(parent, label_text, label_anchor, label_width, label_justify, label_font, sided, **kwargs)
+        super().__init__(parent, label_text, label_anchor, label_width, label_justify,
+                         label_font, sided, style, **kwargs)
 
         # Local frame (text + scroll bar)
         if True:
@@ -398,14 +408,14 @@ class LabelText(LabelCompoundWidget):
             self.text = tk.Text(local_frame, wrap=tk.WORD, spacing1=2, padx=2, pady=2)
             self.text.grid(row=0, column=0, sticky='nsew')
             self.disabled_color = parent.winfo_toplevel().style.colors.secondary
-
-            self.set(text_value)
             if text_width:
                 self.text['width'] = text_width
             if text_height:
                 self.text['height'] = text_height
             if label_font:
                 self.text.config(font=label_font)
+
+            self.set(text_value)
 
         # Scroll bar for the text widget
         if True:
@@ -416,8 +426,35 @@ class LabelText(LabelCompoundWidget):
             y_scroll.bind('<MouseWheel>', self._on_mouse_wheel)
 
         # Bind method
-        if text_method:
-            self.text.bind("<FocusOut>", text_method, add='+')
+        if text_method and callable(text_method):
+            if text_method and callable(text_method):
+                self.text_method = text_method
+            else:
+                self.text_method = None
+            self.idle_event = idle_event
+            self.idle_time = idle_time
+            self.text.bind('<Any-KeyPress>', self.reset_timer, add='+')
+            # self.text.bind('<Any-ButtonPress>', self.reset_timer, add='+')
+            self.text.bind('<FocusOut>', self.text_method, add='+')
+            self.text.bind('<Return>', self.text_method, add='+')
+            self.timer = None
+            self.reset_timer()
+
+        self.set_style()
+
+    def user_is_inactive(self):
+        if self.text_method and self.idle_event:
+            if self.focus_get() != self.text:
+                return
+
+            self.text_method()
+            self.reset_timer()
+
+    def reset_timer(self, event=None):
+        if self.timer is not None:
+            self.after_cancel(self.timer)
+        # create new timer
+        self.timer = self.after(self.idle_time, self.user_is_inactive)
 
     def _on_mouse_wheel(self, event):
         self.text.yview_scroll(int(-1 * event.delta / 120), 'units')
@@ -478,10 +515,11 @@ class LabelSpinbox(LabelCompoundWidget):
                  label_justify=None, label_font=None, sided=True,
                  entry_value=None, entry_width=None, entry_method=None, entry_type='float',
                  spin_start=0, spin_end=10, spin_increment=1, spin_precision=2,
-                 trace_variable=False, **kwargs):
+                 trace_variable=False, style=None, **kwargs):
 
         # Parent class initialization
-        super().__init__(parent, label_text, label_anchor, label_width, label_justify, label_font, sided, **kwargs)
+        super().__init__(parent, label_text, label_anchor, label_width, label_justify,
+                         label_font, sided, style, **kwargs)
 
         # Spinbox atributes initialization
         self.start = spin_start
@@ -491,6 +529,11 @@ class LabelSpinbox(LabelCompoundWidget):
         self.type = entry_type
         self.initial_value = entry_value
         self.trace_variable = trace_variable
+        if self.increment < 1 / 10 ** self.precision:
+            print(f'current increment: {self.increment}')
+            print(f'current precision: {self.precision}. Smaller increment: {1 / 10 ** self.precision}')
+            print(f'increment adjusted')
+            self.increment = 1 / 10 ** self.precision
 
         # Spinbox configuration
         if True:
@@ -544,6 +587,8 @@ class LabelSpinbox(LabelCompoundWidget):
             self.spin.bind("<ButtonRelease-1>", self._spin_selected, add='+')
             self._increment_lock = False
             self._decrement_lock = False
+
+        self.set_style()
 
     def _update_value(self, name, index, mode):
         current = self.variable.get()
@@ -605,8 +650,12 @@ class LabelSpinbox(LabelCompoundWidget):
         except ValueError:
             return "break"
 
+        old_value_adjusted = round(int(old_value / self.increment) * self.increment, self.precision)
+
         if direction == 'up':
-            new_value = old_value + self.increment
+            new_value = round(old_value_adjusted + self.increment, self.precision)
+            if new_value == old_value:
+                new_value += self.increment
             final_value = min(self.end, new_value)
             if self.type == 'float':
                 self.set(float(final_value))
@@ -614,7 +663,11 @@ class LabelSpinbox(LabelCompoundWidget):
                 self.set(int(final_value))
 
         else:
-            new_value = old_value - self.increment
+
+            if old_value_adjusted < old_value:
+                new_value = old_value_adjusted
+            else:
+                new_value = round(old_value_adjusted - self.increment, self.precision)
             final_value = max(self.start, new_value)
             if self.type == 'float':
                 self.set(float(final_value))
@@ -980,10 +1033,11 @@ class LabelEntryUnit(LabelCompoundWidget):
                  label_justify=None, label_font=None, sided=True,
                  entry_value=None, entry_width=None, entry_method=None,
                  combobox_unit=None, combobox_unit_width=8, combobox_unit_conversion=False,
-                 precision=2, trace_variable=False, **kwargs):
+                 precision=2, trace_variable=False, style=None, **kwargs):
 
         # Parent class initialization
-        super().__init__(parent, label_text, label_anchor, label_width, label_justify, label_font, sided, **kwargs)
+        super().__init__(parent, label_text, label_anchor, label_width, label_justify,
+                         label_font, sided, style, **kwargs)
 
         # Entry validation for numbers
         if precision == 0:
@@ -1063,6 +1117,8 @@ class LabelEntryUnit(LabelCompoundWidget):
                 self.unit_combo.bind("<<ComboboxSelected>>", self.entry_method, add='+')
             else:
                 self.unit_combo.bind("<<ComboboxSelected>>", self._convert_to_selected_unit, add='+')
+
+        self.set_style()
 
     def _update_value(self, name, index, mode):
         """ Variable trace method. Calls the applicable method everytime the value changes """
@@ -1499,10 +1555,11 @@ class LabelEntryButton(LabelCompoundWidget):
                  entry_value='', entry_numeric=False, entry_width=None, entry_max_char=None,
                  entry_method=None, precision=2, trace_variable=False,
                  button_text='', button_width=None, button_method=None,
-                 button_style=None, **kwargs):
+                 button_style=None, style=None, **kwargs):
 
         # Parent class initialization
-        super().__init__(parent, label_text, label_anchor, label_width, label_justify, label_font, sided, **kwargs)
+        super().__init__(parent, label_text, label_anchor, label_width, label_justify,
+                         label_font, sided, style, **kwargs)
 
         self.entry_numeric = entry_numeric
         self.entry_max_chars = entry_max_char
@@ -1581,6 +1638,8 @@ class LabelEntryButton(LabelCompoundWidget):
                 self.cb_name = self.variable.trace_add("write", self._update_value)
             self.entry.bind("<FocusOut>", self._adjust_value, add='+')
             self.entry.bind("<Return>", self._adjust_value, add='+')
+
+        self.set_style()
 
     def _update_value(self, name, index, mode):
         """ Variable trace method. Calls the applicable method everytime the value changes """
@@ -1716,10 +1775,12 @@ class LabelComboButton(LabelCompoundWidget):
     def __init__(self, parent, label_text=None, label_anchor='e', label_width=None,
                  label_justify=None, label_font=None, sided=True,
                  combo_value='', combo_list=('No values informed',), combo_width=None, combo_method=None,
-                 button_text='', button_width=None, button_method=None, button_style=None, **kwargs):
+                 button_text='', button_width=None, button_method=None, button_style=None,
+                 style=None, **kwargs):
 
         # Parent class initialization
-        super().__init__(parent, label_text, label_anchor, label_width, label_justify, label_font, sided, **kwargs)
+        super().__init__(parent, label_text, label_anchor, label_width, label_justify,
+                         label_font, sided, style, **kwargs)
 
         if not button_style:
             self.button_style = 'default'
@@ -1764,6 +1825,8 @@ class LabelComboButton(LabelCompoundWidget):
             self.combobox.bind('<<ComboboxSelected>>', combo_method, add='+')
         if button_method and callable(button_method):
             self.button.configure(command=button_method)
+
+        self.set_style()
 
     def enable(self):
         self.disabled = False

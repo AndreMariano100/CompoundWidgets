@@ -12,6 +12,9 @@ class CheckLedButton(ttk.Frame):
         label_method: method to bind to the label
         style: bootstyle (color style)
         font: font for the label
+        active_led_color: color for the selected state
+        inactive_led_color: color for the unselected state
+        relief: boolean, apply or not the relief
     User Methods:
         enable method(): enables the widgets (state='normal')
         disable method(): disables the widgets (state='disabled')
@@ -20,7 +23,8 @@ class CheckLedButton(ttk.Frame):
     """
 
     def __init__(self, parent, label_text='Label', label_width=10, label_method=None,
-                 style='default', font=None):
+                 style='default', font=None,
+                 active_led_color=None, inactive_led_color=None, relief=True):
 
         # Parent class initialization
         super().__init__(parent)
@@ -42,12 +46,19 @@ class CheckLedButton(ttk.Frame):
                 self.disabled_led_color = all_colors.light
 
             label_style_list = (
-                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
+                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default',
+                'inverse-danger', 'inverse-warning', 'inverse-info', 'inverse-success', 'inverse-secondary',
+                'inverse-primary', 'inverse-light', 'inverse-dark', 'inverse-default'
             )
             if style not in label_style_list:
                 self.style = 'default'
             else:
                 self.style = style
+
+            if active_led_color:
+                self.active_led_color = active_led_color
+            if inactive_led_color:
+                self.inactive_led_color = inactive_led_color
 
         # Frame configuration
         if True:
@@ -57,10 +68,12 @@ class CheckLedButton(ttk.Frame):
 
         # Canvas configuration
         if True:
-            self.color_canvas = tk.Canvas(self, bd=0, width=10, height=0, highlightthickness=0,
-                                          relief='raised', borderwidth=1)
+            self.relief = relief
+            self.color_canvas = tk.Canvas(self, bd=0, width=10, height=0, highlightthickness=0)
             self.color_canvas.grid(row=0, column=0, sticky='nsew')
             self.color_canvas.configure(background=self.inactive_led_color)
+            if self.relief:
+                self.color_canvas.config(relief='raised', borderwidth=1)
 
         # Label configuration
         if True:
@@ -98,14 +111,18 @@ class CheckLedButton(ttk.Frame):
 
         if str(self.label.cget('state')) == 'disabled':
             return
-        self.color_canvas.config(bg=self.active_led_color, relief='sunken')
+        self.color_canvas.config(bg=self.active_led_color)
+        if self.relief:
+            self.color_canvas.config(relief='sunken')
 
     def deselect(self, event=None):
         """ Canvas (led) color control """
 
         if str(self.label.cget('state')) == 'disabled':
             return
-        self.color_canvas.config(bg=self.inactive_led_color, relief='raised')
+        self.color_canvas.config(bg=self.inactive_led_color)
+        if self.relief:
+            self.color_canvas.config(relief='raised')
 
     def enable(self):
         """ Enables the widget """
@@ -117,9 +134,11 @@ class CheckLedButton(ttk.Frame):
     def disable(self):
         """ Disables the widget """
 
-        self.color_canvas.config(bg=self.disabled_led_color, relief='raised')
+        self.color_canvas.config(bg=self.disabled_led_color)
         self.label.config(state='disabled')
         self.label.config(bootstyle='secondary')
+        if self.relief:
+            self.color_canvas.config(relief='raised')
 
     def is_selected(self):
         if self.color_canvas.cget('bg') == self.active_led_color:
@@ -143,6 +162,9 @@ class CheckSwitchLedButton(ttk.Frame):
         label_method: method to bind to the label
         style: bootstyle for the label (color style)
         font: font for the label
+        active_led_color: color for the selected state
+        inactive_led_color: color for the unselected state
+        relief: boolean, apply or not the relief
     User Methods:
         enable method(): enables the widgets (state='normal')
         disable method(): disables the widgets (state='disabled')
@@ -151,7 +173,8 @@ class CheckSwitchLedButton(ttk.Frame):
     """
 
     def __init__(self, parent, label_text='Label', label_width=10, label_method=None,
-                 style='default', font=None):
+                 style='default', font=None,
+                 active_led_color=None, inactive_led_color=None, relief=True):
 
         # Parent class initialization
         super().__init__(parent)
@@ -173,12 +196,19 @@ class CheckSwitchLedButton(ttk.Frame):
                 self.disabled_led_color = all_colors.light
 
             label_style_list = (
-                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
+                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default',
+                'inverse-danger', 'inverse-warning', 'inverse-info', 'inverse-success', 'inverse-secondary',
+                'inverse-primary', 'inverse-light', 'inverse-dark', 'inverse-default'
             )
             if style not in label_style_list:
                 self.style = 'default'
             else:
                 self.style = style
+
+            if active_led_color:
+                self.active_led_color = active_led_color
+            if inactive_led_color:
+                self.inactive_led_color = inactive_led_color
 
         # Frame configuration
         if True:
@@ -189,15 +219,18 @@ class CheckSwitchLedButton(ttk.Frame):
 
         # Canvas configuration
         if True:
-            self.color_canvas_1 = tk.Canvas(self, bd=0, width=10, height=0, highlightthickness=0,
-                                            relief='raised', borderwidth=1)
+            self.relief = relief
+            self.color_canvas_1 = tk.Canvas(self, bd=0, width=10, height=0, highlightthickness=0)
             self.color_canvas_1.grid(row=0, column=0, sticky='nsew')
             self.color_canvas_1.configure(background=self.active_led_color)
 
-            self.color_canvas_2 = tk.Canvas(self, bd=0, width=10, height=0, highlightthickness=0,
-                                            relief='sunken', borderwidth=1)
+            self.color_canvas_2 = tk.Canvas(self, bd=0, width=10, height=0, highlightthickness=0)
             self.color_canvas_2.grid(row=0, column=1, sticky='nsew')
             self.color_canvas_2.configure(background=self.bg_led_color)
+
+            if self.relief:
+                self.color_canvas_1.config(relief='raised', borderwidth=1)
+                self.color_canvas_2.config(relief='sunken', borderwidth=1)
 
         # Label configuration
         if True:
@@ -236,16 +269,24 @@ class CheckSwitchLedButton(ttk.Frame):
 
         if str(self.label.cget('state')) == 'disabled':
             return
-        self.color_canvas_1.config(bg=self.active_led_color, relief='raised')
-        self.color_canvas_2.config(bg=self.bg_led_color, relief='sunken')
+        self.color_canvas_1.config(bg=self.active_led_color)
+        self.color_canvas_2.config(bg=self.bg_led_color)
+
+        if self.relief:
+            self.color_canvas_1.config(relief='raised')
+            self.color_canvas_2.config(relief='sunken')
 
     def deselect(self):
         """ Canvas (led) color control """
 
         if str(self.label.cget('state')) == 'disabled':
             return
-        self.color_canvas_1.config(bg=self.bg_led_color, relief='sunken')
-        self.color_canvas_2.config(bg=self.inactive_led_color, relief='raised')
+        self.color_canvas_1.config(bg=self.bg_led_color)
+        self.color_canvas_2.config(bg=self.inactive_led_color)
+
+        if self.relief:
+            self.color_canvas_1.config(relief='sunken')
+            self.color_canvas_2.config(relief='raised')
 
     def enable(self):
         """ Enables the widget """
@@ -257,10 +298,13 @@ class CheckSwitchLedButton(ttk.Frame):
     def disable(self):
         """ Disables the widget """
 
-        self.color_canvas_1.config(bg=self.disabled_led_color, relief='raised')
-        self.color_canvas_2.config(bg=self.bg_led_color, relief='sunken')
+        self.color_canvas_1.config(bg=self.disabled_led_color)
+        self.color_canvas_2.config(bg=self.bg_led_color)
         self.label.config(state='disabled')
         self.label.config(bootstyle='secondary')
+        if self.relief:
+            self.color_canvas_1.config(relief='raised')
+            self.color_canvas_2.config(relief='sunken')
 
     def is_selected(self):
         if self.color_canvas_1.cget('bg') == self.active_led_color:
@@ -285,8 +329,9 @@ class RadioLedButton(ttk.Frame):
         style: bootstyle (color style)
         control_variable: variable that will group the buttons for "radio button" like operation
         font: label font
-        led_color: color for the active state
-        bg color: color for the canvas background
+        active_led_color: color for the selected state
+        inactive_led_color: color for the unselected state
+        relief: boolean, apply or not the relief
     User Methods:
         enable method(): enables the widgets (state='normal')
         disable method(): disables the widgets (state='disabled')
@@ -297,7 +342,8 @@ class RadioLedButton(ttk.Frame):
     control_variable_dict = {}
 
     def __init__(self, parent, label_text='Label', label_width=10, label_method=None,
-                 style='default', control_variable=None, font=None, switch_type=False):
+                 style='default', control_variable=None, font=None, switch_type=False,
+                 active_led_color=None, inactive_led_color=None, relief=True):
 
         # Parent class initialization
         super().__init__(parent)
@@ -325,7 +371,9 @@ class RadioLedButton(ttk.Frame):
                 self.disabled_led_color = all_colors.light
 
             label_style_list = (
-                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
+                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default',
+                'inverse-danger', 'inverse-warning', 'inverse-info', 'inverse-success', 'inverse-secondary',
+                'inverse-primary', 'inverse-light', 'inverse-dark', 'inverse-default'
             )
             if style not in label_style_list:
                 self.style = 'default'
@@ -340,11 +388,15 @@ class RadioLedButton(ttk.Frame):
         # Buttons configuration
         if switch_type:
             self.b = CheckSwitchLedButton(self, label_text=label_text, label_width=label_width,
-                                          label_method=self._check_hover, style=self.style, font=font)
+                                          label_method=self._check_hover, style=self.style, font=font,
+                                          active_led_color=active_led_color, inactive_led_color=inactive_led_color,
+                                          relief=relief)
             self.b.deselect()
         else:
             self.b = CheckLedButton(self, label_text=label_text, label_width=label_width,
-                                    label_method=self._check_hover, style=self.style, font=font)
+                                    label_method=self._check_hover, style=self.style, font=font,
+                                    active_led_color=active_led_color, inactive_led_color=inactive_led_color,
+                                    relief=relief)
         self.b.grid(row=0, column=0, sticky='nsew')
 
         # Bind methods

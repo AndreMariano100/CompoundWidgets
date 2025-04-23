@@ -40,8 +40,9 @@ def set_empty_entries():
 
 
 def set_style():
-    label_style_list = ('danger', 'warning', 'info', 'success',
-                        'secondary', 'primary', 'light', 'dark', 'no style')
+    label_style_list = ('danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default',
+            'inverse-danger', 'inverse-warning', 'inverse-info', 'inverse-success', 'inverse-secondary',
+            'inverse-primary', 'inverse-light', 'inverse-dark', 'inverse-default', 'no style')
     new_styles = random.sample(label_style_list, len(label_entry_list))
     for i, w in enumerate(label_entry_list):
         w.set_style(new_styles[i])

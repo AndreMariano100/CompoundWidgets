@@ -231,14 +231,17 @@ class ProgressBar(tk.Toplevel):
 class Tooltip:
     """ It creates a tooltip window for a given widget as the mouse goes over it. """
 
-    def __init__(self, widget, text='widget info', bg='#FFFF8B', fg='black', wait_time=500, wrap_length=250):
+    def __init__(self, widget, text='widget info', bg='#FFFF8B', fg='black',
+                 wait_time=500, wrap_length=250, hide_time=5000):
 
         self.style = widget.winfo_toplevel().style
         self.style.configure('custom.TLabel', background=bg, foreground=fg)
         self.widget = widget
+        self.root = widget.winfo_toplevel()
         self.text = text
         self.wait_time = wait_time
         self.wrap_length = wrap_length
+        self.hide_time = hide_time
 
         self.id = None
         self.top_level = None
@@ -292,7 +295,21 @@ class Tooltip:
                           wraplength=self.wrap_length, style='custom.TLabel')
         label.grid(row=0, column=0, sticky='nsew', padx=1, pady=1)
 
+        self.top_level.after(self.hide_time, func=self.hide)
+
+    def get_widget_under_cursor(self):
+        """Gets the widget under the current mouse cursor."""
+
+        x = self.root.winfo_pointerx()
+        y = self.root.winfo_pointery()
+        widget = self.root.winfo_containing(x, y)
+        return widget
+
     def hide(self):
+        if self.get_widget_under_cursor() == self.widget:
+            self.top_level.after(self.hide_time, func=self.hide)
+            return
+
         if self.top_level:
             self.top_level.destroy()
         self.top_level = None

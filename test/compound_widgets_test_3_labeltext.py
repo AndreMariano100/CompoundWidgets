@@ -49,8 +49,7 @@ frame.columnconfigure(0, weight=1)
 
 local_text_list = (
     """Now is the winter of our discontent Made glorious summer by this sun of York; And all the clouds that lour'd upon our house In the deep bosom of the ocean buried. Now are our brows bound with victorious wreaths; Our bruised arms hung up for monuments; Our stern alarums changed to merry meetings, Our dreadful marches to delightful measures.""",
-    """Grim-visaged war hath smooth'd his wrinkled front; And now, instead of mounting barded steeds To fright the souls of fearful adversaries, He capers nimbly in a lady's chamber To the lascivious pleasing of a lute. But I, that am not shaped for sportive tricks, Nor made to court an amorous looking-glass; I, that am rudely stamp'd, and want love's majesty To strut before a wanton ambling nymph; I, that am curtail'd of this fair proportion."""
-)
+    """Grim-visaged war hath smooth'd his wrinkled front; And now, instead of mounting barded steeds To fright the souls of fearful adversaries, He capers nimbly in a lady's chamber To the lascivious pleasing of a lute. But I, that am not shaped for sportive tricks, Nor made to court an amorous looking-glass; I, that am rudely stamp'd, and want love's majesty To strut before a wanton ambling nymph; I, that am curtail'd of this fair proportion.""")
 label_text_list = []
 for i, item in enumerate(local_text_list):
     if i:
@@ -60,7 +59,8 @@ for i, item in enumerate(local_text_list):
     else:
         w = cw.LabelText(frame, label_text=f'Label Text {i + 1}', label_width=10, label_anchor='w',
                          text_height=5, text_width=60, text_method=get_all_label_text, text_value=item,
-                         sided=False, label_font=('Verdana', '12'))
+                         sided=False, label_font=('Verdana', '12'),
+                         idle_event=True)
     w.grid(row=i, column=0, sticky='nsew', pady=2, padx=2)
     label_text_list.append(w)
 

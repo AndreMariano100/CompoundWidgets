@@ -47,7 +47,9 @@ class AutocompleteEntryList(ttk.Frame):
 
         # Style definition
         self.label_style_list = (
-            'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
+            'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default',
+            'inverse-danger', 'inverse-warning', 'inverse-info', 'inverse-success', 'inverse-secondary',
+            'inverse-primary', 'inverse-light', 'inverse-dark', 'inverse-default'
         )
         if style:
             if style not in self.label_style_list:
@@ -117,10 +119,7 @@ class AutocompleteEntryList(ttk.Frame):
             self.entry_var.trace('w', self._entry_changed)
             self.entry_var.trace('u', self._entry_changed)
 
-            self.lb.bind("<Right>", self._listbox_selection)
-            self.lb.bind('<Return>', self._listbox_selection)
             self.lb.bind("<Double-Button-1>", self._listbox_selection)
-            self.lb.bind("<<ListboxSelected>>", self._listbox_selection)
 
             self.entry.bind("<FocusOut>", self.call_entry_method, add='+')
             self.entry.bind("<Return>", self.call_entry_method, add='+')
@@ -287,7 +286,9 @@ class AutocompleteCombobox(ttk.Frame):
 
         # Style definition
         self.label_style_list = (
-            'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
+            'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default',
+            'inverse-danger', 'inverse-warning', 'inverse-info', 'inverse-success', 'inverse-secondary',
+            'inverse-primary', 'inverse-light', 'inverse-dark', 'inverse-default'
         )
         if style:
             if style not in self.label_style_list:
@@ -426,7 +427,9 @@ class AutocompleteLabelCombo(LabelCompoundWidget):
 
         # Style definition
         self.label_style_list = (
-            'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
+            'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default',
+            'inverse-danger', 'inverse-warning', 'inverse-info', 'inverse-success', 'inverse-secondary',
+            'inverse-primary', 'inverse-light', 'inverse-dark', 'inverse-default'
         )
         if style:
             if style not in self.label_style_list:

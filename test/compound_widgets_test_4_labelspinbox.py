@@ -58,6 +58,7 @@ local_spin_list = (
     ('Spin 2 - int -10~10', None, 'int', -10, 10, 2, 0),
     ('Spin 3 - float 0~10', 5, 'float', 0, 10, 0.02, 2),
     ('Spin 4 - float -10~10', 0, 'float', -10, 10, 0.5, 1),
+    ('Spin 5 - float 0 - 2', 0, 'float', 0, 2, 0.1, 2),
 )
 label_spin_list = []
 for i, item in enumerate(local_spin_list):
