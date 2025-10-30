@@ -213,7 +213,7 @@ class AutocompleteEntryList(ttk.Frame):
 
     def set_entry(self, new_value):
         """ Sets a value to the entry widget """
-        if str(self.entry.cget('state')) == 'disabled':
+        if self.is_disabled:
             return
         self.entry_var.set(new_value)
 
@@ -370,7 +370,7 @@ class AutocompleteCombobox(ttk.Frame):
 
     def set(self, new_value):
         """ Sets a value to the entry widget """
-        if str(self.cget('state')) == 'disabled':
+        if self.is_disabled:
             return
         if new_value in self.combo_list:
             self.variable.set(new_value)
@@ -515,7 +515,7 @@ class AutocompleteLabelCombo(LabelCompoundWidget):
             return ''
 
     def set(self, value):
-        if str(self.combobox.cget('state')) == 'disabled':
+        if self.is_disabled:
             return
         if value in self.combo_list:
             self.variable.set(value)

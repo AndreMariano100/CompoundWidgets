@@ -126,6 +126,47 @@ def isfloat(number):
         return False
 
 
+def is_list_of_floats(list_of_values):
+    """ Fast check whether all values on a list are float """
+
+    for value in list_of_values:
+        if not isfloat(value):
+            return False
+    return True
+
+
+def interpolate(x_value, x0, x1, y0, y1):
+    """
+    Obtains the y value for an interpolation.
+    Input:
+        x_value - X value of interest
+        x0 - initial value ox X
+        x1 - final value of X
+        y0 - initial value of Y
+        y1 - final value of Y
+    Returns:
+        Y value of interest
+    """
+
+    if not is_list_of_floats([x_value, x0, x1, y0, y1]):
+        return None
+
+    x_value = float(x_value)
+    x0 = float(x0)
+    x1 = float(x1)
+    y0 = float(y0)
+    y1 = float(y1)
+
+    if x0 <= x_value <= x1:
+        try:
+            y_value = y0 + (x_value - x0) * (y1 - y0) / (x1 - x0)
+        except ZeroDivisionError:
+            return y0
+        return y_value
+
+    return None
+
+
 def interpolate_x(x_value, x_series, y_series):
     """
     Obtains the y value for an interpolation.

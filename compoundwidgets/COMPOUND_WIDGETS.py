@@ -46,6 +46,7 @@ class LabelCompoundWidget(ttk.Frame):
             self.columnconfigure(0, weight=1)
 
             if not self.sided:
+                self.rowconfigure(0, weight=0)
                 self.rowconfigure(1, weight=1)
 
         # Label configuration

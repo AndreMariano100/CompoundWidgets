@@ -16,7 +16,7 @@ class CollapsableFrame(ttk.Frame):
 
     def __init__(self, parent, title='Frame Title', title_font=('OpenSans', 12),
                  open_start=True, style=None, disabled=False, expand_method=None,
-                 **kwargs):
+                 collapse_method=None, **kwargs):
 
         # Style definition
         if True:
@@ -73,6 +73,18 @@ class CollapsableFrame(ttk.Frame):
                 # overwrite content frame methods from container frame
                 setattr(self, method, getattr(self.container, method))
 
+        # Expand method
+        if expand_method and callable(expand_method):
+            self.expand_method = expand_method
+        else:
+            self.expand_method = None
+
+        # Collapse method
+        if collapse_method and callable(collapse_method):
+            self.collapse_method = collapse_method
+        else:
+            self.collapse_method = None
+
         # Collapsed start adjust
         if not open_start:
             self.collapse_frame()
@@ -93,12 +105,6 @@ class CollapsableFrame(ttk.Frame):
         self.bind("<<MapChild>>", self._update, add="+")
         self.bind("<Configure>", self._update, add="+")
 
-        # Expand method
-        if expand_method and callable(expand_method):
-            self.expand_method = expand_method
-        else:
-            self.expand_method = None
-
     def _update(self, event=None):
         self.update_idletasks()
 
@@ -117,6 +123,8 @@ class CollapsableFrame(ttk.Frame):
         self.rowconfigure(1, weight=0)
         self.content_grid_remove()
         self.parent.event_generate("<Configure>")
+        if self.collapse_method:
+            self.collapse_method(event)
 
     def expand_frame(self, event=None):
         if not self.disabled:
@@ -333,27 +341,33 @@ class ScrollableFrame(ttk.Frame):
         bind_mouse_wheel: select whether to not bind mouse wheel events
     """
 
-    def __init__(self, parent, style=None, bind_mouse_wheel=True, **kwargs):
+    def __init__(self, parent, style=None, bind_mouse_wheel=True, border_style=None, **kwargs):
 
         # Style definition
-        if True:
-            self.label_style_list = (
-                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default',
-                'inverse-danger', 'inverse-warning', 'inverse-info', 'inverse-success', 'inverse-secondary',
-                'inverse-primary', 'inverse-light', 'inverse-dark', 'inverse-default', 'no style'
-            )
-            if style:
-                if style not in self.label_style_list:
-                    self.style = 'default'
-                else:
-                    self.style = style
-            else:
+        self.label_style_list = (
+            'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default',
+            'inverse-danger', 'inverse-warning', 'inverse-info', 'inverse-success', 'inverse-secondary',
+            'inverse-primary', 'inverse-light', 'inverse-dark', 'inverse-default', 'no style'
+        )
+        if style:
+            if style not in self.label_style_list:
                 self.style = 'default'
+            else:
+                self.style = style
+        else:
+            self.style = 'default'
+
+        if border_style and border_style not in self.label_style_list:
+            self.border_style = None
+        else:
+            self.border_style = border_style
 
         # Main container
         self.container = ttk.Frame(parent)
         self.container.rowconfigure(0, weight=1)
         self.container.columnconfigure(0, weight=1)
+        if self.border_style:
+            self.container.configure(bootstyle=self.border_style, padding=1)
 
         # Canvas
         self.canvas = tk.Canvas(self.container, borderwidth=0, highlightthickness=0)
@@ -382,9 +396,8 @@ class ScrollableFrame(ttk.Frame):
         self.canvas.configure(yscrollcommand=self.v_scroll.set, xscrollcommand=self.h_scroll.set)
 
         # 'self' frame, that will receive all widgets
-        if True:
-            super().__init__(self.bottom_frame, bootstyle=self.style, **kwargs)
-            self.grid(row=0, column=0, sticky='nsew')
+        super().__init__(self.bottom_frame, bootstyle=self.style, **kwargs)
+        self.grid(row=0, column=0, sticky='nsew')
 
         # delegate content geometry methods from container frame
         _methods = vars(tk.Grid).keys()
@@ -413,12 +426,11 @@ class ScrollableFrame(ttk.Frame):
             self.bind("<Leave>", self._on_leave, "+")
 
         # Configure bindings
-        if True:
-            self.container.bind("<Map>", self._update, "+")
-            self.container.bind("<Configure>", self._update, "+")
-            self.container.bind("<<MapChild>>", self._update, "+")
-            self.bind("<<MapChild>>", self._update, "+")
-            self.bind("<Configure>", self._update, "+")
+        self.container.bind("<Map>", self._update, "+")
+        self.container.bind("<Configure>", self._update, "+")
+        self.container.bind("<<MapChild>>", self._update, "+")
+        self.bind("<<MapChild>>", self._update, "+")
+        self.bind("<Configure>", self._update, "+")
 
     def _on_enter(self, event):
         """Callback for when the mouse enters the widget."""
@@ -509,44 +521,41 @@ class BorderFrame(ttk.Frame):
     def __init__(self, parent, border_width=1, border_style=None, frame_style=None, **kwargs):
 
         # Style definition
-        if True:
-            self.label_style_list = (
-                'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default',
-                'inverse-danger', 'inverse-warning', 'inverse-info', 'inverse-success', 'inverse-secondary',
-                'inverse-primary', 'inverse-light', 'inverse-dark', 'inverse-default', 'no style'
-            )
-            if border_style not in self.label_style_list:
-                self.border_style = 'secondary'
-            else:
-                self.border_style = border_style
+        self.label_style_list = (
+            'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default',
+            'inverse-danger', 'inverse-warning', 'inverse-info', 'inverse-success', 'inverse-secondary',
+            'inverse-primary', 'inverse-light', 'inverse-dark', 'inverse-default', 'no style'
+        )
+        if border_style not in self.label_style_list:
+            self.border_style = 'secondary'
+        else:
+            self.border_style = border_style
 
-            if frame_style not in self.label_style_list:
-                self.frame_style = 'TFrame'
-            else:
-                self.frame_style = frame_style
+        if frame_style not in self.label_style_list:
+            self.frame_style = 'TFrame'
+        else:
+            self.frame_style = frame_style
 
-        # Main container
-        if True:
-            self.container = ttk.Frame(parent, bootstyle=self.border_style)
-            self.container.rowconfigure(0, weight=1)
-            self.container.columnconfigure(0, weight=1)
+        # Main container - border style color
+        self.container = ttk.Frame(parent, bootstyle=self.border_style)
+        self.container.rowconfigure(0, weight=1)
+        self.container.columnconfigure(0, weight=1)
 
         # Self initialization
-        if True:
-            super().__init__(self.container, bootstyle=self.frame_style, **kwargs)
+        super().__init__(self.container, bootstyle=self.frame_style, **kwargs)
 
-            if isinstance(border_width, tuple) or isinstance(border_width, list):
-                if len(border_width) == 4:
-                    pad_x = border_width[0:2]
-                    pad_y = border_width[2:4]
-                else:
-                    pad_x = border_width[0]
-                    pad_y = border_width[0]
+        if isinstance(border_width, tuple) or isinstance(border_width, list):
+            if len(border_width) == 4:
+                pad_x = border_width[0:2]
+                pad_y = border_width[2:4]
             else:
-                pad_x = border_width
-                pad_y = border_width
+                pad_x = border_width[0]
+                pad_y = border_width[0]
+        else:
+            pad_x = border_width
+            pad_y = border_width
 
-            self.grid(row=0, column=0, sticky='nsew', padx=pad_x, pady=pad_y)
+        self.grid(row=0, column=0, sticky='nsew', padx=pad_x, pady=pad_y)
 
         # Delegate content geometry methods from container frame
         _methods = vars(tk.Grid).keys()
@@ -558,7 +567,7 @@ class BorderFrame(ttk.Frame):
                 setattr(self, method, getattr(self.container, method))
 
     def set_border_style(self, bootstyle):
-        """ Sets a new style to the widgets """
+        """ Sets a new style to the container - border style """
 
         if bootstyle not in self.label_style_list:
             return
@@ -566,9 +575,98 @@ class BorderFrame(ttk.Frame):
         self.container.configure(bootstyle=self.border_style)
 
     def set_frame_style(self, bootstyle):
-        """ Sets a new style to the widgets """
+        """ Sets a new style to the main frame """
 
         if bootstyle not in self.label_style_list:
             return
         self.frame_style = bootstyle
         self.configure(bootstyle=self.frame_style)
+
+
+class LabelFrame(ttk.Frame):
+    """
+    Creates a frame with a label and a continuous border all around it.
+    Parameters:
+        label_text: label for the frame
+        parent: container for the frame
+        border_width: width of the border (padding)
+        border_style: color of the border (bootstyle)
+        frame_style: main frame style (bootstyle)
+    """
+
+    def __init__(self, parent, label_text=None, border_width=1, border_style=None, frame_style=None, **kwargs):
+
+        # Style definition
+        self.label_style_list = (
+            'danger', 'warning', 'info', 'success', 'secondary', 'primary', 'light', 'dark', 'default'
+        )
+        if border_style not in self.label_style_list:
+            self.border_style = 'secondary'
+        else:
+            self.border_style = border_style
+
+        if frame_style not in self.label_style_list:
+            self.label_style = 'TLabel'
+            self.frame_style = 'TFrame'
+        else:
+            self.label_style = f'{frame_style}.Inverse.TLabel'
+            self.frame_style = frame_style
+
+        # Main container - border style color
+        self.container = ttk.Frame(parent, bootstyle=self.border_style)
+        self.container.rowconfigure(1, weight=0)
+        self.container.columnconfigure(0, weight=1)
+
+        # Intermediate frame, creates the border, holds the label and the "self" frame
+        if isinstance(border_width, tuple) or isinstance(border_width, list):
+            if len(border_width) == 4:
+                pad_x = border_width[0:2]
+                pad_y = border_width[2:4]
+            else:
+                pad_x = border_width[0]
+                pad_y = border_width[0]
+        else:
+            pad_x = border_width
+            pad_y = border_width
+
+        frame = ttk.Frame(self.container, bootstyle=self.frame_style)
+        frame.grid(row=0, column=0, sticky='nsew', padx=pad_x, pady=pad_y)
+        frame.rowconfigure(0, weight=0)
+        frame.rowconfigure(1, weight=1)
+        frame.columnconfigure(0, weight=1)
+
+        # Label
+        if label_text:
+            self.title_label = ttk.Label(frame, text=label_text, bootstyle=self.label_style)
+            self.title_label.grid(row=0, column=0, sticky='nsew')
+
+        # Self initialization
+        super().__init__(frame, bootstyle=self.frame_style, **kwargs)
+        self.grid(row=1, column=0, sticky='nsew')
+
+        # Delegate content geometry methods from container frame
+        _methods = vars(tk.Grid).keys()
+        for method in _methods:
+            if "grid" in method:
+                # prefix content frame methods with 'content_'
+                setattr(self, f"content_{method}", getattr(self, method))
+                # overwrite content frame methods from container frame
+                setattr(self, method, getattr(self.container, method))
+
+    def set_border_style(self, bootstyle):
+        """ Sets a new style to the container - border style """
+
+        if bootstyle not in self.label_style_list:
+            return
+        self.border_style = bootstyle
+        self.container.configure(bootstyle=self.border_style)
+
+    def set_frame_style(self, bootstyle):
+        """ Sets a new style to the main frame """
+
+        if bootstyle not in self.label_style_list:
+            return
+        self.frame_style = bootstyle
+        self.label_style = f'{bootstyle}.Inverse.TLabel'
+        self.configure(bootstyle=self.frame_style)
+        self.title_label.configure(bootstyle=self.label_style)

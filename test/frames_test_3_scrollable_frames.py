@@ -23,7 +23,7 @@ root.columnconfigure(0, weight=1)
 root.rowconfigure(0, weight=1)
 
 # Create frame instance
-frame = cw.ScrollableFrame(root)
+frame = cw.ScrollableFrame(root, border_style='primary')
 frame.grid(row=0, column=0, sticky='nsew', padx=10, pady=10)
 
 # To add widgets to the frame, they shall be children of its 'widgets_frame' as follows
