@@ -108,3 +108,4 @@ Change Log
 0.5.9 (17/08/2025) - Collapse method added to the CollapsableFrames.
 0.5.10 (17/08/2025) - Collapse method added to the CollapsableFrames.
 0.5.11 (30/10/2025) - LabelFrame added.
+0.5.12 (08/11/2025) - Adjustments in LabelFrame.

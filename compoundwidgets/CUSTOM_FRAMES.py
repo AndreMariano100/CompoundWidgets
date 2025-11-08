@@ -614,10 +614,10 @@ class LabelFrame(ttk.Frame):
 
         # Main container - border style color
         self.container = ttk.Frame(parent, bootstyle=self.border_style)
-        self.container.rowconfigure(1, weight=0)
+        self.container.rowconfigure(0, weight=1)
         self.container.columnconfigure(0, weight=1)
 
-        # Intermediate frame, creates the border, holds the label and the "self" frame
+        # Border definition
         if isinstance(border_width, tuple) or isinstance(border_width, list):
             if len(border_width) == 4:
                 pad_x = border_width[0:2]
@@ -629,6 +629,7 @@ class LabelFrame(ttk.Frame):
             pad_x = border_width
             pad_y = border_width
 
+        # Intermediate frame, creates the border, holds the label and the "self" frame
         frame = ttk.Frame(self.container, bootstyle=self.frame_style)
         frame.grid(row=0, column=0, sticky='nsew', padx=pad_x, pady=pad_y)
         frame.rowconfigure(0, weight=0)
@@ -637,8 +638,9 @@ class LabelFrame(ttk.Frame):
 
         # Label
         if label_text:
-            self.title_label = ttk.Label(frame, text=label_text, bootstyle=self.label_style)
-            self.title_label.grid(row=0, column=0, sticky='nsew')
+            self.title_label = ttk.Label(frame, text=label_text, bootstyle=self.label_style,
+                                         font=('Segoe UI', 8, 'italic'))
+            self.title_label.grid(row=0, column=0, sticky='nsew', padx=(5, 0), pady=(2, 0))
 
         # Self initialization
         super().__init__(frame, bootstyle=self.frame_style, **kwargs)
@@ -670,3 +672,6 @@ class LabelFrame(ttk.Frame):
         self.label_style = f'{bootstyle}.Inverse.TLabel'
         self.configure(bootstyle=self.frame_style)
         self.title_label.configure(bootstyle=self.label_style)
+
+    def set_title_label(self, label_text):
+        self.title_label.configure(text=label_text)

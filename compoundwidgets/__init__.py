@@ -1,4 +1,4 @@
-__version__ = "0.5.11"
+__version__ = "0.5.12"
 __author__ = 'Andre Mariano'
 __all__ = ['AUTOCOMPLETE_WIDGETS',
            'COMPOUND_WIDGETS',
